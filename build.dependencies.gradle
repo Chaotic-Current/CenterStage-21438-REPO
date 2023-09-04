@@ -1,6 +1,11 @@
 repositories {
     mavenCentral()
     google() // Needed for androidx
+
+    // [9-4-23]
+    flatDir {
+        dirs rootProject.file('libs')
+    }
 }
 
 dependencies {
