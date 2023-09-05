@@ -131,3 +131,5 @@ public class DT_TeleOp extends OpMode {
     } // end of reducingDeadzone
 }
 
+//Jacob hitting that griddy on the world stage
+
