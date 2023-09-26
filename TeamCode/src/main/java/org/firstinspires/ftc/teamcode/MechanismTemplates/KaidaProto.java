@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Config
-@TeleOp(name = "KaidaProto")
+@TeleOp(name = "KaidaProto") // like Khaidi No. 150, that's crazy
 public class KaidaProto extends OpMode{
     public static double power = 1;
     private DcMotorEx left; //right;
