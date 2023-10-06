@@ -21,7 +21,7 @@ public class GeckoFlipper extends OpMode {
         gecko.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        //gecko.setDirection(DcMotorSimple.Direction.REVERSE);
+        gecko.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override

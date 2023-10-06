@@ -8,30 +8,25 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Config
-@TeleOp(name = "KaidaProto") // like Khaidi No. 150, that's crazy
-public class KaidaProto extends OpMode{
+@TeleOp(name = "NoodleProto")
+public class NoodleProto extends OpMode {
     public static double power = 1;
-    private DcMotorEx left; //right;
+    private DcMotorEx gecko;
 
     @Override
     public void init(){
-        left = (DcMotorEx) hardwareMap.dcMotor.get("L");
+        gecko = (DcMotorEx) hardwareMap.dcMotor.get("gecko");
         //right = (DcMotorEx) hardwareMap.dcMotor.get("R");
 
-        left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        gecko.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        left.setDirection(DcMotorSimple.Direction.REVERSE);
+        gecko.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-
 
     @Override
     public void loop(){
-        left.setPower(power);
-        //right.setPower(power);
-
+        gecko.setPower(power);
     }
-
-
 
 }
