@@ -22,6 +22,34 @@ public class ColorSensorMech {
             return true;
         return false;
     }
+
+    public boolean redDeviation(double old){
+        if ((color.red() > old + 20) || (color.red() < old - 20))
+            return true;
+        return false;
+    }
+    public boolean blueDeviation(double old){
+        if ((color.blue() > old + 20) || (color.blue() < old - 20))
+            return true;
+        return false;
+    }
+    public boolean greenDeviation(double old){
+        if ((color.green() > old + 20) || (color.green() < old - 20))
+            return true;
+        return false;
+    }
+
+
+    public double getRed(){
+        return color.red();
+    }
+    public double getBlue(){
+        return color.blue();
+    }
+    public double getGreen(){
+        return color.green();
+    }
+
     public void update(Telemetry telemetry){
         telemetry.addData(name + "Red", color.red());
         telemetry.addData(name + "Green", color.green());
@@ -29,5 +57,6 @@ public class ColorSensorMech {
         //telemetry.addData("Alpha", color.alpha());
         telemetry.update();
     }
+
 
 }
