@@ -12,8 +12,24 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
 public class FC_TeleOp_BLUE extends LinearOpMode {
+    public final double TURN_PRECISION = 0.65;
+
+    private final double PRECISIONREDUCTION = 0.39;
+
+    private double getMax(double[] input) {
+        double max = Integer.MIN_VALUE;
+        for (double value : input) {
+            if (Math.abs(value) > max) {
+                max = Math.abs(value);
+            }
+        }
+        return max;
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
+
+
         // Declare our motors
         // Make sure your ID's match your configuration
         DcMotorEx motorFrontLeft = (DcMotorEx) hardwareMap.dcMotor.get("FL");
@@ -45,14 +61,19 @@ public class FC_TeleOp_BLUE extends LinearOpMode {
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
+
         waitForStart();
 
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            double y = -gamepad1.left_stick_y; // Remember, this is reversed!//i reversed it again
-            double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-            double rx = gamepad1.right_stick_x;
+            double y = -reducingDeadzone(gamepad1.left_stick_y); // Remember, this is reversed!//i reversed it again
+            double x = reducingDeadzone(gamepad1.left_stick_x * 1.1); // Counteract imperfect strafing
+            boolean precisionToggle = gamepad1.right_trigger > 0.1;
+            double rx = reducingDeadzone(gamepad1.right_stick_x);
+            if (precisionToggle) {
+                rx *= TURN_PRECISION;
+            }
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
@@ -67,6 +88,8 @@ public class FC_TeleOp_BLUE extends LinearOpMode {
             double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
             double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
+
+
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio, but only when
             // at least one is out of the range [-1, 1]
@@ -76,10 +99,42 @@ public class FC_TeleOp_BLUE extends LinearOpMode {
             double frontRightPower =(rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
-            motorFrontLeft.setPower(frontLeftPower);
-            motorBackLeft.setPower(backLeftPower);
-            motorFrontRight.setPower(frontRightPower);
-            motorBackRight.setPower(backRightPower);
+            double maxValue = getMax(new double[]{
+                    frontLeftPower,
+                    frontRightPower,
+                    backLeftPower,
+                    backRightPower
+            });
+
+            if (maxValue > 1) {
+                frontLeftPower /= maxValue;
+                frontRightPower /= maxValue;
+                backLeftPower /= maxValue;
+                backRightPower /= maxValue;
+            }
+
+            if (precisionToggle) {
+                motorFrontLeft.setPower(frontLeftPower * PRECISIONREDUCTION);
+                motorBackLeft.setPower(backLeftPower * PRECISIONREDUCTION);
+                motorFrontRight.setPower(frontRightPower * PRECISIONREDUCTION);
+                motorBackRight.setPower(backRightPower * PRECISIONREDUCTION);
+            } else {
+                motorFrontLeft.setPower(frontLeftPower);
+                motorBackLeft.setPower(backLeftPower);
+                motorFrontRight.setPower(frontRightPower);
+                motorBackRight.setPower(backRightPower);
+            }
         }
+
+    }
+    public double reducingDeadzone(double x) {
+        if (x == 0) {
+            return 0;
+        } else if (0 < x && 0.25 > x) {
+            return 0.25;
+        } else if (0 > x && x > -0.25) {
+            return -0.25;
+        }
+        return x;
     }
 }
