@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class clawTest extends OpMode {
     private Servo claw; //pin 2
     public double openPos = 0.555;
-    public double startPos = 0.3;
+    public double startPos = 0.32;
     public double halfOpenPos = 0.48;
 
     @Override
