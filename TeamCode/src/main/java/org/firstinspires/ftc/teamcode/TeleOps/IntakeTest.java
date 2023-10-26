@@ -17,8 +17,8 @@ public class IntakeTest extends OpMode {
     private DcMotorEx intake; // pin 0
 
     private Servo left, right; // left -> 0, right -> 1
-    public static double leftPower = 0.74;//moving a dist on 0.06
-    public static double rightPower = 0.26;
+    public static double leftFinalPos = 0.74;//moving a dist on 0.06
+    public static double rightFinalPos = 0.26;
 
     @Override
     public void init() {
@@ -45,8 +45,8 @@ public class IntakeTest extends OpMode {
         }
         if(gamepad1.y){
             telemetry.addData("yea", 1);
-            left.setPosition(leftPower);
-            right.setPosition(rightPower);
+            left.setPosition(leftFinalPos);
+            right.setPosition(rightFinalPos);
         }
         if(gamepad1.b){
             telemetry.addData("idk", 1);
@@ -58,6 +58,3 @@ public class IntakeTest extends OpMode {
 
     }
 }
-
-
-
