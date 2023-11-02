@@ -1,0 +1,20 @@
+package org.firstinspires.ftc.teamcode.Autos;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.Pipelines.DetectAprilTag;
+
+@Autonomous (name = "Screw this")
+public class TestAprilTagMethod extends LinearOpMode {
+    @Override
+    public void runOpMode() throws InterruptedException {
+        DetectAprilTag tag = new DetectAprilTag(hardwareMap, 4);
+
+        telemetry.addData("hello","hey");
+        telemetry.addLine("Tag distance: " + tag.getY());
+        telemetry.update();
+        waitForStart();
+        telemetry.addData("hello","hey");
+    }
+}

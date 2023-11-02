@@ -1,19 +1,21 @@
 package org.firstinspires.ftc.teamcode.Pipelines;
 
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.openftc.easyopencv.OpenCvCamera;
 
 import java.util.List;
 
-public class DetectAprilTag{
+public class DetectAprilTag {
 
     AprilTagProcessor aprilTag;
-    OpenCvCamera camera;
+
+    private int tagOfInterest;
+
+
     private VisionPortal visionPortal;
 
     //static final double FEET_PER_METER = 3.28084;
@@ -26,16 +28,20 @@ public class DetectAprilTag{
     double cx = 402.145;
     double cy = 221.506;
 
+    HardwareMap hardwareMap;
+
     // UNITS ARE METERS
 
 
     int ID_TAG_OF_INTEREST = 18; // Tag ID 18 from the 36h11 family
 
-    public DetectAprilTag(){
+    public DetectAprilTag(HardwareMap hardwareMap, int tagOfInterest) {
+        this.hardwareMap = hardwareMap;
         initAprilTag();
     }
 
-    public double getY(){
+
+    public double getY() {
 
 
         List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -43,15 +49,13 @@ public class DetectAprilTag{
 
         // Step through the list of detections and display info for each one.
         for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : currentDetections) {
-            if (detection.id == 3) {
-               return detection.rawPose.x * 39.3701;
+            if (detection.metadata != null && detection.metadata.id == tagOfInterest) {
+                return detection.ftcPose.x;
             }
         }
 
         return 0;
     }
-
-
 
 
     private void initAprilTag() {
@@ -68,7 +72,7 @@ public class DetectAprilTag{
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
                 // to load a predefined calibration for your camera.
-                //.setLensIntrinsics(fx, fy, cx, cy)
+                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
 
                 // ... these parameters are fx, fy, cx, cy.
 
@@ -77,11 +81,12 @@ public class DetectAprilTag{
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+        // Set the camera (webcam vs. built-in RC phone camera).
 
-        // TODO change this camera resolution
+        builder.setCamera(hardwareMap.get(WebcamName.class, "WebcamFront"));
+
+        // Choose a camera resolution. Not all cameras support all resolutions.
         //builder.setCameraResolution(new Size(640, 480));
-
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableCameraMonitoring(true);
@@ -103,6 +108,6 @@ public class DetectAprilTag{
         // Disable or re-enable the aprilTag processor at any time.
         //visionPortal.setProcessorEnabled(aprilTag, true);
 
-    }
+    }   // end method initAprilTag()
 
 }

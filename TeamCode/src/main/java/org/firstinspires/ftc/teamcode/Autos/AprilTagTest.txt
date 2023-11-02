@@ -1,0 +1,75 @@
+package org.firstinspires.ftc.teamcode.Autos;
+
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.Pipelines.DetectAprilTag;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+
+
+@Config
+@Autonomous(name = "failed")
+public class AprilTagTest extends LinearOpMode {
+
+    private int tagOfInterest = 4;
+
+    private Pose2d x = new Pose2d();
+    private SampleMecanumDrive drive;
+
+    private double correctoin;
+
+    DetectAprilTag detectAprilTag;
+
+    public void initialize() {
+        drive = new SampleMecanumDrive(hardwareMap);
+        detectAprilTag = new DetectAprilTag(hardwareMap, tagOfInterest);
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        initialize();
+
+
+        drive.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
+
+        TrajectorySequence moveForward = drive.trajectorySequenceBuilder(new Pose2d())
+                .forward(5)
+                .waitSeconds(5)
+                .build();
+        correctoin = detectAprilTag.getY();
+
+        x=moveForward.end();
+
+//        TrajectorySequence wait = drive.trajectorySequenceBuilder(x)
+//                .waitSeconds(5)
+//                .build();
+//
+//        x=wait.end();
+
+
+        TrajectorySequence reCorrect = drive.trajectorySequenceBuilder(x)
+                .lineTo(new Vector2d(15, 0))
+                .build();
+
+        waitForStart();
+
+        drive.followTrajectorySequenceAsync(moveForward);
+
+
+        drive.followTrajectorySequenceAsync(reCorrect);
+
+
+        while (opModeIsActive() && !isStopRequested()) {
+            drive.update();
+            telemetry.update();
+            telemetry.addData("Y corection: ",detectAprilTag.getY());
+            telemetry.update();
+            x = new Pose2d(x.getX()+ detectAprilTag.getY(), x.getY(), 0);
+        }
+
+    }
+}
