@@ -33,6 +33,9 @@ public class SlideMotorTest extends OpMode {
         if(gamepad1.right_trigger > 0.14){
             SlideRight.setPower(0.25);
             SlideLeft.setPower(0.25);
+        } else if(gamepad1.left_trigger > 0.14){
+            SlideRight.setPower(-0.25);
+            SlideLeft.setPower(-0.25);
         }
         else{
             SlideLeft.setPower(0);
