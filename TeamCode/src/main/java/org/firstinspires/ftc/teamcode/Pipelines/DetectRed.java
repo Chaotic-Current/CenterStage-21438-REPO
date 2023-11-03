@@ -6,8 +6,10 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvPipeline;
@@ -28,6 +30,7 @@ public class DetectRed extends OpenCvPipeline {
     private double avgColorWidth;
 
     private final int width;//width of the image
+    public int blur = 15;
     private Telemetry telemetry;
     private RedLocation locate;
 
@@ -59,10 +62,13 @@ public class DetectRed extends OpenCvPipeline {
             return input;
         }
 
+        if (blur > 0 && blur % 2 == 1)
+            Imgproc.GaussianBlur(mat, mat, new Size(blur, blur), 35);
+
         // The HSV values for the lower bound of red, and the higher bound of red
         //Values from https://cvexplained.wordpress.com/2020/04/28/color-detection-hsv/#:~:text=The%20HSV%20values%20for%20true,10%20and%20160%20to%20180.
-        Scalar lowBoundRed = new Scalar(0, 100, 100);
-        Scalar highBoundRed = new Scalar(4.35, 255, 255);
+        Scalar lowBoundRed = new Scalar(2, 100, 100);
+        Scalar highBoundRed = new Scalar(4, 255, 255);
 
         Mat thresh = new Mat();
 
@@ -116,8 +122,8 @@ public class DetectRed extends OpenCvPipeline {
          * image to find the relative location of the tape to the image (i.e. towards the left, right, or center)
          */
 
-        double leftImage = 0.05 * width;//the left of the image can be classified as everything bellow this value
-        double rightImage = 0.95 * width;//the right of the image can be classified as everything above this value
+        double leftImage = 0.3 * width;//the left of the image can be classified as everything bellow this value
+        double rightImage = 0.7 * width;//the right of the image can be classified as everything above this value
         //TODO need to tune these values to make sure they actually work and done under or overshoot
 
         boolean left = false;//conditionals for the if statements later
@@ -126,13 +132,30 @@ public class DetectRed extends OpenCvPipeline {
 
 
         //A for loop to determine where the tape is using the contour array length
-        for (int i = 0; i != boundRect.length; i++) {
+       /* for (int i = 0; i != boundRect.length; i++) {
             if (boundRect[i].x < leftImage)
                 left = true;
             if (boundRect[i].x + boundRect[i].width > rightImage)
                 right = true;
 
+        }*/
+
+        double maxArea = -1;
+        int maxContourIdx = -1;
+        for (int i = 0; i < contours.size(); i++) {
+            double area = Imgproc.contourArea(contours.get(i));
+            if (area > maxArea) {
+                maxArea = area;
+                maxContourIdx = i;
+            }
         }
+
+        Point centerPoint = findContourCenter(contours, maxContourIdx);
+
+        if(centerPoint.x<leftImage)
+            left = true;
+        else if(centerPoint.x > rightImage)
+            right = true;
 
         //checking if the object is in the center if it is not on the left, nor right of the image and if the color we want to detect exists in the image
         center = !left && !right && (contours.size() > 0);
@@ -151,6 +174,9 @@ public class DetectRed extends OpenCvPipeline {
         telemetry.update();
 
         telemetry.addData("Location pre run", locate);
+        telemetry.addData("Center location: ", avgColorWidth);
+        telemetry.update();
+
 
         if (!contours.isEmpty()) {
             MatOfPoint contour = null;
@@ -161,8 +187,16 @@ public class DetectRed extends OpenCvPipeline {
             avgColorWidth = moments.get_m10() / moments.get_m00();
         }
 
+        if (!contours.isEmpty()) {
+            Mat resultImage = input.clone();
+            Imgproc.drawContours(resultImage, contours, maxContourIdx, new Scalar(0, 255, 0), 1);
 
-        return edges;  //displaying edges of all red objects cuz i think it looks cool
+
+            return resultImage;
+        }
+
+
+        return scaledMask;  //displaying edges of all red objects cuz i think it looks cool
     }
 
     //A method so that other classes can get the relative location of the tape
@@ -172,5 +206,20 @@ public class DetectRed extends OpenCvPipeline {
 
     public double getDistanceFromMidPoint() {
         return (width/2.0)-avgColorWidth;
+    }
+
+    public Point findContourCenter(List<MatOfPoint> contours, int i) {
+        if (!contours.isEmpty()) {
+            MatOfPoint select = contours.get(i);
+
+            Moments moments = Imgproc.moments(select);
+
+            double x = moments.m10 / moments.m00;
+            double y = moments.m01 / moments.m00;
+
+            return new Point(x, y);
+        }
+
+        return null;
     }
 }
