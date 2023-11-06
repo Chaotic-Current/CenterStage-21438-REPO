@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
+
 public class SlideMech {
 
     private PIDFController slidePIDF;
@@ -20,18 +21,25 @@ public class SlideMech {
     public static double LOW_JUNCTION = 1880;  //<-- 12.90V, 1860;
     public static double ZERO_POSITION = 8;//5V;
     private final double MAX = 2500;
+    public final static double Minimum = 0;
 
-    public static double slideKp = 0.0015; //0.00326; //0.0039;
-    public static double slideKpManualDown = 0.027; // 0.007 old val
-    public static double slideKi = 0.000000325; //0.00000325;
-    public static double slideKd = 0.000000062; //0.000001;
-    public static double slideKf = 0.000069; //0.000069;
+    public static double slideKp = 0.00001; //0.00326; //0.0039;
+    public static double slideKpManualDown = 0.00; // 0.007 old val
+    public static double slideKi = 0.0000000; //0.00000325;
+    public static double slideKd = 0.000000; //0.000001;
+    public static double slideKf = 0.00000; //0.000069;
 
     private final double[] PIDF_COFFECIENTS = {slideKp, slideKi, slideKd, slideKf};
 
     private double targetPos;
     double correctionLeft;
     double correctionRight;
+
+    public enum CurrentPosition{
+        ZERO,LEVEl1,LEVEL2,LEVEL3,LEVEL4,CUSTOM
+    }
+
+    private CurrentPosition currentPosition;
 
     public SlideMech(HardwareMap hardwareMap) {
         slideLeft = new Motor(hardwareMap, "SL", Motor.GoBILDA.RPM_312); // Pin 0 on expansion hub
@@ -59,14 +67,14 @@ public class SlideMech {
         slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
         correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
         correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
-        /*
+
        telemetry.addData("targetPosition: ", targetPos);
         telemetry.addData("Right motor position: ", slideRight.getCurrentPosition());
         telemetry.addData("Left motor position: ", slideLeft.getCurrentPosition());
         telemetry.addData("Left correction: ", correctionLeft);
         telemetry.addData("Right correction: ", correctionRight);
         telemetry.update();
-         */
+
 
 
         // sets the output power of the motor
@@ -76,18 +84,22 @@ public class SlideMech {
 
     public void setIntakeOrGround() {
         targetPos = ZERO_POSITION;
+        currentPosition = CurrentPosition.ZERO;
     }
 
     public void setLowJunction() {
         targetPos = LOW_JUNCTION;
+        currentPosition = CurrentPosition.LEVEl1;
     }
 
     public void setMidJunction() {
         targetPos = MID_JUNCTION;
+        currentPosition = CurrentPosition.LEVEL2;
     }
 
     public void setHighJunction(Telemetry telemetry) {
         targetPos = HIGH_JUNCTION;
+        currentPosition = CurrentPosition.LEVEL4;
         telemetry.addLine("high");
         telemetry.update();
     }
@@ -100,6 +112,11 @@ public class SlideMech {
         if(increment < 0){
             slidePIDF.setPIDF(slideKpManualDown, slideKi, slideKd, slideKf);
         }
+        currentPosition = CurrentPosition.CUSTOM;
+    }
+
+    public CurrentPosition getCurrentPosition(){
+        return currentPosition;
     }
 
     public void setCustom(int custom) {

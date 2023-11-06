@@ -6,10 +6,24 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@TeleOp (name = "눈_눈")
+import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
+
+@TeleOp (name = "CS_TeleOpRobotBased")
 public class DT_TeleOp extends OpMode {
     // (づ￣ 3￣)づ hellohello
     private DcMotorEx motorFrontLeft, motorBackLeft, motorFrontRight, motorBackRight;
+    private SlideMech slides;
+    private IntakeMec intake;
+    private ClawMech claw;
+    SignalEdgeDetector gamepad_2_B = new SignalEdgeDetector(()-> gamepad2.b);
+    SignalEdgeDetector gamepad_2_A = new SignalEdgeDetector(() -> gamepad2.a);
+    SignalEdgeDetector gamepad_2_Y = new SignalEdgeDetector(() -> gamepad2.y);
+    SignalEdgeDetector gamepad_1_A = new SignalEdgeDetector(() -> gamepad1.a);
+    SignalEdgeDetector gamepad_1_B = new SignalEdgeDetector(() -> gamepad2.b);
+    SignalEdgeDetector gamePad_1_X = new SignalEdgeDetector(() -> gamepad2.x);
     private final double PRECISIONREDUCTION = 0.39;
     private final double TURN_PRECESION = 0.65;
 
@@ -52,25 +66,40 @@ public class DT_TeleOp extends OpMode {
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        slides = new SlideMech(hardwareMap);
 
+        intake = new IntakeMec(hardwareMap,telemetry,gamepad_2_Y,gamepad_2_B, gamepad2);
+
+        claw = new ClawMech(hardwareMap,telemetry,gamepad_1_A,gamepad_1_B,gamePad_1_X);
     }
 
 
     @Override
     public void loop(){
+
+
+        claw.run();
+        intake.run();
+      //  slides.update(telemetry);
+        gamepad_2_A.update();
+        gamepad_2_B.update();
+        gamepad_2_Y.update();
         drive();
-        
+        telemetry.update();
     }
 
 
     public void drive(){
         double y = -gamepad1.left_stick_y; // Remember, this is reversed!
-        double x = gamepad1.left_stick_x;
+        double x = reducingDeadzone(gamepad1.left_stick_x);
         boolean precisionToggle = gamepad1.right_trigger > 0.1;
         double rx = -gamepad1.right_stick_x * 0.75;
         if (precisionToggle) {
             rx *= TURN_PRECESION;
         }
+
+        /*if(1-Math.abs(x) <= 0.25)
+            x = (1/Math.abs(x)) * x;*/
 
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio, but only when
@@ -116,6 +145,10 @@ public class DT_TeleOp extends OpMode {
             motorFrontRight.setPower(frontRightPower);
             motorBackRight.setPower(backRightPower);
         }
+        telemetry.addData("Motor power FL", motorFrontLeft.getPower());
+        telemetry.addData("Motor power BL", motorBackLeft.getPower());
+        telemetry.addData("Motor power FR", motorFrontRight.getPower());
+        telemetry.addData("Motor power BR", motorBackRight.getPower());
     }// end of drive()
 
 
