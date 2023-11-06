@@ -25,7 +25,7 @@ public class ClawRealign {
 
 
     public ClawRealign(HardwareMap hardwareMap, Telemetry telemetry, SignalEdgeDetector Gamepad1_Options){
-        servo =hardwareMap.get(Servo.class, "servo");
+        servo =hardwareMap.get(Servo.class, "WRIST");
         servo.setPosition(servoPosition);
 
         // Retrieve the IMU from the hardware map

@@ -5,7 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.checkerframework.checker.units.qual.A;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMec;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
@@ -18,12 +21,14 @@ public class DT_TeleOp extends OpMode {
     private SlideMech slides;
     private IntakeMec intake;
     private ClawMech claw;
+    private ArmMec arm;
     SignalEdgeDetector gamepad_2_B = new SignalEdgeDetector(()-> gamepad2.b);
     SignalEdgeDetector gamepad_2_A = new SignalEdgeDetector(() -> gamepad2.a);
     SignalEdgeDetector gamepad_2_Y = new SignalEdgeDetector(() -> gamepad2.y);
-    SignalEdgeDetector gamepad_1_A = new SignalEdgeDetector(() -> gamepad1.a);
-    SignalEdgeDetector gamepad_1_B = new SignalEdgeDetector(() -> gamepad2.b);
-    SignalEdgeDetector gamePad_1_X = new SignalEdgeDetector(() -> gamepad2.x);
+    SignalEdgeDetector gamePad_1_Y = new SignalEdgeDetector(() -> gamepad1.y);
+    SignalEdgeDetector gamePad_1_Up = new SignalEdgeDetector(() -> gamepad1.dpad_up);
+    SignalEdgeDetector gamePad_2_bumperRight = new SignalEdgeDetector(() -> gamepad2.right_bumper);
+    SignalEdgeDetector gamePad_2_bumperLeft = new SignalEdgeDetector(() -> gamepad2.left_bumper);
     private final double PRECISIONREDUCTION = 0.39;
     private final double TURN_PRECESION = 0.65;
 
@@ -63,35 +68,50 @@ public class DT_TeleOp extends OpMode {
 
 
         // Reverse motors
+        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         slides = new SlideMech(hardwareMap);
 
-        intake = new IntakeMec(hardwareMap,telemetry,gamepad_2_Y,gamepad_2_B, gamepad2);
+        intake = new IntakeMec(hardwareMap,telemetry,gamepad_2_Y,gamepad_2_B, gamePad_2_bumperRight, gamePad_2_bumperLeft, gamepad2);
 
-        claw = new ClawMech(hardwareMap,telemetry,gamepad_1_A,gamepad_1_B,gamePad_1_X);
+        claw = new ClawMech(hardwareMap,telemetry,gamepad1);
+
+        arm = new ArmMec(hardwareMap,telemetry,gamepad1);
     }
 
 
     @Override
     public void loop(){
 
+        if(gamePad_1_Y.isRisingEdge()){
+            slides.setMidJunction();
+        }
+
+        if(gamePad_1_Up.isRisingEdge()){
+            slides.setIntakeOrGround();
+        }
+
 
         claw.run();
         intake.run();
-      //  slides.update(telemetry);
+        slides.update(telemetry);
+        drive();
+        arm.run();
         gamepad_2_A.update();
         gamepad_2_B.update();
         gamepad_2_Y.update();
-        drive();
+        gamePad_1_Y.update();
+        gamePad_1_Up.update();
+        gamePad_2_bumperLeft.update();
+        gamePad_2_bumperRight.update();
         telemetry.update();
     }
 
 
     public void drive(){
         double y = -gamepad1.left_stick_y; // Remember, this is reversed!
-        double x = reducingDeadzone(gamepad1.left_stick_x);
+        double x = -reducingDeadzone(gamepad1.left_stick_x);
         boolean precisionToggle = gamepad1.right_trigger > 0.1;
         double rx = -gamepad1.right_stick_x * 0.75;
         if (precisionToggle) {
@@ -145,10 +165,10 @@ public class DT_TeleOp extends OpMode {
             motorFrontRight.setPower(frontRightPower);
             motorBackRight.setPower(backRightPower);
         }
-        telemetry.addData("Motor power FL", motorFrontLeft.getPower());
+       /* telemetry.addData("Motor power FL", motorFrontLeft.getPower());
         telemetry.addData("Motor power BL", motorBackLeft.getPower());
         telemetry.addData("Motor power FR", motorFrontRight.getPower());
-        telemetry.addData("Motor power BR", motorBackRight.getPower());
+        telemetry.addData("Motor power BR", motorBackRight.getPower());*/
     }// end of drive()
 
 

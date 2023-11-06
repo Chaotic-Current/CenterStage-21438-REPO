@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.MechanismTemplates;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -12,39 +13,42 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ClawMech {
     private Servo claw; //pin 2
     private Telemetry telemetry;
-    public double openPos = 0.555;
-    public double startPos = 0.32;
+    public static double openPos = 0.555;
+    public static double startPos = 0.32;
     private SignalEdgeDetector buttonA, buttonB, buttonX;
-    public double halfOpenPos = 0.48;
+    public static double halfOpenPos = 0.48;
 
 
-    public ClawMech(HardwareMap hardwareMap, Telemetry telemetry, SignalEdgeDetector buttonA, SignalEdgeDetector buttonB, SignalEdgeDetector buttonX) {
+
+    public ClawMech(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
         claw = hardwareMap.get(Servo.class, "CLAW");
         claw.setPosition(startPos); // start position
 
         this.telemetry = telemetry;
 
-        this.buttonB = buttonB;
-        this.buttonX = buttonX;
-        this.buttonA = buttonA;
+        buttonA = new SignalEdgeDetector(() -> gamepad.a);
+        buttonB = new SignalEdgeDetector(() -> gamepad.b);
+        buttonX = new SignalEdgeDetector(() -> gamepad.x);
+
         }
 
 
     public void run(){
         if(buttonA.isRisingEdge()){
-            //telemetry.addData("open", 1);
+            telemetry.addData("open", 1);
             claw.setPosition(openPos);
         }
-        if(buttonX.isRisingEdge()){//back to start
-            //telemetry.addData("close", 1);
+        if(buttonX.isFallingEdge()){//back to start
+            telemetry.addData("close", 1);
             claw.setPosition(startPos);
         }
         if(buttonB.isRisingEdge()){
-            //telemetry.addData("halfway", 1);
+            telemetry.addData("halfway", 1);
             claw.setPosition(halfOpenPos);
         }
 
-        telemetry.update();
-
+    buttonX.update();
+    buttonA.update();
+    buttonB.update();
     }
 }

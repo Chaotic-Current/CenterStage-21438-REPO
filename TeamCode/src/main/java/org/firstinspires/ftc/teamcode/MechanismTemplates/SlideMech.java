@@ -19,13 +19,14 @@ public class SlideMech {
     public static double HIGH_JUNCTION = 2020; //<-- 12.90V, 1970;
     public static double MID_JUNCTION = 890; //<-- 12.90V, 1550;
     public static double LOW_JUNCTION = 1880;  //<-- 12.90V, 1860;
-    public static double ZERO_POSITION = 8;//5V;
+    public static double ZERO_POSITION = -105;//5V;
     private final double MAX = 2500;
     public final static double Minimum = 0;
 
-    public static double slideKp = 0.00001; //0.00326; //0.0039;
+    public static double slideKp = 0.00065; //0.00326; //0.0039;
+    public static double slideKpDown = 0.00095;
     public static double slideKpManualDown = 0.00; // 0.007 old val
-    public static double slideKi = 0.0000000; //0.00000325;
+    public static double slideKi = 0.0006; //0.00000325;
     public static double slideKd = 0.000000; //0.000001;
     public static double slideKf = 0.00000; //0.000069;
 
@@ -61,10 +62,12 @@ public class SlideMech {
     }
 
     public void update(Telemetry telemetry) {
-      /*  if(targetPos == ZERO_POSITION && ){
-        slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
-        }else {*/
-        slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
+        int avg = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
+        if( avg > targetPos){
+            slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
+        }else {
+            slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
+        }
         correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
         correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
 

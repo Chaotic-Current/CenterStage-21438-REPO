@@ -28,7 +28,7 @@ public class SlideTest extends OpMode {
         SL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         SR.setDirection(DcMotorSimple.Direction.REVERSE);
-        SL.setDirection(DcMotorSimple.Direction.REVERSE);
+       // SL.setDirection(DcMotorSimple.Direction.REVERSE);
 
     }
 
