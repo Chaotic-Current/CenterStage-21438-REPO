@@ -35,11 +35,11 @@ public class SlideTest extends OpMode {
     @Override
     public void loop() {
         if(gamepad1.right_trigger > 0.2){
-            SR.setPower(0.3);
-            SR.setPower(0.3);
+            SR.setPower(0.6);
+            SR.setPower(0.6);
         }else if(gamepad1.left_trigger > 0.2){
-            SR.setPower(-0.3);
-            SL.setPower(-0.3);
+            SR.setPower(-0.6);
+            SL.setPower(-0.6);
         }
         else{
             SR.setPower(0);
