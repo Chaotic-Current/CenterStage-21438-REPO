@@ -121,7 +121,7 @@ public class DT_TeleOp extends OpMode {
         /*if(1-Math.abs(x) <= 0.25)
             x = (1/Math.abs(x)) * x;*/
 
-        // Denominator is the largest motor power (absolute value) or 1
+        // Denominator is the largest motor power (absolute value) or 1z
         // This ensures all the powers maintain the same ratio, but only when
         // at least one is out of the range [-1, 1]
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);

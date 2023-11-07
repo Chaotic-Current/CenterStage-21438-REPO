@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOps;/* Copyright (c) 2023 FIRST. All rights reserved.
+package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;/* Copyright (c) 2023 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided that
