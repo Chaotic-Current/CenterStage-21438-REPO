@@ -6,9 +6,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMec;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
@@ -21,7 +23,7 @@ public class DT_TeleOp extends OpMode {
     private SlideMech slides;
     private IntakeMec intake;
     private ClawMech claw;
-    private ArmMec arm;
+    private ArmPID arm;
     SignalEdgeDetector gamepad_2_B = new SignalEdgeDetector(()-> gamepad2.b);
     SignalEdgeDetector gamepad_2_A = new SignalEdgeDetector(() -> gamepad2.a);
     SignalEdgeDetector gamepad_2_Y = new SignalEdgeDetector(() -> gamepad2.y);
@@ -77,7 +79,7 @@ public class DT_TeleOp extends OpMode {
 
         claw = new ClawMech(hardwareMap,telemetry,gamepad1);
 
-        arm = new ArmMec(hardwareMap,telemetry,gamepad1);
+        arm = new ArmPID(hardwareMap);
     }
 
 
@@ -97,7 +99,8 @@ public class DT_TeleOp extends OpMode {
         intake.run();
         slides.update(telemetry);
         drive();
-        arm.run();
+        ElapsedTime timer = new ElapsedTime();
+        arm.update(telemetry, timer);
         gamepad_2_A.update();
         gamepad_2_B.update();
         gamepad_2_Y.update();

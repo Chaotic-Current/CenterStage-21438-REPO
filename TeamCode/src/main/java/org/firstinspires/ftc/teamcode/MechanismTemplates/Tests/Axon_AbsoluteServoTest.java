@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 
 @TeleOp(name = "AbsoluteServoTest")
 public class Axon_AbsoluteServoTest extends OpMode {
@@ -17,7 +18,9 @@ public class Axon_AbsoluteServoTest extends OpMode {
     AnalogInput axonAnalogOutput;
     CRServo axon;
 
+    ArmPID arm;
 
+    double correctedAngle;
 
 
 
@@ -27,20 +30,23 @@ public class Axon_AbsoluteServoTest extends OpMode {
         axon = hardwareMap.get(CRServo.class, "axon");
         axonAnalogOutput = hardwareMap.analogInput.get("axonSensor");
 
+        arm = new ArmPID(hardwareMap);
+
 
     }
 
 
     @Override
     public void loop() {
+
+        if(hardwareMap.analogInput.get("axonSensor").getVoltage() < 0.6){
+            correctedAngle =  Math.abs(axonAnalogOutput.getVoltage() - 0.6)/3.3 * 360;
+        } else{
+            correctedAngle =  (Math.abs(axonAnalogOutput.getVoltage() - 3.3)/3.3 * 360 + (0.6/3.3 * 360));
+        }
         telemetry.addData("Servo Voltage : ", axonAnalogOutput.getVoltage());
         telemetry.addData("Servo Position : ", axonAnalogOutput.getVoltage()/3.3 * 360);
-
-
-            telemetry.addData("Running",1);
-            axon.setPower(0.2);
-
-
+        telemetry.addData("Corrected Position", correctedAngle);
 
         telemetry.update();
     }
