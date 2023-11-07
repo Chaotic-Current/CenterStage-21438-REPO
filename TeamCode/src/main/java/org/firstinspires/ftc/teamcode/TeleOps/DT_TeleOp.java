@@ -110,10 +110,10 @@ public class DT_TeleOp extends OpMode {
 
 
     public void drive(){
-        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
-        double x = -reducingDeadzone(gamepad1.left_stick_x);
+        double y = -gamepad1.left_stick_y;
+        double rx = -reducingDeadzone(gamepad1.left_stick_x); // 👌
         boolean precisionToggle = gamepad1.right_trigger > 0.1;
-        double rx = -gamepad1.right_stick_x * 0.75;
+        double x = -gamepad1.right_stick_x * 0.75; // 👌
         if (precisionToggle) {
             rx *= TURN_PRECESION;
         }
