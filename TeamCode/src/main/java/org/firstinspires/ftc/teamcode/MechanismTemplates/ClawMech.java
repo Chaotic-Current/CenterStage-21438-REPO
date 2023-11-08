@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ClawMech {
     private Servo claw; //pin 2
     private Telemetry telemetry;
-    public static double openPos = 0.555;
+    public static double openPos = 0.51;
     public static double startPos = 0.32;
     private SignalEdgeDetector buttonA, buttonB, buttonX;
     public static double halfOpenPos = 0.48;
@@ -22,7 +22,7 @@ public class ClawMech {
 
     public ClawMech(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
         claw = hardwareMap.get(Servo.class, "CLAW");
-        claw.setPosition(startPos); // start position
+        claw.setPosition(openPos); // start position
 
         this.telemetry = telemetry;
 
@@ -30,6 +30,9 @@ public class ClawMech {
         buttonB = new SignalEdgeDetector(() -> gamepad.b);
         buttonX = new SignalEdgeDetector(() -> gamepad.x);
 
+        }
+        public void initialize(){
+            claw.setPosition(halfOpenPos);
         }
 
 
@@ -46,6 +49,7 @@ public class ClawMech {
             telemetry.addData("halfway", 1);
             claw.setPosition(halfOpenPos);
         }
+
 
     buttonX.update();
     buttonA.update();

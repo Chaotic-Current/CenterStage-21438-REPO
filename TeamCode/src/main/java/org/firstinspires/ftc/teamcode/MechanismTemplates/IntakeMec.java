@@ -20,8 +20,8 @@ public class IntakeMec  {
     private Servo left, right; // left -> 0, right -> 1
     private SignalEdgeDetector buttonY,buttonB, bumperLeft, bumperRight;
     private Gamepad gamepad2;
-    public static double leftFinalPos = 0.76;//moving a dist on 0.06
-    public static double rightFinalPos = 0.24;
+    public static double leftFinalPos = 0.74;//moving a dist on 0.06
+    public static double rightFinalPos = 0.26;
     public static double leftFinalUp = 0.9;
     public static double rightFinaUp = 0.1;
 
@@ -56,9 +56,9 @@ public class IntakeMec  {
 
     public void run() {
         if(gamepad2.right_trigger > 0.1) {
-            intake.setPower(0.4);
+            intake.setPower(0.6);
         }else if(gamepad2.left_trigger > 0.1){
-            intake.setPower(-.6);
+            intake.setPower(-.8);
         }else{
             intake.setPower(0);
         }

@@ -14,14 +14,17 @@ public class ArmPID {
     private PIDFController armPIDF;
     private CRServo arm;
     private HardwareMap hardwareMap;
-    public static double armKpUp = 0.0000001; // old is 0.012
-    public static double armKpDown = 0.000001;
+
+    public static double armKpUp = -0.0000001; // old is 0.012
+    public static double armKpDown = -0.000001;
     public static double armKi = 0;
     public static double armKd = 0;
     public static double armKf = 0;
     public static double EXTAKE_POS = 120; // 180 old val; in degrees of absolute encoder
     public static double INTAKE_POS = 64; // 65 old val
-    public static double targetPos = 255;
+    public static double targetPos = 315;
+
+    public static double pow = 0.006;
     private double lastError = 0;
 
 
@@ -29,6 +32,7 @@ public class ArmPID {
         this.hardwareMap = hardwareMap;
         arm = new CRServo(hardwareMap,"axon");
         armPIDF = new PIDFController(armKpUp, armKi, armKd, armKf);
+        targetPos= 23;
     }
 
     public void update(Telemetry telemetry, ElapsedTime timer) {
@@ -45,9 +49,11 @@ public class ArmPID {
         double derivitve = (error - lastError)/timer.seconds();
 
         if(getArmPosition() < targetPos){
-            arm.set(error * 0.2 + derivitve * armKd) ;
+            arm.set(error * pow + derivitve * armKd) ;
+            timer.reset();
         } else if (getArmPosition() > targetPos){
-            arm.set(error * -0.2 + derivitve * armKd);
+            arm.set(error * -pow + derivitve * armKd);
+            timer.reset();
         }
 
         lastError = error;
@@ -79,10 +85,10 @@ public class ArmPID {
 
 
     private double getArmPosition() {
-        if(hardwareMap.analogInput.get("axonSensor").getVoltage() < 0.6){
-            return Math.abs(hardwareMap.analogInput.get("axonSensor").getVoltage() - 0.6)/3.3 * 360;
+        if(hardwareMap.analogInput.get("axonSensor").getVoltage() < 0.8){
+            return Math.abs(hardwareMap.analogInput.get("axonSensor").getVoltage() - 0.8)/3.3 * 360;
         } else{
-            return (Math.abs(hardwareMap.analogInput.get("axonSensor").getVoltage() - 3.3)/3.3 * 360 + (0.6/3.3 * 360));
+            return (Math.abs(hardwareMap.analogInput.get("axonSensor").getVoltage() - 3.3)/3.3 * 360 + (0.8/3.3 * 360));
         }
         //return (int)((hardwareMap.analogInput.get("axonSensor").getVoltage()/3.3) * 360);
     }

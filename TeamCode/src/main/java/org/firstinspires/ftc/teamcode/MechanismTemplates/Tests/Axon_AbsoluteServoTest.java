@@ -39,10 +39,10 @@ public class Axon_AbsoluteServoTest extends OpMode {
     @Override
     public void loop() {
 
-        if(hardwareMap.analogInput.get("axonSensor").getVoltage() < 0.6){
-            correctedAngle =  Math.abs(axonAnalogOutput.getVoltage() - 0.6)/3.3 * 360;
+        if(hardwareMap.analogInput.get("axonSensor").getVoltage() < 0.8){
+            correctedAngle =  Math.abs(axonAnalogOutput.getVoltage() - 0.8)/3.3 * 360;
         } else{
-            correctedAngle =  (Math.abs(axonAnalogOutput.getVoltage() - 3.3)/3.3 * 360 + (0.6/3.3 * 360));
+            correctedAngle =  (Math.abs(axonAnalogOutput.getVoltage() - 3.3)/3.3 * 360 + (0.8/3.3 * 360));
         }
         telemetry.addData("Servo Voltage : ", axonAnalogOutput.getVoltage());
         telemetry.addData("Servo Position : ", axonAnalogOutput.getVoltage()/3.3 * 360);

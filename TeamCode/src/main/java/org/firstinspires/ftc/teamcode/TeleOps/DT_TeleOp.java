@@ -78,6 +78,7 @@ public class DT_TeleOp extends OpMode {
         intake = new IntakeMec(hardwareMap,telemetry,gamepad_2_Y,gamepad_2_B, gamePad_2_bumperRight, gamePad_2_bumperLeft, gamepad2);
 
         claw = new ClawMech(hardwareMap,telemetry,gamepad1);
+        //claw.initialize();
 
         arm = new ArmPID(hardwareMap);
     }
