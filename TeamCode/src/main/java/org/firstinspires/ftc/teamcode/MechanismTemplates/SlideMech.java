@@ -17,9 +17,9 @@ public class SlideMech {
 
     //TODO: change values into actual tested positions instead of placeholders
     public static double HIGH_JUNCTION = 2020; //<-- 12.90V, 1970;
-    public static double MID_JUNCTION = 890; //<-- 12.90V, 1550;
+    public static double MID_JUNCTION = 1090; //<-- 12.90V, 1550;// old 890 as of 11/8/2023
     public static double LOW_JUNCTION = 1880;  //<-- 12.90V, 1860;
-    public static double ZERO_POSITION = -105;//5V;
+    public static double ZERO_POSITION = -125;//5V;// old val -105
     private final double MAX = 2500;
     public final static double Minimum = 0;
 

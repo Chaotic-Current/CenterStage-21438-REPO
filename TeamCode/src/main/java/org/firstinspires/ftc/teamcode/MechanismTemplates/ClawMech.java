@@ -16,7 +16,7 @@ public class ClawMech {
     public static double openPos = 0.51;
     public static double startPos = 0.32;
     private SignalEdgeDetector buttonA, buttonB, buttonX;
-    public static double halfOpenPos = 0.48;
+    public static double halfOpenPos = 0.45;
 
 
 

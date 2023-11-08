@@ -95,6 +95,14 @@ public class DT_TeleOp extends OpMode {
             slides.setIntakeOrGround();
         }
 
+        if(gamepad1.dpad_left){
+            arm.setIntake();
+        }
+
+        if(gamepad1.dpad_right){
+            arm.setExtake(0.0);
+        }
+
 
         claw.run();
         intake.run();

@@ -15,16 +15,18 @@ public class ArmPID {
     private CRServo arm;
     private HardwareMap hardwareMap;
 
-    public static double armKpUp = -0.0000001; // old is 0.012
-    public static double armKpDown = -0.000001;
+    public static double armKpUp = 0.0015; // old is 0.012
+    public static double armKpDown = 0.003;
     public static double armKi = 0;
     public static double armKd = 0;
     public static double armKf = 0;
-    public static double EXTAKE_POS = 120; // 180 old val; in degrees of absolute encoder
-    public static double INTAKE_POS = 64; // 65 old val
-    public static double targetPos = 315;
+    public static double EXTAKE_POS = 305; // 180 old val; in degrees of absolute encoder//120 old val//315 old val
+    public static double INTAKE_POS = 32; // 65 old val//64 old val//28 old val
+    public static double targetPos;
 
     public static double pow = 0.006;
+    public static double powUP = 0.006;//0.006;
+    public static double powDOWN = 0.0009;
     private double lastError = 0;
 
 
@@ -36,14 +38,18 @@ public class ArmPID {
     }
 
     public void update(Telemetry telemetry, ElapsedTime timer) {
-        /*
+
         double correction = armPIDF.calculate(getArmPosition(), targetPos);
        telemetry.addData("Correction: ", correction);
         telemetry.addData("Target Position: ", targetPos);
         telemetry.addData("Motor Position: ", getArmPosition());
         telemetry.update();
-        arm.set(correction); // sets a PID-tuned voltage for the arm motor
-        */
+        arm.set(correction);
+        if(getArmPosition() >285){
+            armPIDF.setP(0.006);
+        }
+        // sets a PID-tuned voltage for the arm motor
+        /*
         double error = Math.abs(getArmPosition() - targetPos);
 
         double derivitve = (error - lastError)/timer.seconds();
@@ -51,10 +57,14 @@ public class ArmPID {
         if(getArmPosition() < targetPos){
             arm.set(error * pow + derivitve * armKd) ;
             timer.reset();
+            if(getArmPosition() > 250){
+                pow = 0.0008;
+            }
         } else if (getArmPosition() > targetPos){
-            arm.set(error * -pow + derivitve * armKd);
+            arm.set(error * pow - + derivitve * armKd);
             timer.reset();
         }
+
 
         lastError = error;
 
@@ -93,13 +103,19 @@ public class ArmPID {
         //return (int)((hardwareMap.analogInput.get("axonSensor").getVoltage()/3.3) * 360);
     }
 
-    public void setExtake() {
+    public void setExtake(double poww) {
         armPIDF.setPIDF(armKpUp, armKi, armKd, armKf);
+        pow =powUP;
         targetPos = EXTAKE_POS;
+        if(getArmPosition() > 150){
+            pow = poww;
+        }
     }
     public void setIntake() {
         armPIDF.setPIDF(armKpDown, armKi, armKd, armKf);
+        pow = -powDOWN;
         targetPos = INTAKE_POS;
+
     }
 
     public void setCustom(int custom) {
