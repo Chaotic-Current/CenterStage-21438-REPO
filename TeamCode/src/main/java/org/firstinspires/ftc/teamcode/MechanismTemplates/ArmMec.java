@@ -45,6 +45,7 @@ public class ArmMec {
         armRight.setPosition(intakePositionR);
     }
 
+
     public void run(){
         if(dpadLeft.isRisingEdge())
             setPositionExtake();
@@ -53,6 +54,7 @@ public class ArmMec {
 
         dpadRight.update();
         dpadLeft.update();
+
     }
 
 }

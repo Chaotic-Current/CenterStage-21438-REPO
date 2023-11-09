@@ -118,6 +118,17 @@ public class ArmPID {
 
     }
 
+    public boolean isIntakePosition;
+
+    public void setExtakeOrIntake() { // would be used at the beginning of the goToJunction method in the arm class, for example
+        if (isIntakePosition) {
+            setExtake(0.0);
+        } else { // if the wrist is in the extake position, switch it back to the intake position so it can pick up cones
+            setIntake();
+        }
+        isIntakePosition = !isIntakePosition;
+    }
+
     public void setCustom(int custom) {
         armPIDF.setPIDF(armKpUp, armKi, armKd, armKf);
         targetPos = custom;

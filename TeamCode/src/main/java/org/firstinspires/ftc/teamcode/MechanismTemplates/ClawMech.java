@@ -26,8 +26,8 @@ public class ClawMech {
 
         this.telemetry = telemetry;
 
-        buttonA = new SignalEdgeDetector(() -> gamepad.a);
-        buttonB = new SignalEdgeDetector(() -> gamepad.b);
+//        buttonA = new SignalEdgeDetector(() -> gamepad.a);
+//        buttonB = new SignalEdgeDetector(() -> gamepad.b);
         buttonX = new SignalEdgeDetector(() -> gamepad.x);
 
         }
@@ -35,24 +35,43 @@ public class ClawMech {
             claw.setPosition(halfOpenPos);
         }
 
+        public int toggleCount = 2;
 
     public void run(){
-        if(buttonA.isRisingEdge()){
-            telemetry.addData("open", 1);
-            claw.setPosition(openPos);
-        }
-        if(buttonX.isFallingEdge()){//back to start
-            telemetry.addData("close", 1);
-            claw.setPosition(startPos);
-        }
-        if(buttonB.isRisingEdge()){
-            telemetry.addData("halfway", 1);
+//        if(buttonA.isRisingEdge()){
+//            telemetry.addData("open", 1);
+//            claw.setPosition(openPos);
+//        }
+//        if(buttonB.isFallingEdge()){//back to start
+//            telemetry.addData("close", 1);
+//            claw.setPosition(startPos);
+//        }
+//        if(buttonX.isRisingEdge()){
+//            telemetry.addData("halfway", 1);
+//            claw.setPosition(halfOpenPos);
+//        }
+
+        if(buttonX.isRisingEdge()){
+            if(toggleCount == 1){
+                telemetry.addData("halfway", 1);
             claw.setPosition(halfOpenPos);
+            toggleCount++;
+            }
+            else if(toggleCount == 2){
+                telemetry.addData("open", 1);
+            claw.setPosition(openPos);
+            toggleCount++;
+            }
+            else{
+                telemetry.addData("close", 1);
+            claw.setPosition(startPos);
+            toggleCount-=2;
+            }
         }
 
 
     buttonX.update();
-    buttonA.update();
-    buttonB.update();
+//    buttonA.update();
+//    buttonB.update();
     }
 }

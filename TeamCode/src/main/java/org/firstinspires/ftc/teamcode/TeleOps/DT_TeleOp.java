@@ -30,6 +30,7 @@ public class DT_TeleOp extends OpMode {
     SignalEdgeDetector gamePad_1_Y = new SignalEdgeDetector(() -> gamepad1.y);
     SignalEdgeDetector gamePad_1_Up = new SignalEdgeDetector(() -> gamepad1.dpad_up);
     SignalEdgeDetector gamePad_2_bumperRight = new SignalEdgeDetector(() -> gamepad2.right_bumper);
+    SignalEdgeDetector gamePad_1_bumperRight = new SignalEdgeDetector(() -> gamepad1.right_bumper);
     SignalEdgeDetector gamePad_2_bumperLeft = new SignalEdgeDetector(() -> gamepad2.left_bumper);
     private final double PRECISIONREDUCTION = 0.39;
     private final double TURN_PRECESION = 0.65;
@@ -95,13 +96,26 @@ public class DT_TeleOp extends OpMode {
             slides.setIntakeOrGround();
         }
 
-        if(gamepad1.dpad_left){
-            arm.setIntake();
+//        if(gamepad1.dpad_left){
+//            arm.setIntake();
+//        }
+//
+//        if(gamepad1.dpad_right){
+//            arm.setExtake(0.0);
+//        }
+
+        if(gamePad_1_bumperRight.isRisingEdge()){
+            arm.setExtakeOrIntake();
         }
 
-        if(gamepad1.dpad_right){
-            arm.setExtake(0.0);
-        }
+
+//        if (gamepad1.right_trigger > 0.1){
+//            slides.setManualSlide(400); //165 old val
+//        }
+
+//        if (gamepad1.left_trigger > 0.1){
+//            slides.setManualSlide(-200);
+//        }
 
 
         claw.run();
@@ -117,6 +131,7 @@ public class DT_TeleOp extends OpMode {
         gamePad_1_Up.update();
         gamePad_2_bumperLeft.update();
         gamePad_2_bumperRight.update();
+        gamePad_1_bumperRight.update();
         telemetry.update();
     }
 
