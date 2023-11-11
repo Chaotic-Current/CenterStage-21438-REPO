@@ -16,17 +16,17 @@ public class SlideMech {
     private Motor slideLeft, slideRight;
 
     //TODO: change values into actual tested positions instead of placeholders
-    public static double HIGH_JUNCTION = 2020; //<-- 12.90V, 1970;
-    public static double MID_JUNCTION = 1090; //<-- 12.90V, 1550;// old 890 as of 11/8/2023
-    public static double LOW_JUNCTION = 1880;  //<-- 12.90V, 1860;
-    public static double ZERO_POSITION = -125;//5V;// old val -105
+    public static double HIGH_JUNCTION = 2390; //<-- 12.90V, 1970;
+    public static double MID_JUNCTION = 2570; //<-- 12.90V, 1550;// old 890 as of 11/8/2023
+    public static double LOW_JUNCTION = 1490;  //<-- 12.90V, 1860;
+    public static double ZERO_POSITION = -200;//5V;// old val -105
     private final double MAX = 2500;
     public final static double Minimum = 0;
 
     public static double slideKp = 0.00065; //0.00326; //0.0039;
-    public static double slideKpDown = 0.00095;
+    public static double slideKpDown = 0.00175;
     public static double slideKpManualDown = 0.00; // 0.007 old val
-    public static double slideKi = 0.0006; //0.00000325;
+    public static double slideKi = 0.00375; //0.00000325;
     public static double slideKd = 0.000000; //0.000001;
     public static double slideKf = 0.00000; //0.000069;
 
@@ -56,7 +56,7 @@ public class SlideMech {
 
         slidePIDF = new PIDFController(PIDF_COFFECIENTS[0], PIDF_COFFECIENTS[1], PIDF_COFFECIENTS[2], PIDF_COFFECIENTS[3]);
 
-        targetPos = ZERO_POSITION; // target position is 0 by default
+        targetPos = 0; // target position is 0 by default
         slideRight.resetEncoder();
         slideLeft.resetEncoder();
     }
@@ -71,12 +71,12 @@ public class SlideMech {
         correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
         correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
 
-      /* telemetry.addData("targetPosition: ", targetPos);
+      telemetry.addData("targetPosition: ", targetPos);
         telemetry.addData("Right motor position: ", slideRight.getCurrentPosition());
         telemetry.addData("Left motor position: ", slideLeft.getCurrentPosition());
         telemetry.addData("Left correction: ", correctionLeft);
         telemetry.addData("Right correction: ", correctionRight);
-        telemetry.update();*/
+        telemetry.update();
 
 
 
@@ -100,11 +100,9 @@ public class SlideMech {
         currentPosition = CurrentPosition.LEVEL2;
     }
 
-    public void setHighJunction(Telemetry telemetry) {
+    public void setHighJunction() {
         targetPos = HIGH_JUNCTION;
         currentPosition = CurrentPosition.LEVEL4;
-        telemetry.addLine("high");
-        telemetry.update();
     }
 
     public void setManualSlide(int increment){

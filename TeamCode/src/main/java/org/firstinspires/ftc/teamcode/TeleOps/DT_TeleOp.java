@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode.TeleOps;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.units.qual.A;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMec;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
@@ -17,21 +16,21 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 
 @TeleOp (name = "CS_TeleOpRobotBased")
+@Config
 public class DT_TeleOp extends OpMode {
     // (づ￣ 3￣)づ hellohello
     private DcMotorEx motorFrontLeft, motorBackLeft, motorFrontRight, motorBackRight;
     private SlideMech slides;
     private IntakeMec intake;
     private ClawMech claw;
+    private Servo wrist;
     private ArmPID arm;
-    SignalEdgeDetector gamepad_2_B = new SignalEdgeDetector(()-> gamepad2.b);
     SignalEdgeDetector gamepad_2_A = new SignalEdgeDetector(() -> gamepad2.a);
-    SignalEdgeDetector gamepad_2_Y = new SignalEdgeDetector(() -> gamepad2.y);
-    SignalEdgeDetector gamePad_1_Y = new SignalEdgeDetector(() -> gamepad1.y);
-    SignalEdgeDetector gamePad_1_Up = new SignalEdgeDetector(() -> gamepad1.dpad_up);
-    SignalEdgeDetector gamePad_2_bumperRight = new SignalEdgeDetector(() -> gamepad2.right_bumper);
-    SignalEdgeDetector gamePad_1_bumperRight = new SignalEdgeDetector(() -> gamepad1.right_bumper);
+    SignalEdgeDetector gamePad_2_Y = new SignalEdgeDetector(() -> gamepad2.y);
+    SignalEdgeDetector gamePad_2_X = new SignalEdgeDetector(() -> gamepad2.x);
+    SignalEdgeDetector gamePad_2_B = new SignalEdgeDetector(() -> gamepad2.b);
     SignalEdgeDetector gamePad_2_bumperLeft = new SignalEdgeDetector(() -> gamepad2.left_bumper);
+    public static double wristPos = 0.5;
     private final double PRECISIONREDUCTION = 0.39;
     private final double TURN_PRECESION = 0.65;
 
@@ -74,11 +73,13 @@ public class DT_TeleOp extends OpMode {
         motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        wrist = hardwareMap.get(Servo.class,"WRIST");
+
         slides = new SlideMech(hardwareMap);
 
-        intake = new IntakeMec(hardwareMap,telemetry,gamepad_2_Y,gamepad_2_B, gamePad_2_bumperRight, gamePad_2_bumperLeft, gamepad2);
+        intake = new IntakeMec(hardwareMap,telemetry,gamepad1);
 
-        claw = new ClawMech(hardwareMap,telemetry,gamepad1);
+        claw = new ClawMech(hardwareMap,telemetry,gamepad2);
         //claw.initialize();
 
         arm = new ArmPID(hardwareMap);
@@ -88,11 +89,19 @@ public class DT_TeleOp extends OpMode {
     @Override
     public void loop(){
 
-        if(gamePad_1_Y.isRisingEdge()){
+        if(gamePad_2_Y.isRisingEdge()){
+            telemetry.addLine("Uh Oh The Bot Is Broken");
+        }
+
+        if(gamePad_2_X.isRisingEdge()){
             slides.setMidJunction();
         }
 
-        if(gamePad_1_Up.isRisingEdge()){
+        if (gamePad_2_B.isRisingEdge()){
+            slides.setLowJunction();
+        }
+
+        if(gamepad_2_A.isRisingEdge()){
             slides.setIntakeOrGround();
         }
 
@@ -104,10 +113,11 @@ public class DT_TeleOp extends OpMode {
 //            arm.setExtake(0.0);
 //        }
 
-        if(gamePad_1_bumperRight.isRisingEdge()){
+        if(gamePad_2_bumperLeft.isRisingEdge() && slides.getCurrentPosition() != SlideMech.CurrentPosition.ZERO){
             arm.setExtakeOrIntake();
-        }
 
+        }
+        wrist.setPosition(wristPos);
 
 //        if (gamepad1.right_trigger > 0.1){
 //            slides.setManualSlide(400); //165 old val
@@ -118,20 +128,17 @@ public class DT_TeleOp extends OpMode {
 //        }
 
 
-        claw.run();
+        claw.run(intake.getState());
         intake.run();
         slides.update(telemetry);
         drive();
         ElapsedTime timer = new ElapsedTime();
         arm.update(telemetry, timer);
         gamepad_2_A.update();
-        gamepad_2_B.update();
-        gamepad_2_Y.update();
-        gamePad_1_Y.update();
-        gamePad_1_Up.update();
+        gamePad_2_Y.update();
+        gamePad_2_X.update();
+        gamePad_2_B.update();
         gamePad_2_bumperLeft.update();
-        gamePad_2_bumperRight.update();
-        gamePad_1_bumperRight.update();
         telemetry.update();
     }
 
@@ -140,7 +147,7 @@ public class DT_TeleOp extends OpMode {
         double y = -gamepad1.left_stick_y;
         double rx = -reducingDeadzone(gamepad1.left_stick_x); // 👌
         boolean precisionToggle = gamepad1.right_trigger > 0.1;
-        double x = -gamepad1.right_stick_x * 0.75; // 👌
+        double x = -gamepad1.right_stick_x; // 👌
         if (precisionToggle) {
             rx *= TURN_PRECESION;
         }

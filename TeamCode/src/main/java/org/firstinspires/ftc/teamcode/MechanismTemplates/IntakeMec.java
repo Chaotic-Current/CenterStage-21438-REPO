@@ -19,14 +19,25 @@ public class IntakeMec  {
     private Telemetry telemetry;
     private Servo left, right; // left -> 0, right -> 1
     private SignalEdgeDetector buttonY,buttonB, bumperLeft, bumperRight;
-    private Gamepad gamepad2;
-    public static double leftFinalPos = 0.74;//moving a dist on 0.06
-    public static double rightFinalPos = 0.26;
+    private Gamepad gamepad;
+    public static double leftFinalPos = 0.79;//moving a dist on 0.06
+    public static double rightFinalPos = 0.21;
+    public static double increment = 0.025;
     public static double leftFinalUp = 0.9;
     public static double rightFinaUp = 0.1;
 
+    public static double power = 0.75;
 
-    public IntakeMec(HardwareMap hardwareMap, Telemetry telemetry, SignalEdgeDetector buttonY, SignalEdgeDetector buttonB, SignalEdgeDetector bumperRight, SignalEdgeDetector bumperLeft, Gamepad gamepad) {
+    public enum State{
+        RUNNING,STOPPED
+    }
+
+    private State state;
+
+
+
+
+    public IntakeMec(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
         intake = (DcMotorEx) hardwareMap.dcMotor.get("IN");
         left = hardwareMap.get(Servo.class, "ARM_L");
         right = hardwareMap.get(Servo.class, "ARM_R");
@@ -42,24 +53,27 @@ public class IntakeMec  {
 
         this.telemetry = telemetry;
 
-        this.buttonY = buttonY;
+        this.buttonY =  new SignalEdgeDetector(() -> this.gamepad.y);
 
-        this.buttonB = buttonB;
+        this.buttonB = new SignalEdgeDetector(()-> this.gamepad.b);
 
-        this.gamepad2 = gamepad;
+        this.gamepad = gamepad;
 
-        this.bumperRight = bumperRight;
+        this.bumperRight = new SignalEdgeDetector(() -> this.gamepad.right_bumper);;
 
-        this.bumperLeft = bumperLeft;
+        this.bumperLeft = new SignalEdgeDetector(() -> this.gamepad.left_bumper);
     }
 
+    public State getState(){
+        return state;
+    }
 
     public void run() {
-        if(gamepad2.right_trigger > 0.1) {
-            intake.setPower(0.6);
-        }else if(gamepad2.left_trigger > 0.1){
-            intake.setPower(-.8);
+        if(gamepad.left_trigger > 0.1) {
+            state = State.RUNNING;
+            intake.setPower(power);
         }else{
+            state = State.STOPPED;
             intake.setPower(0);
         }
         if(buttonY.isRisingEdge()){
@@ -75,16 +89,20 @@ public class IntakeMec  {
 
         if(bumperLeft.isRisingEdge()){
             telemetry.addData("Line up", 1);
-            left.setPosition(left.getPosition() + 0.1);
-            right.setPosition(right.getPosition() - 0.1);
+            left.setPosition(left.getPosition() + increment);
+            right.setPosition(right.getPosition() - increment);
         }
 
         if(bumperRight.isRisingEdge()){
             telemetry.addData("Line down", 1);
-            left.setPosition(left.getPosition() - 0.1);
-            right.setPosition(right.getPosition() + 0.1);
+            left.setPosition(left.getPosition() - increment);
+            right.setPosition(right.getPosition() + increment);
         }
 
         telemetry.update();
+        buttonB.update();
+        buttonY.update();
+        bumperLeft.update();
+        bumperRight.update();
     }
 }

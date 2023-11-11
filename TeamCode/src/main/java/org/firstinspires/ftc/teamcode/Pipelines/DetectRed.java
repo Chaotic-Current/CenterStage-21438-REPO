@@ -152,49 +152,51 @@ public class DetectRed extends OpenCvPipeline {
 
         Point centerPoint = findContourCenter(contours, maxContourIdx);
 
-        if(centerPoint.x<leftImage)
-            left = true;
-        else if(centerPoint.x > rightImage)
-            right = true;
+        if(centerPoint != null) {
 
-        //checking if the object is in the center if it is not on the left, nor right of the image and if the color we want to detect exists in the image
-        center = !left && !right && (contours.size() > 0);
+            if (centerPoint.x < leftImage)
+                left = true;
+            else if (centerPoint.x > rightImage)
+                right = true;
 
-
-        //officially stating what the location of the tape is
-        if (left) {
-            locate = RedLocation.LEFT;
-        } else if (right) {
-            locate = RedLocation.RIGHT;
-        } else if (center) {
-            locate = RedLocation.CENTER;
-        } else {
-            locate = RedLocation.UNDETECTED;
-        }
-        telemetry.update();
-
-        telemetry.addData("Location pre run", locate);
-        telemetry.addData("Center location: ", avgColorWidth);
-        telemetry.update();
+            //checking if the object is in the center if it is not on the left, nor right of the image and if the color we want to detect exists in the image
+            center = !left && !right && (contours.size() > 0);
 
 
-        if (!contours.isEmpty()) {
-            MatOfPoint contour = null;
-            //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            //officially stating what the location of the tape is
+            if (left) {
+                locate = RedLocation.LEFT;
+            } else if (right) {
+                locate = RedLocation.RIGHT;
+            } else if (center) {
+                locate = RedLocation.CENTER;
+            } else {
+                locate = RedLocation.UNDETECTED;
+            }
+            telemetry.update();
+
+            telemetry.addData("Location pre run", locate);
+            telemetry.addData("Center location: ", avgColorWidth);
+            telemetry.update();
+
+
+            if (!contours.isEmpty()) {
+                MatOfPoint contour = null;
+                //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 contour = Collections.max(contours, Comparator.comparingDouble(Imgproc::contourArea));
-           // }
-            Moments moments = Imgproc.moments(contour);
-            avgColorWidth = moments.get_m10() / moments.get_m00();
+                // }
+                Moments moments = Imgproc.moments(contour);
+                avgColorWidth = moments.get_m10() / moments.get_m00();
+            }
+
+            if (!contours.isEmpty()) {
+                Mat resultImage = input.clone();
+                Imgproc.drawContours(resultImage, contours, maxContourIdx, new Scalar(0, 255, 0), 1);
+
+
+                return resultImage;
+            }
         }
-
-        if (!contours.isEmpty()) {
-            Mat resultImage = input.clone();
-            Imgproc.drawContours(resultImage, contours, maxContourIdx, new Scalar(0, 255, 0), 1);
-
-
-            return resultImage;
-        }
-
 
         return scaledMask;  //displaying edges of all red objects cuz i think it looks cool
     }

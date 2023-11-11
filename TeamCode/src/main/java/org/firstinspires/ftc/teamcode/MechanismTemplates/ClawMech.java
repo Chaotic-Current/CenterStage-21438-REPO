@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.MechanismTemplates;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,14 +12,16 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ClawMech {
     private Servo claw; //pin 2
     private Telemetry telemetry;
-    public static double openPos = 0.51;
-    public static double startPos = 0.32;
-    private SignalEdgeDetector buttonA, buttonB, buttonX;
+    public static double openPos = 0.52;
+    public Gamepad gamepad;
+    public static double close = 0.32;
+    private SignalEdgeDetector rightBumper;
     public static double halfOpenPos = 0.45;
 
 
 
     public ClawMech(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
+        this.gamepad = gamepad;
         claw = hardwareMap.get(Servo.class, "CLAW");
         claw.setPosition(openPos); // start position
 
@@ -28,7 +29,7 @@ public class ClawMech {
 
 //        buttonA = new SignalEdgeDetector(() -> gamepad.a);
 //        buttonB = new SignalEdgeDetector(() -> gamepad.b);
-        buttonX = new SignalEdgeDetector(() -> gamepad.x);
+          rightBumper = new SignalEdgeDetector(() -> gamepad.right_bumper);
 
         }
         public void initialize(){
@@ -37,7 +38,7 @@ public class ClawMech {
 
         public int toggleCount = 2;
 
-    public void run(){
+    public void run(IntakeMec.State e){
 //        if(buttonA.isRisingEdge()){
 //            telemetry.addData("open", 1);
 //            claw.setPosition(openPos);
@@ -51,7 +52,15 @@ public class ClawMech {
 //            claw.setPosition(halfOpenPos);
 //        }
 
-        if(buttonX.isRisingEdge()){
+        if(e == IntakeMec.State.RUNNING){
+            claw.setPosition(openPos);
+            toggleCount = 1;
+            rightBumper.update();
+            return;
+        }
+
+
+        if(rightBumper.isRisingEdge()){
             if(toggleCount == 1){
                 telemetry.addData("halfway", 1);
             claw.setPosition(halfOpenPos);
@@ -64,13 +73,14 @@ public class ClawMech {
             }
             else{
                 telemetry.addData("close", 1);
-            claw.setPosition(startPos);
+            claw.setPosition(close);
+            gamepad.rumble(1000);
             toggleCount-=2;
             }
         }
 
 
-    buttonX.update();
+    rightBumper.update();
 //    buttonA.update();
 //    buttonB.update();
     }

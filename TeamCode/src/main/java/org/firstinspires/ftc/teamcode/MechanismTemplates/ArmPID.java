@@ -15,13 +15,13 @@ public class ArmPID {
     private CRServo arm;
     private HardwareMap hardwareMap;
 
-    public static double armKpUp = 0.0015; // old is 0.012
-    public static double armKpDown = 0.003;
-    public static double armKi = 0;
+    public static double armKpUp = 0.00585; // old is 0.012
+    public static double armKpDown = 0.00285;
+    public static double armKi = 0.0001;
     public static double armKd = 0;
     public static double armKf = 0;
-    public static double EXTAKE_POS = 305; // 180 old val; in degrees of absolute encoder//120 old val//315 old val
-    public static double INTAKE_POS = 32; // 65 old val//64 old val//28 old val
+    public static double EXTAKE_POS = 310; // 180 old val; in degrees of absolute encoder//120 old val//315 old val
+    public static double INTAKE_POS = 20; // 65 old val//64 old val//28 old val
     public static double targetPos;
 
     public static double pow = 0.006;
@@ -29,12 +29,14 @@ public class ArmPID {
     public static double powDOWN = 0.0009;
     private double lastError = 0;
 
+    public boolean isIntakePosition;
+
 
     public ArmPID(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
         arm = new CRServo(hardwareMap,"axon");
         armPIDF = new PIDFController(armKpUp, armKi, armKd, armKf);
-        targetPos= 23;
+        targetPos= 20;
     }
 
     public void update(Telemetry telemetry, ElapsedTime timer) {
@@ -45,7 +47,7 @@ public class ArmPID {
         telemetry.addData("Motor Position: ", getArmPosition());
         telemetry.update();
         arm.set(correction);
-        if(getArmPosition() >285){
+        /*if(getArmPosition() >285){
             armPIDF.setP(0.006);
         }
         // sets a PID-tuned voltage for the arm motor
@@ -118,9 +120,9 @@ public class ArmPID {
 
     }
 
-    public boolean isIntakePosition;
+    public void setExtakeOrIntake() {
 
-    public void setExtakeOrIntake() { // would be used at the beginning of the goToJunction method in the arm class, for example
+        // would be used at the beginning of the goToJunction method in the arm class, for example
         if (isIntakePosition) {
             setExtake(0.0);
         } else { // if the wrist is in the extake position, switch it back to the intake position so it can pick up cones
