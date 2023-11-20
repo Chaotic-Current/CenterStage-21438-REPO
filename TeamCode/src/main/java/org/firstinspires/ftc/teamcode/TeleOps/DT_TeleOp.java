@@ -70,7 +70,7 @@ public class DT_TeleOp extends OpMode {
 
 
         // Reverse motors
-        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         wrist = hardwareMap.get(Servo.class,"WRIST");
@@ -115,7 +115,6 @@ public class DT_TeleOp extends OpMode {
 
         if(gamePad_2_bumperLeft.isRisingEdge() && slides.getCurrentPosition() != SlideMech.CurrentPosition.ZERO){
             arm.setExtakeOrIntake();
-
         }
         wrist.setPosition(wristPos);
 
@@ -128,10 +127,14 @@ public class DT_TeleOp extends OpMode {
 //        }
 
 
+//ytrfd
         claw.run(intake.getState());
         intake.run();
         slides.update(telemetry);
+        //altDrive();
         drive();
+
+
         ElapsedTime timer = new ElapsedTime();
         arm.update(telemetry, timer);
         gamepad_2_A.update();
@@ -142,12 +145,40 @@ public class DT_TeleOp extends OpMode {
         telemetry.update();
     }
 
+    public void altDrive(){
+        telemetry.clear();
+        if(gamepad1.a){
+            motorFrontLeft.setPower(0.8);
+            telemetry.addLine("Testing port 2");
+        } else {
+            motorFrontLeft.setPower(0);
+        }
+        if(gamepad1.b){
+            motorBackLeft.setPower(0.8);
+            telemetry.addLine("Testing port 0");
+        } else {
+            motorBackLeft.setPower(0);
+        }
+        if(gamepad1.y){
+            motorFrontRight.setPower(0.8);
+            telemetry.addLine("Testing port 1");
+        } else {
+            motorFrontRight.setPower(0);
+        }
+        if(gamepad1.x){
+            motorBackRight.setPower(0.8);
+            telemetry.addLine("Testing port 3");
+        } else {
+            motorBackRight.setPower(0);
+        }
+        telemetry.update();
+    }
 
     public void drive(){
-        double y = -gamepad1.left_stick_y;
-        double rx = -reducingDeadzone(gamepad1.left_stick_x); // 👌
+        double y = gamepad1.left_stick_y;
+        double x = -reducingDeadzone(gamepad1.left_stick_x); // 👌
         boolean precisionToggle = gamepad1.right_trigger > 0.1;
-        double x = -gamepad1.right_stick_x; // 👌
+        double rx = -gamepad1.right_stick_x; // 👌
         if (precisionToggle) {
             rx *= TURN_PRECESION;
         }

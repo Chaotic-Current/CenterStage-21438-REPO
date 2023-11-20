@@ -15,13 +15,13 @@ public class ArmPID {
     private CRServo arm;
     private HardwareMap hardwareMap;
 
-    public static double armKpUp = 0.00585; // old is 0.012
-    public static double armKpDown = 0.00285;
+    public static double armKpUp = 0.004; // old is 0.012
+    public static double armKpDown = 0.0025;
     public static double armKi = 0.0001;
     public static double armKd = 0;
     public static double armKf = 0;
     public static double EXTAKE_POS = 310; // 180 old val; in degrees of absolute encoder//120 old val//315 old val
-    public static double INTAKE_POS = 20; // 65 old val//64 old val//28 old val
+    public static double INTAKE_POS = 40; // 65 old val//64 old val//28 old val
     public static double targetPos;
 
     public static double pow = 0.006;
