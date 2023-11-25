@@ -77,6 +77,8 @@ public class ClawMech {
         }
 
 
+
+
         if(rightBumper.isRisingEdge()){
             if(state == ClawState.CLOSED){
                 telemetry.addData("halfway", 1);

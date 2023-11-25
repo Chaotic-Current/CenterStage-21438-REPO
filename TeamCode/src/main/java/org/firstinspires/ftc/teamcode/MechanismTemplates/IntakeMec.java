@@ -18,7 +18,7 @@ public class IntakeMec  {
     private DcMotorEx intake; // pin 0
     private Telemetry telemetry;
     private Servo left, right; // left -> 0, right -> 1
-    private SignalEdgeDetector buttonY,buttonB, bumperLeft, bumperRight;
+    private SignalEdgeDetector buttonY,buttonB, bumperLeft, bumperRight, dPadDown;
     private Gamepad gamepad;
     public static double leftFinalPos = 0.79;//moving a dist on 0.06
     public static double rightFinalPos = 0.21;
@@ -28,8 +28,10 @@ public class IntakeMec  {
 
     public static double power = 0.75;
 
+    public static double ejectPower = -1.0;
+
     public enum State{
-        RUNNING,STOPPED
+        RUNNING,STOPPED, REVERSE
     }
 
     private State state;
@@ -72,7 +74,12 @@ public class IntakeMec  {
         if(gamepad.left_trigger > 0.1) {
             state = State.RUNNING;
             intake.setPower(power);
-        }else{
+        } else if(gamepad.dpad_down){
+            state = State.REVERSE;
+            intake.setPower(ejectPower);
+            gamepad.setLedColor(255, 0, 0, 1000);
+
+        } else{
             state = State.STOPPED;
             intake.setPower(0);
         }
