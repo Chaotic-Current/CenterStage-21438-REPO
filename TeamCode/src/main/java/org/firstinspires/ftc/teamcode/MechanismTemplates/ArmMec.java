@@ -8,12 +8,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ArmMec {
     private SignalEdgeDetector dpadLeft, dpadRight;
-    //TODO tune these values
     public static double intakePositionL, extakePositionL, intakePositionR, extakePositionR;
     private Servo armLeft, armRight;
-
-
-
 
     public ArmMec(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad){
         armLeft = hardwareMap.get(Servo.class, "EXTAKEL");

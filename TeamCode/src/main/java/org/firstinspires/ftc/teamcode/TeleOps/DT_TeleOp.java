@@ -30,9 +30,14 @@ public class DT_TeleOp extends OpMode {
     SignalEdgeDetector gamePad_2_X = new SignalEdgeDetector(() -> gamepad2.x);
     SignalEdgeDetector gamePad_2_B = new SignalEdgeDetector(() -> gamepad2.b);
     SignalEdgeDetector gamePad_2_bumperLeft = new SignalEdgeDetector(() -> gamepad2.left_bumper);
+    SignalEdgeDetector GamePad_1_DpadUp = new SignalEdgeDetector(() -> gamepad1.dpad_up);
     public static double wristPos = 0.5;
     private final double PRECISIONREDUCTION = 0.39;
     private final double TURN_PRECESION = 0.65;
+
+    private ElapsedTime timer = new ElapsedTime();
+    private boolean slidesUp = false;
+    private boolean slidesDown = false;
 
     /**
      * Get the maximum absolute value from a static array of doubles
@@ -71,7 +76,7 @@ public class DT_TeleOp extends OpMode {
 
         // Reverse motors
         motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         wrist = hardwareMap.get(Servo.class,"WRIST");
 
@@ -93,17 +98,51 @@ public class DT_TeleOp extends OpMode {
             telemetry.addLine("Uh Oh The Bot Is Broken");
         }
 
+        if(GamePad_1_DpadUp.isRisingEdge()){
+            slides.climbUp();
+        }
+
         if(gamePad_2_X.isRisingEdge()){
+            timer.reset();
             slides.setMidJunction();
+            slidesUp = true;
         }
 
         if (gamePad_2_B.isRisingEdge()){
+            timer.reset();
             slides.setLowJunction();
+            slidesUp = true;
+            slidesDown = false;
+        }
+        if(slidesUp){
+            if(timer.milliseconds() >= 1000) {
+                arm.setExtake(0);
+                timer.reset();
+            }
         }
 
         if(gamepad_2_A.isRisingEdge()){
-            slides.setIntakeOrGround();
+            //slides.setIntakeOrGround();
+            timer.reset();
+            arm.setIntake();
+            slidesDown = true;
+            slidesUp= false;
+
+
         }
+        if(slidesDown){
+            if(timer.milliseconds() >= 2000){
+                slides.setIntakeOrGround();
+                timer.reset();
+            }
+        }
+
+        /*if(slidesUp){
+            slidesDown = false;
+        }
+        if(slidesDown){
+            slidesUp = false;
+        }*/
 
 //        if(gamepad1.dpad_left){
 //            arm.setIntake();
@@ -138,6 +177,7 @@ public class DT_TeleOp extends OpMode {
         gamePad_2_Y.update();
         gamePad_2_X.update();
         gamePad_2_B.update();
+        GamePad_1_DpadUp.update();
         gamePad_2_bumperLeft.update();
         telemetry.update();
     }
@@ -145,9 +185,9 @@ public class DT_TeleOp extends OpMode {
 
     public void drive(){
         double y = -gamepad1.left_stick_y;
-        double rx = -reducingDeadzone(gamepad1.left_stick_x); // 👌
+        double x = reducingDeadzone(gamepad1.left_stick_x); // 👌
         boolean precisionToggle = gamepad1.right_trigger > 0.1;
-        double x = -gamepad1.right_stick_x; // 👌
+        double rx = gamepad1.right_stick_x; // 👌
         if (precisionToggle) {
             rx *= TURN_PRECESION;
         }

@@ -20,8 +20,8 @@ public class ArmPID {
     public static double armKi = 0.0001;
     public static double armKd = 0;
     public static double armKf = 0;
-    public static double EXTAKE_POS = 310; // 180 old val; in degrees of absolute encoder//120 old val//315 old val
-    public static double INTAKE_POS = 20; // 65 old val//64 old val//28 old val
+    public static double EXTAKE_POS = 310; // 290 old val; in degrees of absolute encoder//120 old val//315 old val
+    public static double INTAKE_POS = 25; // 65 old val//64 old val//28 old val
     public static double targetPos;
 
     public static double pow = 0.006;
@@ -42,10 +42,10 @@ public class ArmPID {
     public void update(Telemetry telemetry, ElapsedTime timer) {
 
         double correction = armPIDF.calculate(getArmPosition(), targetPos);
-       telemetry.addData("Correction: ", correction);
+       /*telemetry.addData("Correction: ", correction);
         telemetry.addData("Target Position: ", targetPos);
         telemetry.addData("Motor Position: ", getArmPosition());
-        telemetry.update();
+        telemetry.update();*/
         arm.set(correction);
         /*if(getArmPosition() >285){
             armPIDF.setP(0.006);
@@ -89,10 +89,10 @@ public class ArmPID {
         */
 
 
-        telemetry.addData("Correction: ", 0);
+        /*telemetry.addData("Correction: ", 0);
         telemetry.addData("Target Position: ", targetPos);
         telemetry.addData("Motor Position: ", getArmPosition());
-        telemetry.update();
+        telemetry.update();*/
     }
 
 
