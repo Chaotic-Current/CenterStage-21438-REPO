@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class DetectRed extends OpenCvPipeline {
+public class DetectColor extends OpenCvPipeline {
     public enum RedLocation {
         UNDETECTED, //Constants on the location of red in the camera frame, not seen, left in frame, right in frame, center in frame
         LEFT,
@@ -36,13 +36,13 @@ public class DetectRed extends OpenCvPipeline {
 
     //no real use ngl, just to make EOCV-Sim work properly
 
-    public DetectRed(int w, Telemetry tel) {
+    public DetectColor(int w, Telemetry tel) {
         width = w;
         telemetry = tel;
 
     }
 
-    public DetectRed(Telemetry tel) { //never gonna use this constructor in the real world
+    public DetectColor(Telemetry tel) { //never gonna use this constructor in the real world
 
         telemetry = tel;
         width = 180;

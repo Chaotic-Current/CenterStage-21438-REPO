@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Pipelines.DetectRed;
+import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -24,14 +24,14 @@ public class OpenCVTest extends LinearOpMode {
     private Pose2d x = new Pose2d();
     private SampleMecanumDrive drive;
 
-    private DetectRed detector;
+    private DetectColor detector;
 
     public void initialize() {
         //initializing the basic variables and objects
         width = 160;
         height = 120;
         drive = new SampleMecanumDrive(hardwareMap);
-        detector = new DetectRed(width, telemetry);
+        detector = new DetectColor(width, telemetry);
 
         // Initialize the back-facing camera
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -77,9 +77,9 @@ public class OpenCVTest extends LinearOpMode {
                 .strafeRight(2)
                 .build();
 
-        if(detector.getLocate() == DetectRed.RedLocation.LEFT)
+        if(detector.getLocate() == DetectColor.RedLocation.LEFT)
             x = moveLeft.end();
-        else if(detector.getLocate() == DetectRed.RedLocation.RIGHT)
+        else if(detector.getLocate() == DetectColor.RedLocation.RIGHT)
             x = moveRight.end();
 
         TrajectorySequence turn = drive.trajectorySequenceBuilder(x)

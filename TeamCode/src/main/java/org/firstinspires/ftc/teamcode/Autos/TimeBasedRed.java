@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Pipelines.DetectRed;
+import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -24,7 +24,7 @@ public class TimeBasedRed extends LinearOpMode {
     private int width;
     public static double powerLeft = 0.25, powerRight = 0.25, powerForward = 0.25;
     public static int timeLeft1 = 10000,timeLeft2 = 10000, timeForward = 777, timeRight1= 100000, timeRight2 = 100000, timeRight3 = 100000;//12.6
-    private DetectRed detector;
+    private DetectColor detector;
     private int height;
     private DcMotorEx motorFrontLeft, motorBackLeft, motorFrontRight, motorBackRight;
     private Servo left, right;
@@ -58,7 +58,7 @@ public class TimeBasedRed extends LinearOpMode {
 
         width = 160;
         height = 120;
-        detector = new DetectRed(width, telemetry);
+        detector = new DetectColor(width, telemetry);
 
         // Initialize the back-facing camera
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -88,7 +88,7 @@ public class TimeBasedRed extends LinearOpMode {
 
         waitForStart();
 
-        DetectRed.RedLocation e = detector.getLocate();
+        DetectColor.RedLocation e = detector.getLocate();
 
         backCam.stopStreaming();
 
