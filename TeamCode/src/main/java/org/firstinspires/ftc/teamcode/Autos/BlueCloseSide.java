@@ -26,12 +26,17 @@ public class BlueCloseSide extends LinearOpMode {
     private ClawMech clawMech;
     private DetectColor detector; //This will be out of the frame for know, along with the april tag pipeline
     //TODO all these values are just place holders so the code doesn't cause an error, delete this comment after you see it
-    public static double frwDistance1 = 24;
+    public static double frwDistance1 = 29;
+    public static double backwardsDistance1 = 8;
+    public static double frwDistance2 = 33;
+    public static double wait01 = 1;
+    public static double wait02 = 1;
     public static double linetoLinear1X = 24, linetoLinear1Y = 24, lineToLinear1Heading = 30;
     public static double splineToLinear1X = 24, splineToLinear1Y = -24, splineToLinear1Heading = -80;
     public static double splineToLinear2X = 24, splineToLinear2Y = 32, splineToLinear2Heading = 90, wait1 = 3;
     public static double splineToLinear3X = 16, splineToLinear3Y = 32, splineToLinear3Heading = 90, wait2 = 3;
     public static double splineToLinear4X = 8, splineToLinear4Y = 32, splineToLinear4Heading = 90, wait3 = 3;
+    public static double degree = 90;
 
     //For now, ignore this, it is not gonna be in use for now, just manually change spike locations for now
   /*  public void cameraInit(){
@@ -86,10 +91,11 @@ public class BlueCloseSide extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
 
-        int location = 1; //this will be camera vision based later
+        int location = 2; //this will be camera vision based later
         //For now, 1 is left, 2 is center, 3 is right
 
         TrajectorySequence firstMove;
+        //TrajectorySequence moveBack;
         TrajectorySequence moveToBackboard;
 
         //I added what I think would be proper points for mechanisms to do what they need to do, but I commented them out just for now
@@ -123,6 +129,7 @@ public class BlueCloseSide extends LinearOpMode {
                 firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                         .forward(frwDistance1)
                         .build();
+
                 moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
                         .splineToLinearHeading(new Pose2d(splineToLinear3X,splineToLinear3Y,Math.toRadians(splineToLinear3Heading)), Math.toRadians(0))
                         .UNSTABLE_addTemporalMarkerOffset(wait2, () ->{
@@ -171,7 +178,17 @@ public class BlueCloseSide extends LinearOpMode {
             default:
                 firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                         .forward(frwDistance1)
+                        .waitSeconds(wait01)
+                        .back(backwardsDistance1)
+                        .waitSeconds(wait02)
+                        .turn(Math.toRadians(degree))
+                        .forward(frwDistance2)
                         .build();
+                /*
+                moveBack = drive.trajectorySequenceBuilder(new Pose2d())
+                        .back(backwardsDistance1)
+                        .build();
+                        */
                 moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
                         .splineToLinearHeading(new Pose2d(splineToLinear3X,splineToLinear3Y,Math.toRadians(splineToLinear3Heading)), Math.toRadians(0))
                         .build();
@@ -181,7 +198,7 @@ public class BlueCloseSide extends LinearOpMode {
         waitForStart();
 
         drive.followTrajectorySequenceAsync(firstMove);
-        drive.followTrajectorySequenceAsync(moveToBackboard);
+        //drive.followTrajectorySequenceAsync(moveBack);
 
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
