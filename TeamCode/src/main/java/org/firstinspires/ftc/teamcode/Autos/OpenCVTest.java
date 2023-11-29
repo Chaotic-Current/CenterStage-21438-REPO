@@ -77,9 +77,9 @@ public class OpenCVTest extends LinearOpMode {
                 .strafeRight(2)
                 .build();
 
-        if(detector.getLocate() == DetectColor.RedLocation.LEFT)
+        if(detector.getLocate() == DetectColor.ColorLocation.LEFT)
             x = moveLeft.end();
-        else if(detector.getLocate() == DetectColor.RedLocation.RIGHT)
+        else if(detector.getLocate() == DetectColor.ColorLocation.RIGHT)
             x = moveRight.end();
 
         TrajectorySequence turn = drive.trajectorySequenceBuilder(x)

@@ -88,7 +88,7 @@ public class TimeBasedRed extends LinearOpMode {
 
         waitForStart();
 
-        DetectColor.RedLocation e = detector.getLocate();
+        DetectColor.ColorLocation e = detector.getLocate();
 
         backCam.stopStreaming();
 

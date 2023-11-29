@@ -12,7 +12,7 @@ public class ServoRangeTest extends OpMode{
     public static double val = 0.5;
     @Override
     public void init() {
-        servo1 = hardwareMap.get(Servo.class, "servo");
+        servo1 = hardwareMap.get(Servo.class, "CLAW");
 
     }
     @Override

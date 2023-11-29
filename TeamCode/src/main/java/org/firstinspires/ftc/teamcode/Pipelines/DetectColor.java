@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class DetectColor extends OpenCvPipeline {
-    public enum RedLocation {
+    public enum ColorLocation {
         UNDETECTED, //Constants on the location of red in the camera frame, not seen, left in frame, right in frame, center in frame
         LEFT,
         RIGHT,
@@ -28,11 +28,11 @@ public class DetectColor extends OpenCvPipeline {
     }
 
     private double avgColorWidth;
-
+    private Scalar upperBound, lowerBound;
     private final int width;//width of the image
-    public int blur = 15;
+    public int blur = 13;
     private Telemetry telemetry;
-    private RedLocation locate;
+    private ColorLocation locate;
 
     //no real use ngl, just to make EOCV-Sim work properly
 
@@ -40,6 +40,13 @@ public class DetectColor extends OpenCvPipeline {
         width = w;
         telemetry = tel;
 
+    }
+
+    public DetectColor(int width, Telemetry telemetry, Scalar upper, Scalar lower){
+         this.width = width;
+         this.telemetry = telemetry;
+         upperBound = upper;
+         lowerBound = lower;
     }
 
     public DetectColor(Telemetry tel) { //never gonna use this constructor in the real world
@@ -58,7 +65,7 @@ public class DetectColor extends OpenCvPipeline {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);//changing the color space from RGB to HSV, due to it being more useful when light values change
 
         if (mat.empty()) { //if mat is shown not to have anything, as a failsafe the location would be undetected and will return the input matrix
-            locate = RedLocation.UNDETECTED;
+            locate = ColorLocation.UNDETECTED;
             return input;
         }
 
@@ -67,14 +74,14 @@ public class DetectColor extends OpenCvPipeline {
 
         // The HSV values for the lower bound of red, and the higher bound of red
         //Values from https://cvexplained.wordpress.com/2020/04/28/color-detection-hsv/#:~:text=The%20HSV%20values%20for%20true,10%20and%20160%20to%20180.
-        Scalar lowBoundRed = new Scalar(2, 100, 100);
-        Scalar highBoundRed = new Scalar(4, 255, 255);
+//       Scalar lowerBound = new Scalar(2, 100, 100);
+//        Scalar upperBound = new Scalar(4, 255, 255);
 
         Mat thresh = new Mat();
 
         // We'll get a black and white image. The white regions represent red.
         // inRange(): thresh[i][j] = {255,255,255} if mat[i][i] is within the range
-        Core.inRange(mat, lowBoundRed, highBoundRed, thresh);
+        Core.inRange(mat, lowerBound, upperBound, thresh);
 
 
         Mat masked = new Mat();
@@ -122,7 +129,7 @@ public class DetectColor extends OpenCvPipeline {
          * image to find the relative location of the tape to the image (i.e. towards the left, right, or center)
          */
 
-        double leftImage = 0.3 * width;//the left of the image can be classified as everything bellow this value
+        double leftImage = 0.2 * width;//the left of the image can be classified as everything bellow this value
         double rightImage = 0.7 * width;//the right of the image can be classified as everything above this value
         //TODO need to tune these values to make sure they actually work and done under or overshoot
 
@@ -154,9 +161,9 @@ public class DetectColor extends OpenCvPipeline {
 
         if(centerPoint != null) {
 
-            if (centerPoint.x < leftImage)
+            if (centerPoint.x <= leftImage)
                 left = true;
-            else if (centerPoint.x > rightImage)
+            else if (centerPoint.x >= rightImage)
                 right = true;
 
             //checking if the object is in the center if it is not on the left, nor right of the image and if the color we want to detect exists in the image
@@ -165,19 +172,19 @@ public class DetectColor extends OpenCvPipeline {
 
             //officially stating what the location of the tape is
             if (left) {
-                locate = RedLocation.LEFT;
+                locate = ColorLocation.LEFT;
             } else if (right) {
-                locate = RedLocation.RIGHT;
+                locate = ColorLocation.RIGHT;
             } else if (center) {
-                locate = RedLocation.CENTER;
+                locate = ColorLocation.CENTER;
             } else {
-                locate = RedLocation.UNDETECTED;
+                locate = ColorLocation.UNDETECTED;
             }
-            telemetry.update();
-
-            telemetry.addData("Location pre run", locate);
-            telemetry.addData("Center location: ", avgColorWidth);
-            telemetry.update();
+//            telemetry.update();
+//
+//            telemetry.addData("Location pre run", locate);
+//            telemetry.addData("Center location: ", avgColorWidth);
+//            telemetry.update();
 
 
             if (!contours.isEmpty()) {
@@ -191,7 +198,7 @@ public class DetectColor extends OpenCvPipeline {
 
             if (!contours.isEmpty()) {
                 Mat resultImage = input.clone();
-                Imgproc.drawContours(resultImage, contours, maxContourIdx, new Scalar(0, 255, 0), 1);
+                Imgproc.drawContours(resultImage, contours, maxContourIdx, new Scalar(255, 0, 0), 1);
 
 
                 return resultImage;
@@ -202,7 +209,7 @@ public class DetectColor extends OpenCvPipeline {
     }
 
     //A method so that other classes can get the relative location of the tape
-    public RedLocation getLocate() {
+    public ColorLocation getLocate() {
         return locate;
     }
 

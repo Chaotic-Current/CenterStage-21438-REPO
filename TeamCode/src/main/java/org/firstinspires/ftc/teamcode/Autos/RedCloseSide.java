@@ -78,7 +78,7 @@ public class RedCloseSide extends LinearOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         arm = new ArmPID(hardwareMap);
         slide = new SlideMech(hardwareMap);
-        clawMech = new ClawMech(hardwareMap);
+        clawMech = new ClawMech(hardwareMap,telemetry);
         //DO NOT UNCOMMENT THIS
         //cameraInit();
     }
@@ -92,82 +92,82 @@ public class RedCloseSide extends LinearOpMode {
         TrajectorySequence moveToBackboard;
 
         //I added what I think would be proper points for mechanisms to do what they need to do, but I commented them out just for now
-        switch (location){
-            case 1:
-                firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                        .splineToLinearHeading(new Pose2d(splineToLinear1X,splineToLinear1Y,Math.toRadians(splineToLinear1Heading)), Math.toRadians(0))
-                        .build();
+        if (location == 1) {
 
-                moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
-                        .splineToLinearHeading(new Pose2d(splineToLinear2X,splineToLinear2Y,Math.toRadians(splineToLinear2Heading)), Math.toRadians(0))
-                        .UNSTABLE_addTemporalMarkerOffset(wait1, () ->{
-                            //slide.setLowJunction();
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait1+1,() ->{
-                            //arm.setExtakeOrIntake();
-                        })
-                        .waitSeconds(4)
-                        .UNSTABLE_addTemporalMarkerOffset(wait1+2,() ->{
-                            //clawMech.setBothOpen(false);
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait1+2.5,() ->{
-                            //arm.setExtakeOrIntake();
-                            //clawMech.getClaw().setPosition(clawMech.close);
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait1+3.5,() ->{
-                            //slide.setIntakeOrGround();
-                        })
-                        .build();
-            case 2:
-                firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                        .forward(frwDistance1)
-                        .build();
-                moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
-                        .splineToLinearHeading(new Pose2d(splineToLinear3X,splineToLinear3Y,Math.toRadians(splineToLinear3Heading)), Math.toRadians(0))
-                        .UNSTABLE_addTemporalMarkerOffset(wait2, () ->{
-                            //slide.setLowJunction();
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait2+1,() ->{
-                            //arm.setExtakeOrIntake();
-                        })
-                        .waitSeconds(4)
-                        .UNSTABLE_addTemporalMarkerOffset(wait2+2,() ->{
-                            //clawMech.setBothOpen(false);
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait2+2.5,() ->{
-                            //arm.setExtakeOrIntake();
-                            //clawMech.getClaw().setPosition(clawMech.close);
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait2+3.5,() ->{
-                            //slide.setIntakeOrGround();
-                        })
-                        .build();
-            case 3:
-                firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                        .lineToLinearHeading(new Pose2d(linetoLinear1X,linetoLinear1Y,Math.toRadians(lineToLinear1Heading)))
-                        .build();
+            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
+                    .splineToLinearHeading(new Pose2d(splineToLinear1X, splineToLinear1Y, Math.toRadians(splineToLinear1Heading)), Math.toRadians(0))
+                    .build();
 
-                moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
-                        .splineToLinearHeading(new Pose2d(splineToLinear4X,splineToLinear4Y,Math.toRadians(splineToLinear4Heading)), Math.toRadians(0))
-                        .UNSTABLE_addTemporalMarkerOffset(wait3, () ->{
-                            //slide.setLowJunction();
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait3+1,() ->{
-                            //arm.setExtakeOrIntake();
-                        })
-                        .waitSeconds(4)
-                        .UNSTABLE_addTemporalMarkerOffset(wait3+2,() ->{
-                            //clawMech.setBothOpen(false);
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait3+2.5,() ->{
-                            //arm.setExtakeOrIntake();
-                            //clawMech.getClaw().setPosition(clawMech.close);
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(wait3+3.5,() ->{
-                            //slide.setIntakeOrGround();
-                        })
-                        .build();
-            default:
+            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
+                    .splineToLinearHeading(new Pose2d(splineToLinear2X, splineToLinear2Y, Math.toRadians(splineToLinear2Heading)), Math.toRadians(0))
+                    .UNSTABLE_addTemporalMarkerOffset(wait1, () -> {
+                        //slide.setLowJunction();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait1 + 1, () -> {
+                        //arm.setExtakeOrIntake();
+                    })
+                    .waitSeconds(4)
+                    .UNSTABLE_addTemporalMarkerOffset(wait1 + 2, () -> {
+                        //clawMech.setBothOpen(false);
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait1 + 2.5, () -> {
+                        //arm.setExtakeOrIntake();
+                        //clawMech.getClaw().setPosition(clawMech.close);
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait1 + 3.5, () -> {
+                        //slide.setIntakeOrGround();
+                    })
+                    .build();
+        }else if(location == 2) {
+            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
+                    .forward(frwDistance1)
+                    .build();
+            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
+                    .splineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y, Math.toRadians(splineToLinear3Heading)), Math.toRadians(0))
+                    .UNSTABLE_addTemporalMarkerOffset(wait2, () -> {
+                        //slide.setLowJunction();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 1, () -> {
+                        //arm.setExtakeOrIntake();
+                    })
+                    .waitSeconds(4)
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 2, () -> {
+                        //clawMech.setBothOpen(false);
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 2.5, () -> {
+                        //arm.setExtakeOrIntake();
+                        //clawMech.getClaw().setPosition(clawMech.close);
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 3.5, () -> {
+                        //slide.setIntakeOrGround();
+                    })
+                    .build();
+        }else if(location == 3) {
+            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
+                    .lineToLinearHeading(new Pose2d(linetoLinear1X, linetoLinear1Y, Math.toRadians(lineToLinear1Heading)))
+                    .build();
+
+            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
+                    .splineToLinearHeading(new Pose2d(splineToLinear4X, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)), Math.toRadians(0))
+                    .UNSTABLE_addTemporalMarkerOffset(wait3, () -> {
+                        //slide.setLowJunction();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait3 + 1, () -> {
+                        //arm.setExtakeOrIntake();
+                    })
+                    .waitSeconds(4)
+                    .UNSTABLE_addTemporalMarkerOffset(wait3 + 2, () -> {
+                        //clawMech.setBothOpen(false);
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait3 + 2.5, () -> {
+                        //arm.setExtakeOrIntake();
+                        //clawMech.getClaw().setPosition(clawMech.close);
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(wait3 + 3.5, () -> {
+                        //slide.setIntakeOrGround();
+                    })
+                    .build();
+        }else {
                 firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                         .forward(frwDistance1)
                         .build();
