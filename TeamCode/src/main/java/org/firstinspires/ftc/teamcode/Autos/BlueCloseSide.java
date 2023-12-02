@@ -39,13 +39,15 @@ public class BlueCloseSide extends LinearOpMode {
     public static double frwDistance3 = 12;
     public static double wait01 = 1;
     public static double wait02 = 1;
-    public static double spline1deg = 90;
+    public static double spline1deg = -75;
+    public static double backdist2 = 6;
+    public static double spline2deg = -90;
 
-    public static double linetoLinear1X = 24, linetoLinear1Y = -5, lineToLinear1Heading = 30;
-    public static double splineToLinear1X = 24, splineToLinear1Y = -24, splineToLinear1Heading = -80;
-    public static double splineToLinear2X = 17.5, splineToLinear2Y = 33, splineToLinear2Heading = 90, wait1 = 3;
+    public static double linetoLinear1X = 26, linetoLinear1Y = 6, lineToLinear1Heading = 30;
+    public static double splineToLinear1X = 26, splineToLinear1Y = -2.5, splineToLinear1Heading = -80;
+    public static double splineToLinear2X = 29, splineToLinear2Y = 34, splineToLinear2Heading = 90, wait1 = 3;
     public static double splineToLinear3X = 26, splineToLinear3Y = 38, splineToLinear3Heading = 90, wait2 = 3;
-    public static double splineToLinear4X = 8, splineToLinear4Y = 32, splineToLinear4Heading = 90, wait3 = 3;
+    public static double splineToLinear4X = 20, splineToLinear4Y = 33.5, splineToLinear4Heading = 90, wait3 = 3;
 
     public static double parkX = 4, parkY = 37, parkHeading = 90;
     public static double degree = 90;
@@ -55,19 +57,19 @@ public class BlueCloseSide extends LinearOpMode {
     TrajectorySequence park;
 
     //Fuck this shit
-   public void cameraInit(){
+    public void cameraInit(){
         int width = 160;
 
 
         detector = new DetectColor(width, telemetry, new Scalar(140,255,255),new Scalar(75,100,100));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-       // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
+        // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
         frontCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamFront"), cameraMonitorViewId);
-       // backCam.setPipeline(detector);
+        // backCam.setPipeline(detector);
         frontCam.setPipeline(detector);
 
-       // backCam.setMillisecondsPermissionTimeout(2500);
+        // backCam.setMillisecondsPermissionTimeout(2500);
         frontCam.setMillisecondsPermissionTimeout(2500);
         /*backCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -96,11 +98,11 @@ public class BlueCloseSide extends LinearOpMode {
     }
 
     public void initialize(){
-      drive = new SampleMecanumDrive(hardwareMap);
-      arm = new ArmPID(hardwareMap);
-      slide = new SlideMech(hardwareMap);
-      clawMech = new ClawMech(hardwareMap,telemetry);
-      cameraInit();
+        drive = new SampleMecanumDrive(hardwareMap);
+        arm = new ArmPID(hardwareMap);
+        slide = new SlideMech(hardwareMap);
+        clawMech = new ClawMech(hardwareMap,telemetry);
+        cameraInit();
     }
     @Override
     public void runOpMode() throws InterruptedException {
@@ -129,10 +131,9 @@ public class BlueCloseSide extends LinearOpMode {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
                     .splineTo(new Vector2d(splineToLinear1X, splineToLinear1Y), Math.toRadians(spline1deg))
-                    .build();
-
-            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
-                    .splineTo(new Vector2d(splineToLinear2X, splineToLinear2Y), Math.toRadians(spline1deg))
+                    .waitSeconds(3)
+                    .back(5)
+                    .lineToLinearHeading(new Pose2d(splineToLinear2X, splineToLinear2Y, Math.toRadians(spline2deg)))
                     .UNSTABLE_addTemporalMarkerOffset(wait1, () -> {
                         //slide.setLowJunction();
                     })
@@ -157,9 +158,7 @@ public class BlueCloseSide extends LinearOpMode {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance1)
                     .back(backwardsDistance1)
-                    .build();
 
-            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
                     .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y, Math.toRadians(splineToLinear3Heading)))
 
                     .UNSTABLE_addTemporalMarkerOffset(wait2, () -> {
@@ -186,9 +185,7 @@ public class BlueCloseSide extends LinearOpMode {
         } else if(e == DetectColor.ColorLocation.LEFT) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(linetoLinear1X, linetoLinear1Y, Math.toRadians(lineToLinear1Heading)))
-                    .build();
-
-            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
+                    .back(backdist2)
                     .lineToLinearHeading(new Pose2d(splineToLinear4X, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(wait3, () -> {
                         //slide.setLowJunction();
@@ -210,15 +207,16 @@ public class BlueCloseSide extends LinearOpMode {
                     .build();
 
         }else {
-                telemetry.addLine("its curtins");
-                firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                        .forward(frwDistance1)
-                        .waitSeconds(wait01)
-                        .back(backwardsDistance1)
-                        .waitSeconds(wait02)
-                        .turn(Math.toRadians(degree))
-                        .forward(frwDistance2)
-                        .build();
+            telemetry.addLine("its curtins");
+            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
+                    .forward(frwDistance1)
+                    .waitSeconds(wait01)
+                    .back(backwardsDistance1)
+                    .waitSeconds(wait02)
+                    .turn(Math.toRadians(degree))
+                    .forward(frwDistance2)
+                    .build();
+
 
 
                 /*
@@ -226,15 +224,17 @@ public class BlueCloseSide extends LinearOpMode {
                         .back(backwardsDistance1)
                         .build();
                         */
-                moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
-                        .splineToLinearHeading(new Pose2d(splineToLinear3X,splineToLinear3Y,Math.toRadians(splineToLinear3Heading)), Math.toRadians(0))
-                        .build();
+            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
+                    .splineToLinearHeading(new Pose2d(splineToLinear3X,splineToLinear3Y,Math.toRadians(splineToLinear3Heading)), Math.toRadians(0))
+                    .build();
         }
-
+/*
         park = drive.trajectorySequenceBuilder(moveToBackboard.end())
                 .lineToLinearHeading(new Pose2d(parkX,parkY,parkHeading))
                 .forward(frwDistance2)
                 .build();
+
+ */
 
 
 
