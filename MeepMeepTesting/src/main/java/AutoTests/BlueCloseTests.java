@@ -15,10 +15,10 @@ public class BlueCloseTests {
                 .setConstraints(50, 40, 2.225, 1.895, 11.5)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(12, 62, Math.toRadians(270)))
-                                .forward(15)
-                                .splineTo(new Vector2d(7,33),Math.toRadians(220))
-                                .lineToLinearHeading(new Pose2d(12,40,Math.toRadians(270)))
-                                .splineTo(new Vector2d(49,28.5),Math.toRadians(360))
+                                .forward(15) //+15 x
+                                .splineTo(new Vector2d(7,33),Math.toRadians(220)) //+5 y, +14 x, +50 degree angle
+                                .lineToLinearHeading(new Pose2d(12,40,Math.toRadians(270)))//-5 y, -7 x, - 50 degree angle
+                                .splineTo(new Vector2d(49,28.5),Math.toRadians(360))//-37 y, + 11.5 x, - 90 degree angle
                                 .build()
                 );
 
