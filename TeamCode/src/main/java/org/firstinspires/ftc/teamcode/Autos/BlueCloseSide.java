@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -35,9 +36,12 @@ public class BlueCloseSide extends LinearOpMode {
     public static double frwDistance1 = 30;
     public static double backwardsDistance1 = 12;
     public static double frwDistance2 = 5;
+    public static double frwDistance3 = 12;
     public static double wait01 = 1;
     public static double wait02 = 1;
-    public static double linetoLinear1X = 24, linetoLinear1Y = 24, lineToLinear1Heading = 30;
+    public static double spline1deg = 90;
+
+    public static double linetoLinear1X = 24, linetoLinear1Y = -5, lineToLinear1Heading = 30;
     public static double splineToLinear1X = 24, splineToLinear1Y = -24, splineToLinear1Heading = -80;
     public static double splineToLinear2X = 17.5, splineToLinear2Y = 33, splineToLinear2Heading = 90, wait1 = 3;
     public static double splineToLinear3X = 26, splineToLinear3Y = 38, splineToLinear3Heading = 90, wait2 = 3;
@@ -123,11 +127,12 @@ public class BlueCloseSide extends LinearOpMode {
         if (e == DetectColor.ColorLocation.RIGHT) {
 
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                    .splineToLinearHeading(new Pose2d(splineToLinear1X, splineToLinear1Y, Math.toRadians(splineToLinear1Heading)), Math.toRadians(0))
+                    .forward(frwDistance3)
+                    .splineTo(new Vector2d(splineToLinear1X, splineToLinear1Y), Math.toRadians(spline1deg))
                     .build();
 
             moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
-                    .splineToLinearHeading(new Pose2d(splineToLinear2X, splineToLinear2Y, Math.toRadians(splineToLinear2Heading)), Math.toRadians(0))
+                    .splineTo(new Vector2d(splineToLinear2X, splineToLinear2Y), Math.toRadians(spline1deg))
                     .UNSTABLE_addTemporalMarkerOffset(wait1, () -> {
                         //slide.setLowJunction();
                     })
@@ -152,7 +157,6 @@ public class BlueCloseSide extends LinearOpMode {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance1)
                     .back(backwardsDistance1)
-                    .addDisplacementMarker(() -> drive.followTrajectorySequenceAsync(moveToBackboard))
                     .build();
 
             moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
@@ -176,7 +180,6 @@ public class BlueCloseSide extends LinearOpMode {
                         slide.setIntakeOrGround();
                     })
                     .waitSeconds(15)
-                    .addDisplacementMarker(() -> drive.followTrajectorySequenceAsync(park))
                     .build();
 
 
@@ -186,7 +189,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .build();
 
             moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
-                    .splineToLinearHeading(new Pose2d(splineToLinear4X, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)), Math.toRadians(0))
+                    .lineToLinearHeading(new Pose2d(splineToLinear4X, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(wait3, () -> {
                         //slide.setLowJunction();
                     })
@@ -244,7 +247,9 @@ public class BlueCloseSide extends LinearOpMode {
 
         frontCam.stopStreaming();
 
-        drive.followTrajectorySequenceAsync(firstMove);
+        drive.followTrajectorySequence(firstMove);
+        //drive.followTrajectorySequenceAsync(moveToBackboard);
+
 
 
         while (opModeIsActive() && !isStopRequested()) {
