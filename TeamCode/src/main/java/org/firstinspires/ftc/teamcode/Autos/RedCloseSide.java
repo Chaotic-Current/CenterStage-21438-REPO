@@ -113,12 +113,15 @@ public class RedCloseSide extends LinearOpMode {
 
 
         DetectColor.ColorLocation e = detector.getLocate();
-        while (e == null || e == DetectColor.ColorLocation.UNDETECTED){
+        ElapsedTime time = new ElapsedTime();
+        while (e == null || time.milliseconds() <= 1000){
             e = detector.getLocate();
             if(e != null) {
                 telemetry.addLine("in loop " + e.name());
                 telemetry.update();
             }
+            if(e== null)
+                time.reset();
         }
 
 
@@ -135,25 +138,24 @@ public class RedCloseSide extends LinearOpMode {
                     .waitSeconds(3)
                     .back(5)
                     .lineToLinearHeading(new Pose2d(splineToLinear2X, splineToLinear2Y, Math.toRadians(-spline2deg)))
-                    .UNSTABLE_addTemporalMarkerOffset(wait1, () -> {
-                        //slide.setLowJunction();
+                    .UNSTABLE_addTemporalMarkerOffset(wait2, () -> {
+                        slide.setLowJunction();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(wait1 + 1, () -> {
-                        //arm.setExtakeOrIntake();
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 1, () -> {
+                        arm.setExtakeOrIntake();
                     })
-                    .waitSeconds(4)
-                    .UNSTABLE_addTemporalMarkerOffset(wait1 + 2, () -> {
-                        //clawMech.setBothOpen(false);
+                    .waitSeconds(3)
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 2, () -> {
+                        clawMech.open();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(wait1 + 2.5, () -> {
-                        //arm.setExtakeOrIntake();
-                        //clawMech.getClaw().setPosition(clawMech.close);
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 3, () -> {
+                        arm.setIntake();
+                        clawMech.close();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(wait1 + 3.5, () -> {
-                        //slide.setIntakeOrGround();
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 5, () -> {
+                        slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
-                    //.splineTo(new Vector2d(frparkX, frparkY), Math.toRadians(frparkHeading))
+                    .waitSeconds(15)
                     .lineToLinearHeading(new Pose2d(frparkX-2, frparkY, Math.toRadians(frparkHeading)))
                     .forward(10)
                     .build();
@@ -167,53 +169,49 @@ public class RedCloseSide extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y, Math.toRadians(splineToLinear3Heading)))
 
                     .UNSTABLE_addTemporalMarkerOffset(wait2, () -> {
-                        //slide.setLowJunction();
+                        slide.setLowJunction();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(wait2 + 1, () -> {
-                        //arm.setExtakeOrIntake();
+                        arm.setExtakeOrIntake();
                     })
                     .waitSeconds(3)
                     .UNSTABLE_addTemporalMarkerOffset(wait2 + 2, () -> {
-                        //clawMech.open();
+                        clawMech.open();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(wait2 + 3, () -> {
-                        //arm.setIntake();
-                        //clawMech.close();
+                        arm.setIntake();
+                        clawMech.close();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(wait2 + 5, () -> {
-                        //slide.setIntakeOrGround();
+                        slide.setIntakeOrGround();
                     })
-                    //.back(11)
-                    .waitSeconds(5)
-                    //.splineTo(new Vector2d(frparkX, frparkY), Math.toRadians(frparkHeading))
-                    .lineToLinearHeading(new Pose2d(frparkX, frparkY, Math.toRadians(frparkHeading)))
-                    .forward(10)
+                    .waitSeconds(15)
                     .build();
 
 
-        } else if(e == DetectColor.ColorLocation.RIGHT) {
+        } else if(e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(linetoLinear1X, linetoLinear1Y, Math.toRadians(lineToLinear1Heading)))
                     .back(backdist2)
                     .lineToLinearHeading(new Pose2d(splineToLinear4X, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)))
-                    .UNSTABLE_addTemporalMarkerOffset(wait3, () -> {
-                        //slide.setLowJunction();
+                    .UNSTABLE_addTemporalMarkerOffset(wait2, () -> {
+                        slide.setLowJunction();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(wait3 + 1, () -> {
-                        //arm.setExtakeOrIntake();
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 1, () -> {
+                        arm.setExtakeOrIntake();
                     })
-                    .waitSeconds(4)
-                    .UNSTABLE_addTemporalMarkerOffset(wait3 + 2, () -> {
-                        //clawMech.setBothOpen(false);
+                    .waitSeconds(3)
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 2, () -> {
+                        clawMech.open();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(wait3 + 2.5, () -> {
-                        //arm.setExtakeOrIntake();
-                        //clawMech.getClaw().setPosition(clawMech.close);
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 3, () -> {
+                        arm.setIntake();
+                        clawMech.close();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(wait3 + 3.5, () -> {
-                        //slide.setIntakeOrGround();
+                    .UNSTABLE_addTemporalMarkerOffset(wait2 + 5, () -> {
+                        slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
+                    .waitSeconds(15)
                     //.splineTo(new Vector2d(frparkX, frparkY), Math.toRadians(frparkHeading))
                     .lineToLinearHeading(new Pose2d(frparkX, frparkY, Math.toRadians(frparkHeading)))
                     .forward(10)
