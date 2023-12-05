@@ -30,7 +30,9 @@ public class SlideMech {
     public static double slideKd = 0.000000; //0.000001;
     public static double slideKf = 0.00000; //0.000069;
     public static double slideKpClimb = 0.003;
-    private boolean isClimbing = false;
+    public static double slideKpClimbDown=0.03;
+    private int isClimbing = 0;
+    public static double targetclimb = 3050;
 
     private final double[] PIDF_COFFECIENTS = {slideKp, slideKi, slideKd, slideKf};
 
@@ -66,9 +68,11 @@ public class SlideMech {
     public void update(Telemetry telemetry) {
         int avg = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
 
-        if(isClimbing){
+        if(isClimbing>0){
             slidePIDF.setPIDF(slideKpClimb,slideKi,slideKd,slideKf);
-        }else if( avg > targetPos){
+        }
+
+        else if( avg > targetPos){
             slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
         }else {
             slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
@@ -92,6 +96,9 @@ public class SlideMech {
 
     public void setIntakeOrGround() {
         targetPos = ZERO_POSITION;
+        if(isClimbing>0){//was climbing up, now down
+            slidePIDF.setPIDF(slideKpClimbDown,slideKi,slideKd,slideKf);
+        }
         currentPosition = CurrentPosition.ZERO;
     }
 
@@ -106,9 +113,10 @@ public class SlideMech {
     }
 
     public void climbUp(){
-        targetPos = 3800;
-        isClimbing = true;
+        targetPos = targetclimb;
+        isClimbing = 1;
         currentPosition = CurrentPosition.CUSTOM;
+
     }
 
     public void setHighJunction() {

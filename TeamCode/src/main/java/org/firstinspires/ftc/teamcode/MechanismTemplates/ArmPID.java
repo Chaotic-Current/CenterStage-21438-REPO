@@ -20,7 +20,7 @@ public class ArmPID {
     public static double armKi = 0.0001;
     public static double armKd = 0;
     public static double armKf = 0;
-    public static double EXTAKE_POS = 310; // 290 old val; in degrees of absolute encoder//120 old val//315 old val
+    public static double EXTAKE_POS = 310; // 290 old val; in degrees of absolute encoder//120 old val//315 old val//310 old val
     public static double INTAKE_POS = 25; // 65 old val//64 old val//28 old val
     public static double targetPos;
 
