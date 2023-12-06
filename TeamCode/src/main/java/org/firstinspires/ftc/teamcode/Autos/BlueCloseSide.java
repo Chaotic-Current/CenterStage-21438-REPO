@@ -23,16 +23,15 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 @Config
 @Autonomous
-public class BlueCloseSide extends LinearOpMode {
+public class BlueCloseSide extends LinearOpMode{
     
     private SampleMecanumDrive drive;
     private OpenCvWebcam frontCam, backCam;
     private ArmPID arm;
     private SlideMech slide;
     private ClawMech clawMech;
-    private DetectColor detector; //This will be out of the frame for know, along with the april tag pipeline
+    private DetectColor detector;
     private AprilTagDetectionPipeline aprilTagPipeline;
-    //TODO all these values are just place holders so the code doesn't cause an error, delete this comment after you see it
     public static double centerFrwDistance1 = 30;
     public static double centerBackwardsDistance1 = 12;
     public static double frwDistance2 = 5;
@@ -56,11 +55,8 @@ public class BlueCloseSide extends LinearOpMode {
 
     TrajectorySequence autoTrajectory;
 
-
-    //Fuck this shit
     public void cameraInit() {
         int width = 160;
-
 
         detector = new DetectColor(width, telemetry, new Scalar(140, 255, 255), new Scalar(75, 100, 100));
 
@@ -112,7 +108,6 @@ public class BlueCloseSide extends LinearOpMode {
 
         drive.setPoseEstimate(new Pose2d());
 
-
         DetectColor.ColorLocation e = detector.getLocate();
         ElapsedTime time = new ElapsedTime();
         while (e == null || time.milliseconds() <= 1000) {
@@ -142,8 +137,9 @@ public class BlueCloseSide extends LinearOpMode {
 //            }
 //        });
 
-        //I added what I think would be proper points for mechanisms to do what they need to do, but I commented them out just for now
-        if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
+//       I added what I think would be proper points for mechanisms to do what they need to do, but I commented them out just for now
+
+        if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED){
 
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
@@ -157,7 +153,8 @@ public class BlueCloseSide extends LinearOpMode {
                         arm.setExtakeOrIntake();
                     })
                     .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
-                    //don't do anything with this
+
+//  don't do anything with this
 //                    .UNSTABLE_addTemporalMarkerOffset(0.5,() ->{
 //                        double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
 //                        double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
@@ -165,6 +162,7 @@ public class BlueCloseSide extends LinearOpMode {
 //                        drive.setPoseEstimate(new Pose2d(newX, newY,newAngle));
 //                    })
 //                    .waitSeconds(0.7)
+
                     .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y, Math.toRadians(rightLineToLinear2deg)))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         clawMech.open();
@@ -180,7 +178,8 @@ public class BlueCloseSide extends LinearOpMode {
                     .build();
 
 
-        } else if (e == DetectColor.ColorLocation.CENTER) {
+        }
+        else if (e == DetectColor.ColorLocation.CENTER) {
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(centerFrwDistance1)
                     .back(centerBackwardsDistance1)
@@ -198,7 +197,7 @@ public class BlueCloseSide extends LinearOpMode {
 //                        double newAngle = drive.getPoseEstimate().getHeading() + Math.toRadians(aprilTagPipeline.getErrorYaw());
 //                        drive.setPoseEstimate(new Pose2d(newX, newY,newAngle));
 //                    })
-//                    .waitSeconds(0.7)
+//                  .waitSeconds(0.7)
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         clawMech.open();
@@ -213,8 +212,8 @@ public class BlueCloseSide extends LinearOpMode {
                     .waitSeconds(15)
                     .build();
 
-
-        } else if (e == DetectColor.ColorLocation.LEFT) {
+        }
+        else if (e == DetectColor.ColorLocation.LEFT) {
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
                     .back(leftBackDist)
@@ -247,20 +246,10 @@ public class BlueCloseSide extends LinearOpMode {
                     .waitSeconds(15)
                     .build();
 
-        } else {
-            telemetry.addLine("its curtins");
-            autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-                    .forward(centerFrwDistance1)
-                    .waitSeconds(wait01)
-                    .back(centerBackwardsDistance1)
-                    .waitSeconds(wait02)
-                    .turn(Math.toRadians(degree))
-                    .forward(frwDistance2)
-                    .build();
-
         }
-
-
+        else {
+            telemetry.addLine("ruh roh");
+        }
             waitForStart();
             telemetry.update();
             telemetry.addLine(e.name());
@@ -269,7 +258,6 @@ public class BlueCloseSide extends LinearOpMode {
             frontCam.stopStreaming();
 
             drive.followTrajectorySequence(autoTrajectory);
-
 
             while (opModeIsActive() && !isStopRequested()) {
                 drive.update();
