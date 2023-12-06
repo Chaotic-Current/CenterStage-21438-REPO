@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.Pipelines;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+
+
+import org.firstinspires.ftc.robotcore.external.navigation.*;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -12,13 +16,34 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
-import org.openftc.apriltag.AprilTagPose;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-class AprilTagDetectionPipeline extends OpenCvPipeline
+public class AprilTagDetectionPipeline extends OpenCvPipeline
 {
+
+    public static Scalar blue = new Scalar(7,197,235,255);
+    public static Scalar red = new Scalar(255,0,0,255);
+    public static Scalar green = new Scalar(0,255,0,255);
+    public static Scalar white = new Scalar(255,255,255,255);
+
+    static final double INCHES_PER_METER = 39.3701;
+
+    // Lens intrinsics
+    // UNITS ARE PIXELS
+    // NOTE: this calibration is for the C920 webcam at 800x448.
+    // You will need to do your own calibration for other configurations!
+    public static double fx = 578.272;
+    public static double fy = 578.272;
+    public static double cx = 402.145;
+    public static double cy = 221.506;
+
+    // UNITS ARE METERS
+    public static double TAG_SIZE = 0.166;
+
+    // instance variables
+
     private long nativeApriltagPtr;
     private Mat grey = new Mat();
     private ArrayList<AprilTagDetection> detections = new ArrayList<>();
@@ -28,37 +53,26 @@ class AprilTagDetectionPipeline extends OpenCvPipeline
 
     Mat cameraMatrix;
 
-    Scalar blue = new Scalar(7,197,235,255);
-    Scalar red = new Scalar(255,0,0,255);
-    Scalar green = new Scalar(0,255,0,255);
-    Scalar white = new Scalar(255,255,255,255);
-
-    double fx;
-    double fy;
-    double cx;
-    double cy;
-
-    // UNITS ARE METERS
-    double tagsize;
-    double tagsizeX;
-    double tagsizeY;
+    double tagsizeX = TAG_SIZE;
+    double tagsizeY = TAG_SIZE;
+    private double ErrorX;
+    private double ErrorY;
+    private double ErrorYaw;
 
     private float decimation;
     private boolean needToSetDecimation;
     private final Object decimationSync = new Object();
 
-    public AprilTagDetectionPipeline(double tagsize, double fx, double fy, double cx, double cy)
-    {
-        this.tagsize = tagsize;
-        this.tagsizeX = tagsize;
-        this.tagsizeY = tagsize;
-        this.fx = fx;
-        this.fy = fy;
-        this.cx = cx;
-        this.cy = cy;
+
+
+    public AprilTagDetectionPipeline() {
 
         constructMatrix();
+    }
 
+    @Override
+    public void init(Mat frame)
+    {
         // Allocate a native context object. See the corresponding deletion in the finalizer
         nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector(AprilTagDetectorJNI.TagFamily.TAG_36h11.string, 3, 3);
     }
@@ -66,17 +80,8 @@ class AprilTagDetectionPipeline extends OpenCvPipeline
     @Override
     public void finalize()
     {
-        // Might be null if createApriltagDetector() threw an exception
-        if(nativeApriltagPtr != 0)
-        {
-            // Delete the native context we created in the constructor
-            AprilTagDetectorJNI.releaseApriltagDetector(nativeApriltagPtr);
-            nativeApriltagPtr = 0;
-        }
-        else
-        {
-            System.out.println("AprilTagDetectionPipeline.finalize(): nativeApriltagPtr was NULL");
-        }
+        // Delete the native context we created in the init() function
+        AprilTagDetectorJNI.releaseApriltagDetector(nativeApriltagPtr);
     }
 
     @Override
@@ -95,21 +100,30 @@ class AprilTagDetectionPipeline extends OpenCvPipeline
         }
 
         // Run AprilTag
-        detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
+        detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, TAG_SIZE, fx, fy, cx, cy);
 
         synchronized (detectionsUpdateSync)
         {
             detectionsUpdate = detections;
         }
 
-        // For fun, use OpenCV to draw 6DOF markers on the image.
+        // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
+        // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
         for(AprilTagDetection detection : detections)
         {
-            Pose pose = aprilTagPoseToOpenCvPose(detection.pose);
-            //Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
+            Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
             drawAxisMarker(input, tagsizeY/2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
             draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
+
+          Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+
+            
+            ErrorX = detection.pose.x*INCHES_PER_METER;
+            ErrorY = detection.pose.y*INCHES_PER_METER;
+            ErrorYaw = rot.firstAngle;
         }
+
+
 
         return input;
     }
@@ -238,28 +252,6 @@ class AprilTagDetectionPipeline extends OpenCvPipeline
         Imgproc.line(buf, projectedPoints[4], projectedPoints[7], green, thickness);
     }
 
-    Pose aprilTagPoseToOpenCvPose(AprilTagPose aprilTagPose)
-    {
-        Pose pose = new Pose();
-        pose.tvec.put(0,0, aprilTagPose.x);
-        pose.tvec.put(1,0, aprilTagPose.y);
-        pose.tvec.put(2,0, aprilTagPose.z);
-
-        Mat R = new Mat(3, 3, CvType.CV_32F);
-
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                R.put(i,j, aprilTagPose.R.get(i,j));
-            }
-        }
-
-        Calib3d.Rodrigues(R, pose.rvec);
-
-        return pose;
-    }
-
     /**
      * Extracts 6DOF pose from a trapezoid, using a camera intrinsics matrix and the
      * original size of the tag.
@@ -290,6 +282,18 @@ class AprilTagDetectionPipeline extends OpenCvPipeline
         return pose;
     }
 
+    public double getErrorX() {
+        return ErrorX;
+    }
+
+    public double getErrorY() {
+        return ErrorY;
+    }
+
+    public double getErrorYaw() {
+        return ErrorYaw;
+    }
+
     /*
      * A simple container to hold both rotation and translation
      * vectors, which together form a 6DOF pose.
@@ -301,8 +305,8 @@ class AprilTagDetectionPipeline extends OpenCvPipeline
 
         public Pose()
         {
-            rvec = new Mat(3, 1, CvType.CV_32F);
-            tvec = new Mat(3, 1, CvType.CV_32F);
+            rvec = new Mat();
+            tvec = new Mat();
         }
 
         public Pose(Mat rvec, Mat tvec)
