@@ -197,10 +197,12 @@ public class BlueCloseSide extends LinearOpMode {
                     .forward(centerFrwDistance1)
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
+                        telemetry.addData("slides?", 0);
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
                         arm.setExtake(0.0);
+                        telemetry.addData("arm?", 0);
                     })
                     .waitSeconds(.1)
 
@@ -217,6 +219,8 @@ public class BlueCloseSide extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X,centerLineToLinear2Y,Math.toRadians(centerLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(1000);
+                        telemetry.addData("slides again?", 0);
+
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
