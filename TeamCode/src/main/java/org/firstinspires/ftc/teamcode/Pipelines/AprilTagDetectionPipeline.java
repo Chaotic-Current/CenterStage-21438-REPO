@@ -34,10 +34,10 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline
     // UNITS ARE PIXELS
     // NOTE: this calibration is for the C920 webcam at 800x448.
     // You will need to do your own calibration for other configurations!
-    public static double fx = 578.272;
-    public static double fy = 578.272;
-    public static double cx = 402.145;
-    public static double cy = 221.506;
+    public static double fx = 1430;
+    public static double fy = 1430;
+    public static double cx = 480;
+    public static double cy = 620;
 
     // UNITS ARE METERS
     public static double TAG_SIZE = 0.166;
@@ -58,6 +58,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline
     private double ErrorX;
     private double ErrorY;
     private double ErrorYaw;
+    private int targetTag;
 
     private float decimation;
     private boolean needToSetDecimation;
@@ -109,18 +110,19 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline
 
         // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
         // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
-        for(AprilTagDetection detection : detections)
-        {
-            Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
-            drawAxisMarker(input, tagsizeY/2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
-            draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
+        for(AprilTagDetection detection : detections) {
+            if (detection.id == targetTag) {
+                Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
+                drawAxisMarker(input, tagsizeY / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
+                draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
 
-          Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+                Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
-            
-            ErrorX = detection.pose.x*INCHES_PER_METER;
-            ErrorY = detection.pose.y*INCHES_PER_METER;
-            ErrorYaw = rot.firstAngle;
+
+                ErrorX = detection.pose.x * INCHES_PER_METER;
+                ErrorY = detection.pose.y * INCHES_PER_METER;
+                ErrorYaw = rot.firstAngle;
+            }
         }
 
 
@@ -292,6 +294,10 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline
 
     public double getErrorYaw() {
         return ErrorYaw;
+    }
+
+    public void setTargetTag(int tag){
+        targetTag = tag;
     }
 
     /*
