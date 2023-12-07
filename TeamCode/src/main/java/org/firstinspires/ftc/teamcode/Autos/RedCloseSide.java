@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
@@ -21,7 +22,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @Config
-@Autonomous (name = "AAAAAA")
+@Autonomous
 public class RedCloseSide extends LinearOpMode {
 
     public static int location = 1;
@@ -52,7 +53,8 @@ public class RedCloseSide extends LinearOpMode {
     public static double parkX = 4, parkY = 37, parkHeading = 90;
     public static double degree = 90;
 
-    TrajectorySequence autoTrajectory;
+    TrajectorySequence firstMove;
+    TrajectorySequence moveToBackboard;
     TrajectorySequence park;
 
     //Fuck this shit
@@ -123,14 +125,14 @@ public class RedCloseSide extends LinearOpMode {
         }
 
 
-        frontCam.stopStreaming();
+
         telemetry.addLine(e.name());
         telemetry.update();
 
         //I added what I think would be proper points for mechanisms to do what they need to do, but I commented them out just for now
         if (e == DetectColor.ColorLocation.LEFT) {
 
-            autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
+            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
                     .splineTo(new Vector2d(splineToLinear1X, splineToLinear1Y), Math.toRadians(spline1deg))
                     .waitSeconds(3)
@@ -177,27 +179,23 @@ public class RedCloseSide extends LinearOpMode {
 
 
         } else if (e == DetectColor.ColorLocation.CENTER) {
-            autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
+            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance1)
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
-                        telemetry.addData("slides?", 0);
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
                         arm.setExtake(0.0);
-                        telemetry.addData("arm?", 0);
                     })
                     .waitSeconds(.1)
 
                     .back(backwardsDistance1)
 
-
                     .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y, Math.toRadians(splineToLinear3Heading)))
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(1000);
-                        telemetry.addData("slides? again", 0);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
@@ -225,7 +223,7 @@ public class RedCloseSide extends LinearOpMode {
 
 
         } else if(e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
-            autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
+            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(linetoLinear1X, linetoLinear1Y, Math.toRadians(lineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
@@ -268,7 +266,26 @@ public class RedCloseSide extends LinearOpMode {
                     .build();
 
         }else {
-            telemetry.addLine("ruh roh");
+            telemetry.addLine("its curtins");
+            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
+                    .forward(frwDistance1)
+                    .waitSeconds(wait01)
+                    .back(backwardsDistance1)
+                    .waitSeconds(wait02)
+                    .turn(Math.toRadians(degree))
+                    .forward(frwDistance2)
+                    .build();
+
+
+
+                /*
+                moveBack = drive.trajectorySequenceBuilder(new Pose2d())
+                        .back(backwardsDistance1)
+                        .build();
+                        */
+            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
+                    .splineToLinearHeading(new Pose2d(splineToLinear3X,splineToLinear3Y,Math.toRadians(splineToLinear3Heading)), Math.toRadians(0))
+                    .build();
         }
 /*
         park = drive.trajectorySequenceBuilder(moveToBackboard.end())
@@ -279,14 +296,20 @@ public class RedCloseSide extends LinearOpMode {
  */
 
 
+
+
+
         waitForStart();
         telemetry.update();
         telemetry.addLine(e.name());
         telemetry.update();
 
-        //frontCam.stopStreaming();
+        frontCam.stopStreaming();
 
-        drive.followTrajectorySequence(autoTrajectory);
+        drive.followTrajectorySequenceAsync(firstMove);
+        //drive.followTrajectorySequenceAsync(moveToBackboard);
+
+
 
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
