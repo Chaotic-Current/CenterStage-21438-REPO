@@ -103,6 +103,7 @@ public class RedCloseSide extends LinearOpMode {
         arm = new ArmPID(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap,telemetry);
+
         cameraInit();
     }
     @Override
@@ -276,8 +277,6 @@ public class RedCloseSide extends LinearOpMode {
                     .forward(frwDistance2)
                     .build();
 
-
-
                 /*
                 moveBack = drive.trajectorySequenceBuilder(new Pose2d())
                         .back(backwardsDistance1)
@@ -295,10 +294,6 @@ public class RedCloseSide extends LinearOpMode {
 
  */
 
-
-
-
-
         waitForStart();
         telemetry.update();
         telemetry.addLine(e.name());
@@ -307,15 +302,11 @@ public class RedCloseSide extends LinearOpMode {
         frontCam.stopStreaming();
 
         drive.followTrajectorySequenceAsync(firstMove);
-        //drive.followTrajectorySequenceAsync(moveToBackboard);
-
-
 
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
             slide.update(telemetry);
             arm.update(telemetry, new ElapsedTime());
-
         }
     }
 }

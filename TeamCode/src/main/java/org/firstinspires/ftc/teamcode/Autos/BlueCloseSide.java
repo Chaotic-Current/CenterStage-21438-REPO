@@ -141,7 +141,7 @@ public class BlueCloseSide extends LinearOpMode {
 
 
         if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
-            aprilTagPipeline.setTargetTag(3);
+            //aprilTagPipeline.setTargetTag(3);
 
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
@@ -193,7 +193,7 @@ public class BlueCloseSide extends LinearOpMode {
 
 
         } else if (e == DetectColor.ColorLocation.CENTER) {
-            aprilTagPipeline.setTargetTag(2);
+            //aprilTagPipeline.setTargetTag(2);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(centerFrwDistance1)
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -249,7 +249,7 @@ public class BlueCloseSide extends LinearOpMode {
 
 
         } else if (e == DetectColor.ColorLocation.LEFT) {
-            aprilTagPipeline.setTargetTag(1);
+            //aprilTagPipeline.setTargetTag(1);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1X, Math.toRadians(leftLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -309,7 +309,7 @@ public class BlueCloseSide extends LinearOpMode {
         telemetry.update();
 
 
-        drive.followTrajectorySequence(autoTrajectory);
+        drive.followTrajectorySequenceAsync(autoTrajectory);
 
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
