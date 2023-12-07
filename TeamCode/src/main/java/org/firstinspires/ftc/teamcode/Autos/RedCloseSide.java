@@ -306,7 +306,7 @@ public class RedCloseSide extends LinearOpMode {
 
         frontCam.stopStreaming();
 
-        drive.followTrajectorySequence(firstMove);
+        drive.followTrajectorySequenceAsync(firstMove);
         //drive.followTrajectorySequenceAsync(moveToBackboard);
 
 
