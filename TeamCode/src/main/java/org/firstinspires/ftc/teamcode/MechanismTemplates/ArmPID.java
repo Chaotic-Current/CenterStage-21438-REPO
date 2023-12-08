@@ -96,7 +96,7 @@ public class ArmPID {
     }
 
 
-    private double getArmPosition() {
+    public double getArmPosition() {
         if(hardwareMap.analogInput.get("axonSensor").getVoltage() < 0.8){
             return Math.abs(hardwareMap.analogInput.get("axonSensor").getVoltage() - 0.8)/3.3 * 360;
         } else{

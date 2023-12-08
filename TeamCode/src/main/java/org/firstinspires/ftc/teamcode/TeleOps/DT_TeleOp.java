@@ -179,6 +179,7 @@ public class DT_TeleOp extends OpMode {
         gamePad_2_B.update();
         GamePad_1_DpadUp.update();
         gamePad_2_bumperLeft.update();
+        telemetry.addLine("Position : " + arm.getArmPosition());
         telemetry.update();
     }
 
