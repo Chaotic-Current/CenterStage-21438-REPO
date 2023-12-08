@@ -19,6 +19,12 @@ public class BlueCloseTests {
                                 .splineTo(new Vector2d(7,33),Math.toRadians(220)) //+5 y, +14 x, +50 degree angle
                                 .lineToLinearHeading(new Pose2d(12,40,Math.toRadians(270)))//-5 y, -7 x, - 50 degree angle
                                 .splineTo(new Vector2d(49,28.5),Math.toRadians(360))//-37 y, + 11.5 x, - 90 degree angle
+                                .waitSeconds(2)
+                                .lineToLinearHeading(new Pose2d(39,12, Math.toRadians(180)))
+                                .lineToLinearHeading(new Pose2d(-59,11.5, Math.toRadians(180)))
+                                .waitSeconds(5)
+                                .lineToLinearHeading(new Pose2d(39,12, Math.toRadians(180)))
+                                .lineToLinearHeading(new Pose2d(new Vector2d(49,28.5),Math.toRadians(360)))
                                 .build()
                 );
 
@@ -36,7 +42,7 @@ public class BlueCloseTests {
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(spikeleft)
+                .addEntity(spikeRight)
                 .start();
     }
 }

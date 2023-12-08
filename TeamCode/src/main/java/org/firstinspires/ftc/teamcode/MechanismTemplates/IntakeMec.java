@@ -43,7 +43,6 @@ public class IntakeMec  {
         intake = (DcMotorEx) hardwareMap.dcMotor.get("IN");
         left = hardwareMap.get(Servo.class, "ARM_L");
         right = hardwareMap.get(Servo.class, "ARM_R");
-
         left.setPosition(0.8); // left start pos
         right.setPosition(0.2); // right start pos
 
@@ -64,6 +63,21 @@ public class IntakeMec  {
         this.bumperRight = new SignalEdgeDetector(() -> this.gamepad.right_bumper);;
 
         this.bumperLeft = new SignalEdgeDetector(() -> this.gamepad.left_bumper);
+    }
+
+    public IntakeMec(HardwareMap hardwareMap){
+        intake = (DcMotorEx) hardwareMap.dcMotor.get("IN");
+        left = hardwareMap.get(Servo.class, "ARM_L");
+        right = hardwareMap.get(Servo.class, "ARM_R");
+
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        left.setPosition(0.8);
+        left.setPosition(0.2);
     }
 
     public State getState(){
@@ -111,5 +125,17 @@ public class IntakeMec  {
         buttonY.update();
         bumperLeft.update();
         bumperRight.update();
+    }
+
+    public DcMotorEx getIntake() {
+        return intake;
+    }
+
+    public Servo getLeft() {
+        return left;
+    }
+
+    public Servo getRight() {
+        return right;
     }
 }

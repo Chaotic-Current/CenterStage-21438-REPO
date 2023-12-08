@@ -5,11 +5,13 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
@@ -27,6 +29,7 @@ public class BlueCloseSide extends LinearOpMode {
 
     private SampleMecanumDrive drive;
     private OpenCvWebcam frontCam, backCam;
+    private IntakeMec intake;
     private ArmPID arm;
     private SlideMech slide;
     private ClawMech clawMech;
@@ -52,6 +55,12 @@ public class BlueCloseSide extends LinearOpMode {
     public static double leftLinetoLinear3Y = 40.5;
     public static double parkX = 4, parkY = 37, parkHeading = 90;
     public static double degree = 90;
+
+    public static double toStackLinetoLinear1X, toStackLinetoLinear1Y, toStackLineToLinear1Heading;
+    public static double toStackLinetoLinear2X, toStackLinetoLinear2Y, toStackLineToLinear2Heading;
+    public static double toBackBoardLinetoLinear1X, toBackBoardLinetoLinear1Y, toBackBoardLinetoLinear1Heading;
+    public static double toBackBoardLinetoLinear2X, toBackBoardLinetoLinear2Y, toBackBoardLinetoLinear2Heading;
+    String x;
 
     TrajectorySequence autoTrajectory;
 
@@ -96,6 +105,7 @@ public class BlueCloseSide extends LinearOpMode {
     }
 
     public void initialize() {
+        intake = new IntakeMec(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         arm = new ArmPID(hardwareMap);
         slide = new SlideMech(hardwareMap);
@@ -141,7 +151,7 @@ public class BlueCloseSide extends LinearOpMode {
 
 
         if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
-            //aprilTagPipeline.setTargetTag(3);
+            aprilTagPipeline.setTargetTag(3);
 
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
@@ -159,10 +169,12 @@ public class BlueCloseSide extends LinearOpMode {
                     .waitSeconds(.1)
                     .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
                     .UNSTABLE_addTemporalMarkerOffset(0.15,() ->{
+                         x = "old: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                         double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
                        // double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
                         double newAngle = drive.getPoseEstimate().getHeading() - Math.toRadians(aprilTagPipeline.getErrorYaw());
                         drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
+                        x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                    })
                     .waitSeconds(0.5)
                     .lineToLinearHeading(new Pose2d(rightLineToLinear2X,rightLineToLinear3Y,Math.toRadians(rightLineToLinear2deg)))
@@ -186,6 +198,42 @@ public class BlueCloseSide extends LinearOpMode {
                         slide.setIntakeOrGround();
                     })
                     .waitSeconds(5)
+//                    .lineToLinearHeading(new Pose2d(toStackLinetoLinear1X,toStackLinetoLinear1Y,Math.toRadians(toStackLineToLinear1Heading)))
+//                    .UNSTABLE_addTemporalMarkerOffset(0, () ->{
+//                        intake.getLeft().setPosition(0.9);
+//                        intake.getRight().setPosition(0.1);
+//                    })
+//                    .lineToLinearHeading(new Pose2d(toStackLinetoLinear2X,toStackLinetoLinear2Y,Math.toRadians(toStackLineToLinear2Heading)))
+//                    .UNSTABLE_addTemporalMarkerOffset(0,()->{
+//                        intake.getIntake().setPower(0.75);
+//                    })
+//                    .UNSTABLE_addTemporalMarkerOffset(0.15,()->{
+//                        intake.getLeft().setPosition(0.8);
+//                        intake.getRight().setPosition(0.2);
+//                    })
+//                    .waitSeconds(1.5)
+//                    .UNSTABLE_addTemporalMarkerOffset(0,()->{
+//                        intake.getIntake().setPower(0);
+//                    })
+//                    .lineToLinearHeading(new Pose2d(toBackBoardLinetoLinear1X, toBackBoardLinetoLinear1Y, Math.toRadians(toBackBoardLinetoLinear1Heading)))
+//                    .lineToLinearHeading(new Pose2d(toBackBoardLinetoLinear2X,toBackBoardLinetoLinear2Y,Math.toRadians(toBackBoardLinetoLinear2Heading)))
+//                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+//                        clawMech.open();
+//                    })
+//                    .waitSeconds(2)
+//                    .back(5)
+//
+//                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+//                        slide.setLowJunction();
+//                    })
+//                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+//                        arm.setIntake();
+//                        clawMech.close();
+//                    })
+//                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
+//                        slide.setIntakeOrGround();
+//                    })
+//                    .waitSeconds(5)
                     .strafeLeft(28)
                     .waitSeconds(.5)
                     .forward(11)
@@ -193,7 +241,7 @@ public class BlueCloseSide extends LinearOpMode {
 
 
         } else if (e == DetectColor.ColorLocation.CENTER) {
-            //aprilTagPipeline.setTargetTag(2);
+            aprilTagPipeline.setTargetTag(2);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(centerFrwDistance1)
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -211,10 +259,12 @@ public class BlueCloseSide extends LinearOpMode {
 
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(0.15,() ->{
+                        x = "old: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                         double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
                         // double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
                         double newAngle = drive.getPoseEstimate().getHeading() - Math.toRadians(aprilTagPipeline.getErrorYaw());
                         drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
+                        x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                     })
                     .waitSeconds(0.5)
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X,centerLineToLinear2Y,Math.toRadians(centerLineToLinear1Heading)))
@@ -249,7 +299,7 @@ public class BlueCloseSide extends LinearOpMode {
 
 
         } else if (e == DetectColor.ColorLocation.LEFT) {
-            //aprilTagPipeline.setTargetTag(1);
+            aprilTagPipeline.setTargetTag(1);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1X, Math.toRadians(leftLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -265,10 +315,12 @@ public class BlueCloseSide extends LinearOpMode {
 
                     .lineToLinearHeading(new Pose2d(leftLineToLinear2X, leftLineToLinear2Y, Math.toRadians(leftLineToLinear2Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(0.15,() ->{
+                        x = "old: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                         double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
                         // double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
                         double newAngle = drive.getPoseEstimate().getHeading() - Math.toRadians(aprilTagPipeline.getErrorYaw());
                         drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
+                        x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                     })
                     .waitSeconds(0.5)
                     .lineToLinearHeading(new Pose2d(leftLineToLinear2X,leftLinetoLinear3Y,Math.toRadians(leftLineToLinear2Heading)))
@@ -305,7 +357,7 @@ public class BlueCloseSide extends LinearOpMode {
 
         waitForStart();
         telemetry.update();
-        telemetry.addLine(e.name());
+        telemetry.addLine(x);
         telemetry.update();
 
 
