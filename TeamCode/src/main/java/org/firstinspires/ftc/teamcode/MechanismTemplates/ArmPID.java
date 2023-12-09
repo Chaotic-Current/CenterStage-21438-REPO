@@ -16,7 +16,7 @@ public class ArmPID {
     private HardwareMap hardwareMap;
 
     public static double armKpUp = 0.00585; // old is 0.012
-    public static double armKpDown = 0.00225;
+    public static double armKpDown = 0.00265;
     public static double armKi = 0.0001;
     public static double armKd = 0;
     public static double armKf = 0;
@@ -47,6 +47,11 @@ public class ArmPID {
         telemetry.addData("Motor Position: ", getArmPosition());
         telemetry.update();*/
         arm.set(correction);
+
+
+        /*if(getArmPosition() < 10 || getArmPosition() > 340){
+            armPIDF.setPIDF(-armKpUp, -armKi, -armKd, -armKf);
+        }
         /*if(getArmPosition() >285){
             armPIDF.setP(0.006);
         }

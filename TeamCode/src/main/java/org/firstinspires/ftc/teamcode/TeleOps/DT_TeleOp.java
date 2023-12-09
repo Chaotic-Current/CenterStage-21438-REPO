@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.DroneThrower;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
@@ -26,7 +27,8 @@ public class DT_TeleOp extends OpMode {
     private ClawMech claw;
     private Servo wrist;
     //private Servo planeLaucher;
-    private ArmPID arm;
+    //private ArmPID arm;
+    private ArmMecNew arm;
     private DroneThrower thrower;
     SignalEdgeDetector gamepad_2_A = new SignalEdgeDetector(() -> gamepad2.a);
     SignalEdgeDetector gamePad_2_Y = new SignalEdgeDetector(() -> gamepad2.y);
@@ -36,6 +38,7 @@ public class DT_TeleOp extends OpMode {
     SignalEdgeDetector gamePad_1_DpadUp = new SignalEdgeDetector(() -> gamepad1.dpad_up);
     SignalEdgeDetector gamePad_1_DpadDown = new SignalEdgeDetector(() -> gamepad1.dpad_down);
     SignalEdgeDetector gamePad_1_DpadLeft = new SignalEdgeDetector(() -> gamepad1.dpad_left);
+    SignalEdgeDetector GamePad_2_DpadLeft = new SignalEdgeDetector(() -> gamepad2.dpad_left);
     public static double wristPos = 0.5;
     private final double PRECISIONREDUCTION = 0.39;
     private final double TURN_PRECESION = 0.65;
@@ -84,6 +87,7 @@ public class DT_TeleOp extends OpMode {
         motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         wrist = hardwareMap.get(Servo.class,"WRIST");
+        wrist.setPosition(0.5);
         //planeLaucher = hardwareMap.get(Servo.class,"plane");
 
         slides = new SlideMech(hardwareMap);
@@ -94,7 +98,7 @@ public class DT_TeleOp extends OpMode {
         claw = new ClawMech(hardwareMap,telemetry,gamepad2);
         //claw.initialize();
 
-        arm = new ArmPID(hardwareMap);
+        arm = new ArmMecNew(hardwareMap);
 
         thrower = new DroneThrower(hardwareMap);
     }
@@ -131,7 +135,7 @@ public class DT_TeleOp extends OpMode {
         }
         if(slidesUp){
             if(timer.milliseconds() >= 1000) {
-                arm.setExtake(0);
+                arm.setExtake();
                 timer.reset();
             }
         }
@@ -147,6 +151,7 @@ public class DT_TeleOp extends OpMode {
 
 
         }
+
 
          if(slidesDown){
             if(timer.milliseconds() >= 2000  && !slides.isClimbing){
@@ -174,10 +179,7 @@ public class DT_TeleOp extends OpMode {
             thrower.luanched();
         }
 
-        if(gamePad_2_bumperLeft.isRisingEdge() && slides.getCurrentPosition() != SlideMech.CurrentPosition.ZERO){
-            arm.setExtakeOrIntake();
 
-        }
         wrist.setPosition(wristPos);
 
 //        if (gamepad1.right_trigger > 0.1){
@@ -194,16 +196,18 @@ public class DT_TeleOp extends OpMode {
         slides.update(telemetry);
         drive();
         ElapsedTime timer = new ElapsedTime();
-        arm.update(telemetry, timer);
+        //arm.update(telemetry, timer);
         gamepad_2_A.update();
         gamePad_2_Y.update();
         gamePad_2_X.update();
         gamePad_2_B.update();
+        gamePad_1_DpadLeft.update();
         gamePad_1_DpadUp.update();
         gamePad_1_DpadDown.update();
         gamePad_2_bumperLeft.update();
         gamePad_1_DpadLeft.update();
-        telemetry.addLine("Position : " + arm.getArmPosition());
+        GamePad_2_DpadLeft.update();
+        //telemetry.addLine("Position : " + arm.getArmPosition());
         telemetry.update();
     }
 

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
@@ -27,7 +28,7 @@ public class OneTrajectoryBlueCloseSide extends LinearOpMode {
     public static int location = 1;
     private SampleMecanumDrive drive;
     private OpenCvWebcam frontCam, backCam;
-    private ArmPID arm;
+    private ArmMecNew arm;
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector; //This will be out of the frame for know, along with the april tag pipeline
@@ -91,7 +92,7 @@ public class OneTrajectoryBlueCloseSide extends LinearOpMode {
 
     public void initialize(){
         drive = new SampleMecanumDrive(hardwareMap);
-        arm = new ArmPID(hardwareMap);
+        arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap,telemetry);
         cameraInit();
@@ -155,7 +156,7 @@ public class OneTrajectoryBlueCloseSide extends LinearOpMode {
                         slide.setLowJunction();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(wait2 + 1, () -> {
-                        arm.setExtakeOrIntake();
+                        arm.setExtake();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(wait2 + 3, () -> {
                         slide.setCustom(1290);
@@ -239,7 +240,7 @@ public class OneTrajectoryBlueCloseSide extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
             slide.update(telemetry);
-            arm.update(telemetry, new ElapsedTime());
+
 
         }
     }

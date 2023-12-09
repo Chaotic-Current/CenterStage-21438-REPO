@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
@@ -30,7 +31,7 @@ public class BlueCloseSide extends LinearOpMode {
     private SampleMecanumDrive drive;
     private OpenCvWebcam frontCam, backCam;
     private IntakeMec intake;
-    private ArmPID arm;
+    private ArmMecNew arm;
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector;
@@ -109,7 +110,7 @@ public class BlueCloseSide extends LinearOpMode {
     public void initialize() {
         //intake = new IntakeMec(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
-        arm = new ArmPID(hardwareMap);
+        arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
         cameraInit();
@@ -159,7 +160,7 @@ public class BlueCloseSide extends LinearOpMode {
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
                     .splineTo(new Vector2d(rightSplineTo1X, rightSplineTo1Y), Math.toRadians(rightSpline1deg))
-                    .waitSeconds(3)
+                    .waitSeconds(1.5)
                     .back(5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -167,7 +168,7 @@ public class BlueCloseSide extends LinearOpMode {
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
-                        arm.setExtake(0.0);
+                        arm.setExtake();
                     })
                     .waitSeconds(.1)
                     .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
@@ -198,7 +199,7 @@ public class BlueCloseSide extends LinearOpMode {
                         arm.setIntake();
                         clawMech.close();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(3, () -> {
                         slide.setIntakeOrGround();
                     })
                     .waitSeconds(5)
@@ -254,7 +255,7 @@ public class BlueCloseSide extends LinearOpMode {
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
-                        arm.setExtake(0.0);
+                        arm.setExtake();
                         telemetry.addData("arm?", 0);
                     })
                     .waitSeconds(.1)
@@ -311,7 +312,7 @@ public class BlueCloseSide extends LinearOpMode {
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
-                        arm.setExtake(0.0);
+                        arm.setExtake();
                     })
                     .waitSeconds(.2)
                     .back(leftBackDist)
@@ -370,7 +371,6 @@ public class BlueCloseSide extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
             slide.update(telemetry);
-            arm.update(telemetry, new ElapsedTime());
 
         }
     }

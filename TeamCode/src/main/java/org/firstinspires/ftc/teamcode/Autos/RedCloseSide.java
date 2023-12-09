@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
@@ -28,7 +29,7 @@ public class RedCloseSide extends LinearOpMode {
     public static int location = 1;
     private SampleMecanumDrive drive;
     private OpenCvWebcam frontCam, backCam;
-    private ArmPID arm;
+    private ArmMecNew arm;
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector; //This will be out of the frame for know, along with the april tag pipeline
@@ -101,7 +102,7 @@ public class RedCloseSide extends LinearOpMode {
 
     public void initialize(){
         drive = new SampleMecanumDrive(hardwareMap);
-        arm = new ArmPID(hardwareMap);
+        arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap,telemetry);
 
@@ -144,7 +145,7 @@ public class RedCloseSide extends LinearOpMode {
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
-                        arm.setExtake(0.0);
+                        arm.setExtake();
                     })
                     .waitSeconds(.1)
                     .lineToLinearHeading(new Pose2d(splineToLinear2X+3, splineToLinear2Y, Math.toRadians(-spline2deg)))
@@ -187,7 +188,7 @@ public class RedCloseSide extends LinearOpMode {
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
-                        arm.setExtake(0.0);
+                        arm.setExtake();
                     })
                     .waitSeconds(.1)
 
@@ -233,7 +234,7 @@ public class RedCloseSide extends LinearOpMode {
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
-                        arm.setExtake(0.0);
+                        arm.setExtake();
                     })
                     .waitSeconds(.2)
                     .back(backdist2)
@@ -308,7 +309,6 @@ public class RedCloseSide extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
             slide.update(telemetry);
-            arm.update(telemetry, new ElapsedTime());
         }
     }
 }

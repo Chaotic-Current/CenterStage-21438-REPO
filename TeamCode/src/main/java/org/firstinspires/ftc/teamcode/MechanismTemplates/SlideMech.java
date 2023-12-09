@@ -20,12 +20,12 @@ public class SlideMech {
 
     public static double MID_JUNCTION = 2570; //<-- 12.90V, 1550;// old 890 as of 11/8/2023
     public static double LOW_JUNCTION = 1490;  //<-- 12.90V, 1860;
-    public static double ZERO_POSITION = -50;//5V;// old val -105
+    public static double ZERO_POSITION = -40;//5V;// old val -105
     private final double MAX = 2500;
     public final static double Minimum = 0;
 
     public static double slideKp = 0.00065; //0.00326; //0.0039;
-    public static double slideKpDown = 0.0018;
+    public static double slideKpDown = 0.004;
     public static double slideKpManualDown = 0.00; // 0.007 old val
     public static double slideKi = 0.00375; //0.00000325;
     public static double slideKd = 0.000000; //0.000001;
