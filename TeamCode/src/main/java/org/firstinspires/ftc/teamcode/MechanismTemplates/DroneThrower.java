@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class DroneThrower {
     private Servo launcher;
-    public static double shot = 1;
-    public static double loaded = 0.5;
+    public static double shot = 0.5;
+    public static double loaded = 0.81;
 
     public DroneThrower(HardwareMap hardwareMap){
-        launcher = hardwareMap.get(Servo.class, "you tell me bruh");
+        launcher = hardwareMap.get(Servo.class, "plane");
 
         launcher.setPosition(loaded);
     }

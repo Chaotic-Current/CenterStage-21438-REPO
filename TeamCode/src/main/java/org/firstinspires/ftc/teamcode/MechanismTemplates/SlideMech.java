@@ -32,8 +32,8 @@ public class SlideMech {
     public static double slideKf = 0.00000; //0.000069;
     public static double slideKpClimb = 0.003;
     public static double slideKpClimbDown=0.03;
-    private int isClimbing = 0;
-    public static double targetclimb = 3050;
+    public boolean isClimbing;
+    public static double targetclimb = 3200;
 
     private final double[] PIDF_COFFECIENTS = {slideKp, slideKi, slideKd, slideKf};
 
@@ -64,20 +64,22 @@ public class SlideMech {
         targetPos = 0; // target position is 0 by default
         slideRight.resetEncoder();
         slideLeft.resetEncoder();
+
+        isClimbing = false;
     }
 
     public void update(Telemetry telemetry) {
         int avg = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
 
-        if(isClimbing>0){
-            slidePIDF.setPIDF(slideKpClimb,slideKi,slideKd,slideKf);
-        }
 
-        else if( avg > targetPos){
+
+    if(!isClimbing) {
+        if (avg > targetPos) {
             slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
-        }else {
+        } else {
             slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
         }
+    }
         correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
         correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
 
@@ -97,8 +99,9 @@ public class SlideMech {
 
     public void setIntakeOrGround() {
         targetPos = ZERO_POSITION;
-        if(isClimbing>0){//was climbing up, now down
+        if(isClimbing){//was climbing up, now down
             slidePIDF.setPIDF(slideKpClimbDown,slideKi,slideKd,slideKf);
+            isClimbing=false;
         }
         currentPosition = CurrentPosition.ZERO;
     }
@@ -115,8 +118,9 @@ public class SlideMech {
 
     public void climbUp(){
         targetPos = targetclimb;
-        isClimbing = 1;
+        isClimbing = true;
         currentPosition = CurrentPosition.CUSTOM;
+        slidePIDF.setPIDF(slideKpClimb,slideKi,slideKd,slideKf);
 
     }
 

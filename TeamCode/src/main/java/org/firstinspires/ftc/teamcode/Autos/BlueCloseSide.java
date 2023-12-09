@@ -42,8 +42,8 @@ public class BlueCloseSide extends LinearOpMode {
     public static double wait01 = 1;
     public static double wait02 = 1;
     public static double rightSpline1deg = -75;
-    public static double leftBackDist = 6;
-    public static double rightLineToLinear2deg = -90;
+    public static double leftBackDist = 10;
+    public static double rightLineToLinear2deg = 90;
 
     public static double leftLinetoLinear1X = 26, leftLinetoLinear1Y = 6, leftLineToLinear1Heading = 30;
     public static double rightSplineTo1X = 26, rightSplineTo1Y = -2.5, splineToLinear1Heading = -80;
@@ -55,6 +55,8 @@ public class BlueCloseSide extends LinearOpMode {
     public static double leftLinetoLinear3Y = 40.5;
     public static double parkX = 4, parkY = 37, parkHeading = 90;
     public static double degree = 90;
+
+    double errorx, errory, errorheading;
 
     public static double toStackLinetoLinear1X, toStackLinetoLinear1Y, toStackLineToLinear1Heading;
     public static double toStackLinetoLinear2X, toStackLinetoLinear2Y, toStackLineToLinear2Heading;
@@ -105,7 +107,7 @@ public class BlueCloseSide extends LinearOpMode {
     }
 
     public void initialize() {
-        intake = new IntakeMec(hardwareMap);
+        //intake = new IntakeMec(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         arm = new ArmPID(hardwareMap);
         slide = new SlideMech(hardwareMap);
@@ -121,16 +123,17 @@ public class BlueCloseSide extends LinearOpMode {
 
         DetectColor.ColorLocation e = detector.getLocate();
         ElapsedTime time = new ElapsedTime();
-        while (e == null || time.milliseconds() <= 1000) {
+        while (e == null && time.milliseconds() <= 5000){
             e = detector.getLocate();
-            if (e != null) {
+            if(e != null) {
                 telemetry.addLine("in loop " + e.name());
                 telemetry.update();
             }
-            if (e == null)
-                time.reset();
-        }
 
+            if(e == null && time.milliseconds() >= 3500)
+                e = DetectColor.ColorLocation.UNDETECTED;
+
+        }
         frontCam.stopStreaming();
         telemetry.addLine(e.name());
         telemetry.update();
@@ -171,9 +174,10 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(0.15,() ->{
                          x = "old: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                         double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
+                        errorx = aprilTagPipeline.getErrorX();
                        // double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
                         double newAngle = drive.getPoseEstimate().getHeading() - Math.toRadians(aprilTagPipeline.getErrorYaw());
-                        drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
+                        //.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
                         x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                    })
                     .waitSeconds(0.5)
@@ -263,7 +267,7 @@ public class BlueCloseSide extends LinearOpMode {
                         double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
                         // double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
                         double newAngle = drive.getPoseEstimate().getHeading() - Math.toRadians(aprilTagPipeline.getErrorYaw());
-                        drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
+                        //drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
                         x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                     })
                     .waitSeconds(0.5)
@@ -301,7 +305,7 @@ public class BlueCloseSide extends LinearOpMode {
         } else if (e == DetectColor.ColorLocation.LEFT) {
             aprilTagPipeline.setTargetTag(1);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-                    .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1X, Math.toRadians(leftLineToLinear1Heading)))
+                    .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
                     })
@@ -357,7 +361,7 @@ public class BlueCloseSide extends LinearOpMode {
 
         waitForStart();
         telemetry.update();
-        telemetry.addLine(x);
+        telemetry.addLine(x + " \nnyess");
         telemetry.update();
 
 

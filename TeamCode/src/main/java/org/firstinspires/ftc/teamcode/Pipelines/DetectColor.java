@@ -47,6 +47,7 @@ public class DetectColor extends OpenCvPipeline {
          this.telemetry = telemetry;
          upperBound = upper;
          lowerBound = lower;
+         //locate = ColorLocation.UNDETECTED;
     }
 
     public DetectColor(Telemetry tel) { //never gonna use this constructor in the real world

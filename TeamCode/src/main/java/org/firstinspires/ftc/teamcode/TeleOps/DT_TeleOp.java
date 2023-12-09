@@ -25,6 +25,7 @@ public class DT_TeleOp extends OpMode {
     private IntakeMec intake;
     private ClawMech claw;
     private Servo wrist;
+    //private Servo planeLaucher;
     private ArmPID arm;
     private DroneThrower thrower;
     SignalEdgeDetector gamepad_2_A = new SignalEdgeDetector(() -> gamepad2.a);
@@ -34,6 +35,7 @@ public class DT_TeleOp extends OpMode {
     SignalEdgeDetector gamePad_2_bumperLeft = new SignalEdgeDetector(() -> gamepad2.left_bumper);
     SignalEdgeDetector gamePad_1_DpadUp = new SignalEdgeDetector(() -> gamepad1.dpad_up);
     SignalEdgeDetector gamePad_1_DpadDown = new SignalEdgeDetector(() -> gamepad1.dpad_down);
+    SignalEdgeDetector gamePad_1_DpadLeft = new SignalEdgeDetector(() -> gamepad1.dpad_left);
     public static double wristPos = 0.5;
     private final double PRECISIONREDUCTION = 0.39;
     private final double TURN_PRECESION = 0.65;
@@ -82,8 +84,10 @@ public class DT_TeleOp extends OpMode {
         motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         wrist = hardwareMap.get(Servo.class,"WRIST");
+        //planeLaucher = hardwareMap.get(Servo.class,"plane");
 
         slides = new SlideMech(hardwareMap);
+
 
         intake = new IntakeMec(hardwareMap,telemetry,gamepad1);
 
@@ -106,6 +110,12 @@ public class DT_TeleOp extends OpMode {
         if(gamePad_1_DpadUp.isRisingEdge()){
             slides.climbUp();
         }
+        /*
+        if(gamePad_1_DpadLeft.isRisingEdge()){
+            planeLaucher.setPosition(0.5);
+        }
+
+         */
 
         if(gamePad_2_X.isRisingEdge()){
             timer.reset();
@@ -127,7 +137,9 @@ public class DT_TeleOp extends OpMode {
         }
 
         if(gamepad_2_A.isRisingEdge()){
-            //slides.setIntakeOrGround();
+            if(slides.isClimbing) {
+                slides.setIntakeOrGround();
+            }
             timer.reset();
             arm.setIntake();
             slidesDown = true;
@@ -135,8 +147,9 @@ public class DT_TeleOp extends OpMode {
 
 
         }
-        if(slidesDown){
-            if(timer.milliseconds() >= 2000){
+
+         if(slidesDown){
+            if(timer.milliseconds() >= 2000  && !slides.isClimbing){
                 slides.setIntakeOrGround();
                 timer.reset();
             }
@@ -157,7 +170,7 @@ public class DT_TeleOp extends OpMode {
 //            arm.setExtake(0.0);
 //        }
 
-        if(gamePad_1_DpadDown.isRisingEdge()){
+        if(gamePad_1_DpadLeft.isRisingEdge()){
             thrower.luanched();
         }
 
@@ -189,6 +202,7 @@ public class DT_TeleOp extends OpMode {
         gamePad_1_DpadUp.update();
         gamePad_1_DpadDown.update();
         gamePad_2_bumperLeft.update();
+        gamePad_1_DpadLeft.update();
         telemetry.addLine("Position : " + arm.getArmPosition());
         telemetry.update();
     }

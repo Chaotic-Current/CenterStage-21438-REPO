@@ -22,7 +22,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @Config
-@Autonomous
+@Autonomous (name = "AA Red Close Side")
 public class RedCloseSide extends LinearOpMode {
 
     public static int location = 1;
@@ -42,9 +42,10 @@ public class RedCloseSide extends LinearOpMode {
     public static double spline1deg = 75;
     public static double backdist2 = 6;
     public static double spline2deg = 90;
+    public static double frw = 10.25;
 
     public static double linetoLinear1X = 26, linetoLinear1Y = -6, lineToLinear1Heading = -30;
-    public static double splineToLinear1X = 26, splineToLinear1Y = 2.5, splineToLinear1Heading = 80;
+    public static double splineToLinear1X = 26, splineToLinear1Y = 1.75, splineToLinear1Heading = 80;
     public static double splineToLinear2X = 29, splineToLinear2Y = -34, splineToLinear2Heading = -90, wait1 = 3;
     public static double splineToLinear3X = 26, splineToLinear3Y = -38, splineToLinear3Heading = -90, wait2 = 3;
     public static double splineToLinear4X = 20, splineToLinear4Y = -33.5, splineToLinear4Heading = -90, wait3 = 3;
@@ -62,7 +63,7 @@ public class RedCloseSide extends LinearOpMode {
         int width = 160;
 
 
-        detector = new DetectColor(width, telemetry, new Scalar(140,255,255),new Scalar(75,100,100));
+        detector = new DetectColor(width, telemetry, new Scalar(10,255,255),new Scalar(2,100,100));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
@@ -115,28 +116,28 @@ public class RedCloseSide extends LinearOpMode {
 
         DetectColor.ColorLocation e = detector.getLocate();
         ElapsedTime time = new ElapsedTime();
-        while (e == null || time.milliseconds() <= 1000){
+        while (e == null && time.milliseconds() <= 5000){
             e = detector.getLocate();
             if(e != null) {
                 telemetry.addLine("in loop " + e.name());
                 telemetry.update();
             }
-            if(e== null)
-                time.reset();
+
+            if(e == null && time.milliseconds() >= 3500)
+                e = DetectColor.ColorLocation.UNDETECTED;
+
         }
-
-
-
+        frontCam.stopStreaming();
         telemetry.addLine(e.name());
         telemetry.update();
 
         //I added what I think would be proper points for mechanisms to do what they need to do, but I commented them out just for now
-        if (e == DetectColor.ColorLocation.LEFT) {
+        if (e == DetectColor.ColorLocation.LEFT || e == DetectColor.ColorLocation.UNDETECTED) {
 
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
                     .splineTo(new Vector2d(splineToLinear1X, splineToLinear1Y), Math.toRadians(spline1deg))
-                    .waitSeconds(3)
+                    .waitSeconds(0.1)
                     .back(5)
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
@@ -146,9 +147,9 @@ public class RedCloseSide extends LinearOpMode {
                         arm.setExtake(0.0);
                     })
                     .waitSeconds(.1)
-                    .lineToLinearHeading(new Pose2d(splineToLinear2X, splineToLinear2Y, Math.toRadians(-spline2deg)))
-                    .waitSeconds(1)
-                    .forward(3.5)
+                    .lineToLinearHeading(new Pose2d(splineToLinear2X+3, splineToLinear2Y, Math.toRadians(-spline2deg)))
+                    .waitSeconds(0.25)
+                    .forward(8)
 
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
@@ -157,9 +158,8 @@ public class RedCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(0.1)
 
-                    .waitSeconds(2)
+                    .waitSeconds(0.75)
                     .back(5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
@@ -172,7 +172,7 @@ public class RedCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
+                    .waitSeconds(3.25)
                     .strafeRight(28)
                     .waitSeconds(.5)
                     .forward(11)
@@ -194,6 +194,8 @@ public class RedCloseSide extends LinearOpMode {
                     .back(backwardsDistance1)
 
                     .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y, Math.toRadians(splineToLinear3Heading)))
+
+                    .forward(4.5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(1000);
@@ -223,7 +225,7 @@ public class RedCloseSide extends LinearOpMode {
                     .build();
 
 
-        } else if(e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
+        } else if(e == DetectColor.ColorLocation.RIGHT) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(linetoLinear1X, linetoLinear1Y, Math.toRadians(lineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -237,7 +239,7 @@ public class RedCloseSide extends LinearOpMode {
                     .back(backdist2)
                     .waitSeconds(.3)
                     .lineToLinearHeading(new Pose2d(splineToLinear4X, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)))
-                    .forward(7)
+                    .forward(frw)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(1000);
