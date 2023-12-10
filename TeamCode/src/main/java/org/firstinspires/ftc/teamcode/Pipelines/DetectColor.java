@@ -179,7 +179,7 @@ public class DetectColor extends OpenCvPipeline {
             } else if (center) {
                 locate = ColorLocation.CENTER;
             } else {
-                locate = ColorLocation.UNDETECTED;
+                locate = ColorLocation.RIGHT;
             }
 //            telemetry.update();
 //

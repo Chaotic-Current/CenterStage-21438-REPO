@@ -33,7 +33,7 @@ public class SlideMech {
     public static double slideKpClimb = 0.003;
     public static double slideKpClimbDown=0.03;
     public boolean isClimbing;
-    public static double targetclimb = 3200;
+    public static double targetclimb = 3275;
 
     private final double[] PIDF_COFFECIENTS = {slideKp, slideKi, slideKd, slideKf};
 

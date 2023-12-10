@@ -118,17 +118,21 @@ public class BlueFarSide extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d());
 
         DetectColor.ColorLocation e = detector.getLocate();
-        ElapsedTime time = new ElapsedTime();
-        while (e == null && time.milliseconds() <= 5000) {
-            e = detector.getLocate();
-            if (e != null) {
-                telemetry.addLine("in loop " + e.name());
-                telemetry.update();
+
+
+        while(!isStarted()) {
+            ElapsedTime time = new ElapsedTime();
+            while (time.milliseconds() <= 8000) {
+                e = detector.getLocate();
+                if (e != null) {
+                    telemetry.addLine("in loop " + e.name());
+                    telemetry.update();
+                }
+
+                if (e == null && time.milliseconds() >= 3700)
+                    e = DetectColor.ColorLocation.UNDETECTED;
+
             }
-
-            if (e == null && time.milliseconds() >= 3500)
-                e = DetectColor.ColorLocation.UNDETECTED;
-
         }
         frontCam.stopStreaming();
         telemetry.addLine(e.name());
@@ -139,16 +143,22 @@ public class BlueFarSide extends LinearOpMode {
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
                     .splineTo(new Vector2d(rightSplineTo1X, rightSplineTo1Y), Math.toRadians(rightSpline1deg))
+                    .waitSeconds(1)
+                    .back(6)
                     .build();
         } else if (e == DetectColor.ColorLocation.CENTER) {
             aprilTagPipeline.setTargetTag(2);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(centerFrwDistance1)
+                    .waitSeconds(1)
+                    .back(6)
                     .build();
         } else if (e == DetectColor.ColorLocation.LEFT) {
             aprilTagPipeline.setTargetTag(1);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
+                    .waitSeconds(1)
+                    .back(6)
                     .build();
         }
 

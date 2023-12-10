@@ -123,17 +123,21 @@ public class BlueCloseSide extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d());
 
         DetectColor.ColorLocation e = detector.getLocate();
-        ElapsedTime time = new ElapsedTime();
-        while (e == null && time.milliseconds() <= 5000){
-            e = detector.getLocate();
-            if(e != null) {
-                telemetry.addLine("in loop " + e.name());
-                telemetry.update();
+
+
+        while(!isStarted()) {
+            ElapsedTime time = new ElapsedTime();
+            while (time.milliseconds() <= 8000 && time.milliseconds()%500<=10) {
+                e = detector.getLocate();
+                if (e != null) {
+                    telemetry.addLine("in loop " + e.name());
+                    telemetry.update();
+                }
+
+                if (e == null && time.milliseconds() >= 3700)
+                    e = DetectColor.ColorLocation.UNDETECTED;
+
             }
-
-            if(e == null && time.milliseconds() >= 3500)
-                e = DetectColor.ColorLocation.UNDETECTED;
-
         }
         frontCam.stopStreaming();
         telemetry.addLine(e.name());

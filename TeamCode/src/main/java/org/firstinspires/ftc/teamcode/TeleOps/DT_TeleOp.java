@@ -177,6 +177,7 @@ public class DT_TeleOp extends OpMode {
 
         if(gamePad_1_DpadLeft.isRisingEdge()){
             thrower.luanched();
+            telemetry.addData("works",0);
         }
 
 
@@ -205,7 +206,7 @@ public class DT_TeleOp extends OpMode {
         gamePad_1_DpadUp.update();
         gamePad_1_DpadDown.update();
         gamePad_2_bumperLeft.update();
-        gamePad_1_DpadLeft.update();
+
         GamePad_2_DpadLeft.update();
         //telemetry.addLine("Position : " + arm.getArmPosition());
         telemetry.update();

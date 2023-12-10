@@ -33,7 +33,6 @@ public class RedCloseSide extends LinearOpMode {
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector; //This will be out of the frame for know, along with the april tag pipeline
-    //TODO all these values are just place holders so the code doesn't cause an error, delete this comment after you see it
     public static double frwDistance1 = 30;
     public static double backwardsDistance1 = 12;
     public static double frwDistance2 = 5;
@@ -56,7 +55,6 @@ public class RedCloseSide extends LinearOpMode {
     public static double degree = 90;
 
     TrajectorySequence firstMove;
-    TrajectorySequence moveToBackboard;
     TrajectorySequence park;
 
     //Fuck this shit
@@ -112,22 +110,29 @@ public class RedCloseSide extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
 
+        //cameraInit();
+
         drive.setPoseEstimate(new Pose2d());
 
-
         DetectColor.ColorLocation e = detector.getLocate();
-        ElapsedTime time = new ElapsedTime();
-        while (e == null && time.milliseconds() <= 5000){
-            e = detector.getLocate();
-            if(e != null) {
-                telemetry.addLine("in loop " + e.name());
-                telemetry.update();
+
+
+        while(!isStarted()) {
+            ElapsedTime time = new ElapsedTime();
+            while (time.milliseconds() <= 8000) {
+                e = detector.getLocate();
+                if (e != null) {
+                    telemetry.addLine("in loop " + e.name());
+                    telemetry.update();
+                }
+
+                if (e == null && time.milliseconds() >= 3700)
+                    e = DetectColor.ColorLocation.UNDETECTED;
+
             }
-
-            if(e == null && time.milliseconds() >= 3500)
-                e = DetectColor.ColorLocation.UNDETECTED;
-
         }
+        //e=detector.getLocate();
+
         frontCam.stopStreaming();
         telemetry.addLine(e.name());
         telemetry.update();
@@ -285,9 +290,7 @@ public class RedCloseSide extends LinearOpMode {
                         .back(backwardsDistance1)
                         .build();
                         */
-            moveToBackboard = drive.trajectorySequenceBuilder(firstMove.end())
-                    .splineToLinearHeading(new Pose2d(splineToLinear3X,splineToLinear3Y,Math.toRadians(splineToLinear3Heading)), Math.toRadians(0))
-                    .build();
+
         }
 /*
         park = drive.trajectorySequenceBuilder(moveToBackboard.end())

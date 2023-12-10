@@ -51,7 +51,7 @@ public class RedFarSide extends LinearOpMode {
     public static double degree = 90;
 
     TrajectorySequence firstMove;
-    TrajectorySequence moveToBackboard;
+    //TrajectorySequence moveToBackboard;
     TrajectorySequence park;
 
     //Fuck this shit
@@ -103,6 +103,10 @@ public class RedFarSide extends LinearOpMode {
 
         cameraInit();
     }
+
+
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
@@ -111,17 +115,21 @@ public class RedFarSide extends LinearOpMode {
 
 
         DetectColor.ColorLocation e = detector.getLocate();
-        ElapsedTime time = new ElapsedTime();
-        while (e == null && time.milliseconds() <= 5000) {
-            e = detector.getLocate();
-            if (e != null) {
-                telemetry.addLine("in loop " + e.name());
-                telemetry.update();
+
+
+        while(!isStarted()) {
+            ElapsedTime time = new ElapsedTime();
+            while (time.milliseconds() <= 8000) {
+                e = detector.getLocate();
+                if (e != null) {
+                    telemetry.addLine("in loop " + e.name());
+                    telemetry.update();
+                }
+
+                if (e == null && time.milliseconds() >= 3700)
+                    e = DetectColor.ColorLocation.UNDETECTED;
+
             }
-
-            if (e == null && time.milliseconds() >= 3500)
-                e = DetectColor.ColorLocation.UNDETECTED;
-
         }
         frontCam.stopStreaming();
         telemetry.addLine(e.name());
@@ -133,15 +141,21 @@ public class RedFarSide extends LinearOpMode {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
                     .splineTo(new Vector2d(splineToLinear1X, splineToLinear1Y), Math.toRadians(spline1deg))
+                    .waitSeconds(1)
+                    .back(6)
                     .build();
 
         } else if (e == DetectColor.ColorLocation.CENTER) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance1)
+                    .waitSeconds(1)
+                    .back(6)
                     .build();
         } else if (e == DetectColor.ColorLocation.RIGHT) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(linetoLinear1X, linetoLinear1Y, Math.toRadians(lineToLinear1Heading)))
+                    .waitSeconds(1)
+                    .back(6)
                     .build();
         }
 
