@@ -24,16 +24,16 @@ public class SlideMech {
     private final double MAX = 2500;
     public final static double Minimum = 0;
 
-    public static double slideKp = 0.00065; //0.00326; //0.0039;
-    public static double slideKpDown = 0.004;
+    public static double slideKp = 0.006; //0.00326; //0.0039;
+    public static double slideKpDown = 0.006;
     public static double slideKpManualDown = 0.00; // 0.007 old val
     public static double slideKi = 0.00375; //0.00000325;
     public static double slideKd = 0.000000; //0.000001;
     public static double slideKf = 0.00000; //0.000069;
     public static double slideKpClimb = 0.003;
-    public static double slideKpClimbDown=0.03;
+    public static double slideKpClimbDown=0.036;
     public boolean isClimbing;
-    public static double targetclimb = 3275;
+    public static double targetclimb = 3400;
 
     private final double[] PIDF_COFFECIENTS = {slideKp, slideKi, slideKd, slideKf};
 

@@ -134,7 +134,7 @@ public class DT_TeleOp extends OpMode {
             slidesDown = false;
         }
         if(slidesUp){
-            if(timer.milliseconds() >= 1000) {
+            if(timer.milliseconds() >= 750) {
                 arm.setExtake();
                 timer.reset();
             }
@@ -154,7 +154,7 @@ public class DT_TeleOp extends OpMode {
 
 
          if(slidesDown){
-            if(timer.milliseconds() >= 2000  && !slides.isClimbing){
+            if(timer.milliseconds() >= 750  && !slides.isClimbing){
                 slides.setIntakeOrGround();
                 timer.reset();
             }

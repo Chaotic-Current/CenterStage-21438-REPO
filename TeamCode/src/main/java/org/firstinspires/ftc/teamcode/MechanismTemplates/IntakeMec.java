@@ -20,8 +20,8 @@ public class IntakeMec  {
     private Servo left, right; // left -> 0, right -> 1
     private SignalEdgeDetector buttonY,buttonB, bumperLeft, bumperRight, dPadDown;
     private Gamepad gamepad;
-    public static double leftFinalPos = 0.79;//moving a dist on 0.06
-    public static double rightFinalPos = 0.21;
+    public static double leftFinalPos = 0.63;//moving a dist on 0.06
+    public static double rightFinalPos = 0.37;
     public static double increment = 0.025;
     public static double leftFinalUp = 0.9;
     public static double rightFinaUp = 0.1;
@@ -97,6 +97,12 @@ public class IntakeMec  {
             state = State.STOPPED;
             intake.setPower(0);
         }
+
+        if(state == State.RUNNING){
+            left.setPosition(leftFinalPos);
+            right.setPosition(rightFinalPos);
+        }
+
         if(buttonY.isRisingEdge()){
            telemetry.addData("yea", 1);
             left.setPosition(leftFinalPos);
