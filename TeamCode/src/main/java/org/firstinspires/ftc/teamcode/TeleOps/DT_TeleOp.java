@@ -113,7 +113,13 @@ public class DT_TeleOp extends OpMode {
     public void loop(){
 
         if(gamePad_2_Y.isRisingEdge()){
-            telemetry.addLine("Uh Oh The Bot Is Broken");
+            claw.close();
+            isGoingUp = true;
+            timer.reset();
+            slides.setTargetPosQueued(SlideMech.CurrentPosition.LEVEL3);
+            if(slides.isUp(telemetry)){
+                slides.setHighJunction();
+            }
         }
 
         if(gamePad_1_DpadUp.isRisingEdge()){
@@ -131,6 +137,9 @@ public class DT_TeleOp extends OpMode {
             isGoingUp = true;
             timer.reset();
             slides.setTargetPosQueued(SlideMech.CurrentPosition.LEVEL2);
+            if(slides.isUp(telemetry)){
+                slides.setMidJunction();
+            }
         }
 
         if (gamePad_2_B.isRisingEdge()){
@@ -138,6 +147,9 @@ public class DT_TeleOp extends OpMode {
             isGoingUp = true;
             timer.reset();
             slides.setTargetPosQueued(SlideMech.CurrentPosition.LEVEl1);
+            if(slides.isUp(telemetry)){
+                slides.setLowJunction();
+            }
         }
 
         if(slides.isUp(telemetry)){
@@ -145,11 +157,15 @@ public class DT_TeleOp extends OpMode {
             telemetry.addLine("setFalse");
         }
 
+        // TARGETPOSQUEUE :
+        // used to set slide pos after a delay and keep everything in for the slides in one area
         if(isGoingUp && timer.milliseconds() > clawDelay){
             if(slides.targetPosQueued.equals(SlideMech.CurrentPosition.LEVEl1)){
                 slides.setLowJunction();
             } else if (slides.targetPosQueued.equals(SlideMech.CurrentPosition.LEVEL2)){
                 slides.setMidJunction();
+            } else if (slides.targetPosQueued.equals(SlideMech.CurrentPosition.LEVEL3)){
+                slides.setHighJunction();
             } else {
                 slides.setLowJunction();
             }
@@ -180,8 +196,6 @@ public class DT_TeleOp extends OpMode {
             arm.setIntake();
             slidesDown = true;
             slidesUp= false;
-
-
         }
 
 

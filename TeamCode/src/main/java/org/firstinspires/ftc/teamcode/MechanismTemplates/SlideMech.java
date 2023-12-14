@@ -16,7 +16,7 @@ public class SlideMech {
     private Motor slideLeft, slideRight;
 
     //TODO: change values into actual tested positions instead of placeholders
-    public static double HIGH_JUNCTION = 2390; //<-- 12.90V, 1970;
+    public static double HIGH_JUNCTION = 3100; //<-- 12.90V, 1970;
 
     public static double MID_JUNCTION = 2570; //<-- 12.90V, 1550;// old 890 as of 11/8/2023
     public static double LOW_JUNCTION = 1490;  //<-- 12.90V, 1860;
@@ -128,7 +128,7 @@ public class SlideMech {
 
     public void setHighJunction() {
         targetPos = HIGH_JUNCTION;
-        currentPosition = CurrentPosition.LEVEL4;
+        currentPosition = CurrentPosition.LEVEL3;
     }
 
     public void setManualSlide(int increment){
