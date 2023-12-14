@@ -24,7 +24,7 @@ public class IntakeMec  {
     public static double rightFinalPos = 0.37;
     public static double increment = 0.025;
     public static double leftFinalUp = 0.9;
-    public static double rightFinaUp = 0.1;
+    public static double rightFinalUp = 0.1;
 
     public static double power = 0.75;
 
@@ -36,7 +36,7 @@ public class IntakeMec  {
 
     private State state;
 
-
+    private boolean isIntaking = false;
 
 
     public IntakeMec(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
@@ -86,22 +86,27 @@ public class IntakeMec  {
 
     public void run() {
         if(gamepad.left_trigger > 0.1) {
+            setIntake();
             state = State.RUNNING;
             intake.setPower(power);
+
         } else if(gamepad.dpad_down){
             state = State.REVERSE;
             intake.setPower(ejectPower);
             gamepad.setLedColor(255, 0, 0, 1000);
 
         } else{
+            setNeutral();
             state = State.STOPPED;
             intake.setPower(0);
         }
 
+        /*
         if(state == State.RUNNING){
             left.setPosition(leftFinalPos);
             right.setPosition(rightFinalPos);
         }
+         */
 
         if(buttonY.isRisingEdge()){
            telemetry.addData("yea", 1);
@@ -111,7 +116,7 @@ public class IntakeMec  {
         if(buttonB.isRisingEdge()){
             telemetry.addData("idk", 1);
             left.setPosition(leftFinalUp);
-            right.setPosition(rightFinaUp);
+            right.setPosition(rightFinalUp);
         }
 
         if(bumperLeft.isRisingEdge()){
@@ -143,5 +148,21 @@ public class IntakeMec  {
 
     public Servo getRight() {
         return right;
+    }
+
+    public void setIntake(){
+        if(!isIntaking) {
+            left.setPosition(leftFinalPos);
+            right.setPosition(rightFinalPos);
+            isIntaking = true;
+        }
+    }
+
+    public void setNeutral(){
+        if(isIntaking) {
+            left.setPosition(leftFinalUp);
+            right.setPosition(rightFinalUp);
+            isIntaking = false;
+        }
     }
 }

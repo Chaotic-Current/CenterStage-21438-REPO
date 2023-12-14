@@ -18,10 +18,14 @@ public class ClawMech {
     private SignalEdgeDetector rightBumper, rightDPadRight;
     public static double halfOpenPos = 0.45;
     public static double timeOffset = 750;
-    private ElapsedTime timer;
+    public ElapsedTime timer;
+
+    public boolean delayOver;
+
+    public boolean readyForSlides;
 
     public enum ClawState {
-        OPEN, HALF_OPEN, CLOSED
+        OPEN, HALF_OPEN, CLOSED, DELAY_CLOSE
     }
 
     private boolean bothOpenRan;
@@ -42,6 +46,7 @@ public class ClawMech {
         rightBumper = new SignalEdgeDetector(() -> gamepad.right_bumper);
         rightDPadRight = new SignalEdgeDetector(() -> gamepad.dpad_right);
 
+        timer = new ElapsedTime();
     }
 
     public ClawMech(HardwareMap hardwareMap, Telemetry telemetry){
@@ -86,6 +91,8 @@ public class ClawMech {
             return;
         }
 
+
+
         if (rightDPadRight.isRisingEdge() || bothOpenRan) {
             setBothOpen(this.bothOpenRan);
         }
@@ -114,15 +121,33 @@ public class ClawMech {
         rightBumper.update();
         rightDPadRight.update();
         telemetry.update();
+        //delayClose();
 //    buttonA.update();
 //    buttonB.update();
     }
 
     public void close(){
         claw.setPosition(close);
+
+        state = ClawState.CLOSED;
+    }
+
+    public void delayClose(){
+        if(state.equals(ClawState.DELAY_CLOSE) && timer.milliseconds() > 500 && !delayOver) {
+            readyForSlides = true;
+            delayOver = true;
+        }
     }
 
     public void open(){
         claw.setPosition(openPos);
+    }
+
+    public ClawState getState(){
+        return state;
+    }
+
+    public void resetTimer(){
+        timer.reset();
     }
 }

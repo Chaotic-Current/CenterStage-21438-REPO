@@ -47,6 +47,11 @@ public class DT_TeleOp extends OpMode {
     private boolean slidesUp = false;
     private boolean slidesDown = false;
 
+    private boolean isGoingUp = false;
+
+    public static double clawDelay = 400;
+    public static int armDelay = 400;
+
     /**
      * Get the maximum absolute value from a static array of doubles
      *
@@ -122,25 +127,52 @@ public class DT_TeleOp extends OpMode {
          */
 
         if(gamePad_2_X.isRisingEdge()){
+            claw.close();
+            isGoingUp = true;
             timer.reset();
-            slides.setMidJunction();
-            slidesUp = true;
+            slides.setTargetPosQueued(SlideMech.CurrentPosition.LEVEL2);
         }
 
         if (gamePad_2_B.isRisingEdge()){
+            claw.close();
+            isGoingUp = true;
             timer.reset();
-            slides.setLowJunction();
+            slides.setTargetPosQueued(SlideMech.CurrentPosition.LEVEl1);
+        }
+
+        if(slides.isUp(telemetry)){
+            isGoingUp = false;
+            telemetry.addLine("setFalse");
+        }
+
+        if(isGoingUp && timer.milliseconds() > clawDelay){
+            if(slides.targetPosQueued.equals(SlideMech.CurrentPosition.LEVEl1)){
+                slides.setLowJunction();
+            } else if (slides.targetPosQueued.equals(SlideMech.CurrentPosition.LEVEL2)){
+                slides.setMidJunction();
+            } else {
+                slides.setLowJunction();
+            }
+
             slidesUp = true;
             slidesDown = false;
+            timer.reset();
         }
         if(slidesUp){
-            if(timer.milliseconds() >= 750) {
+            if(timer.milliseconds() >= armDelay) {
                 arm.setExtake();
                 timer.reset();
             }
         }
 
+        telemetry.addData("isGoingUp", isGoingUp);
+        telemetry.addData("slides.isUp()", slides.isUp(telemetry));
+        telemetry.addData("timer", timer.milliseconds());
+        telemetry.addData("slidesUp", slidesUp);
         if(gamepad_2_A.isRisingEdge()){
+
+            claw.close();
+
             if(slides.isClimbing) {
                 slides.setIntakeOrGround();
             }
@@ -197,6 +229,7 @@ public class DT_TeleOp extends OpMode {
         slides.update(telemetry);
         drive();
         ElapsedTime timer = new ElapsedTime();
+
         //arm.update(telemetry, timer);
         gamepad_2_A.update();
         gamePad_2_Y.update();

@@ -41,11 +41,13 @@ public class SlideMech {
     double correctionLeft;
     double correctionRight;
 
+    public CurrentPosition targetPosQueued;
+
     public enum CurrentPosition{
         ZERO,LEVEl1,LEVEL2,LEVEL3,LEVEL4,CUSTOM
     }
 
-    private CurrentPosition currentPosition;
+    private CurrentPosition currentPosition = CurrentPosition.ZERO;
 
     public SlideMech(HardwareMap hardwareMap) {
         slideLeft = new Motor(hardwareMap, "SL", Motor.GoBILDA.RPM_312); // Pin 0 on expansion hub
@@ -146,5 +148,16 @@ public class SlideMech {
 
     public void setCustom(int custom) {
         targetPos = custom;
+    }
+
+
+    public boolean isUp(Telemetry tele){
+        tele.addData("target Pos", targetPos);
+        tele.addData("current pos", slideLeft.getCurrentPosition());
+        return Math.abs(slideLeft.getCurrentPosition() - targetPos) < 200 && !currentPosition.equals(CurrentPosition.ZERO);
+    }
+
+    public void setTargetPosQueued(CurrentPosition posQueued){
+        targetPosQueued = posQueued;
     }
 }
