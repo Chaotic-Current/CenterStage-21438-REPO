@@ -29,6 +29,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 public class BlueCloseSide extends LinearOpMode {
 
     private SampleMecanumDrive drive;
+    private ElapsedTime timer = new ElapsedTime();
     private OpenCvWebcam frontCam, backCam;
     private IntakeMec intake;
     private ArmMecNew arm;
@@ -113,6 +114,7 @@ public class BlueCloseSide extends LinearOpMode {
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
+        intake = new IntakeMec(hardwareMap);
         cameraInit();
     }
 
@@ -140,7 +142,7 @@ public class BlueCloseSide extends LinearOpMode {
             }
         }
         frontCam.stopStreaming();
-        telemetry.addLine(e.name());
+        //telemetry.addLine(e.name());
         telemetry.update();
 
         frontCam.setPipeline(aprilTagPipeline);
@@ -193,7 +195,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(2)
+                    .waitSeconds(1)
                     .back(5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
@@ -206,7 +208,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(3, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
+                    .waitSeconds(2)
 //                    .lineToLinearHeading(new Pose2d(toStackLinetoLinear1X,toStackLinetoLinear1Y,Math.toRadians(toStackLineToLinear1Heading)))
 //                    .UNSTABLE_addTemporalMarkerOffset(0, () ->{
 //                        intake.getLeft().setPosition(0.9);
@@ -300,10 +302,20 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
-                    .strafeLeft(24)
+                    .waitSeconds(2)
+                    .strafeRight(23)
                     .waitSeconds(.5)
-                    .forward(11)
+                    .back(106.5)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                       timer.reset();
+                       while(timer.seconds()<6)
+                       {
+                           intake.start();
+                       }
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(10, () -> {
+                        intake.stop();
+                    })
                     .build();
 
 
@@ -366,7 +378,7 @@ public class BlueCloseSide extends LinearOpMode {
 
         waitForStart();
         telemetry.update();
-        telemetry.addLine(x + " \nnyess");
+        telemetry.addLine(x + " \nyes");
         telemetry.update();
 
 

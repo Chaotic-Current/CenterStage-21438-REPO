@@ -83,7 +83,17 @@ public class IntakeMec  {
     public State getState(){
         return state;
     }
+public void start(){
+    setIntake();
+    state = State.RUNNING;
+    intake.setPower(power);
+}
 
+public void stop(){
+    setNeutral();
+    state = State.STOPPED;
+    intake.setPower(0);
+}
     public void run() {
         if(gamepad.left_trigger > 0.1) {
             setIntake();
@@ -100,6 +110,7 @@ public class IntakeMec  {
             state = State.STOPPED;
             intake.setPower(0);
         }
+
 
         /*
         if(state == State.RUNNING){
