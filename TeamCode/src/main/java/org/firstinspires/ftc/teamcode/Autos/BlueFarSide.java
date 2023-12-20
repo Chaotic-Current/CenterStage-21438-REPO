@@ -37,6 +37,7 @@ public class BlueFarSide extends LinearOpMode {
     public static double frwDistance3 = 12;
     public static double wait01 = 1;
     public static double wait02 = 1;
+
     public static double rightSpline1deg = -75;
     public static double leftBackDist = 10;
     public static double rightLineToLinear2deg = 90;
@@ -61,6 +62,7 @@ public class BlueFarSide extends LinearOpMode {
     String x;
 
     TrajectorySequence autoTrajectory;
+
 
     public void cameraInit() {
         int width = 160;
