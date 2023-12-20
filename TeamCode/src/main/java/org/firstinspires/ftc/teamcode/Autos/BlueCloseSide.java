@@ -5,10 +5,13 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
@@ -66,6 +69,9 @@ public class BlueCloseSide extends LinearOpMode {
     public static double toBackBoardLinetoLinear2X, toBackBoardLinetoLinear2Y, toBackBoardLinetoLinear2Heading;
     String x;
 
+    private int counter;
+    private double thresholdCurrent = 0.5;
+
     TrajectorySequence autoTrajectory;
 
     public void cameraInit() {
@@ -115,6 +121,8 @@ public class BlueCloseSide extends LinearOpMode {
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
         intake = new IntakeMec(hardwareMap);
+
+
         cameraInit();
     }
 
@@ -308,10 +316,21 @@ public class BlueCloseSide extends LinearOpMode {
                     .back(106.5)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                        timer.reset();
+                       counter = 0;
+                       /*
                        while(timer.seconds()<6)
                        {
                            intake.start();
+                           if(intake.getIntakeVoltage()>thresholdCurrent){
+                               counter++;
+                               telemetry.addData("voltage", intake.getIntakeVoltage());
+                           }
+                           if(counter>2){
+                               intake.reverse();
+                           }
                        }
+
+                        */
                     })
                     .UNSTABLE_addTemporalMarkerOffset(10, () -> {
                         intake.stop();

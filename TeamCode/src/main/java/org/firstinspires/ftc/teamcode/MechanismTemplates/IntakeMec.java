@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -30,6 +33,9 @@ public class IntakeMec  {
 
     public static double ejectPower = -1.0;
 
+    private VoltageSensor vS;
+
+
     public enum State{
         RUNNING,STOPPED, REVERSE
     }
@@ -41,6 +47,7 @@ public class IntakeMec  {
 
     public IntakeMec(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
         intake = (DcMotorEx) hardwareMap.dcMotor.get("IN");
+        //vS = hardwareMap.get(VoltageSensor.class, "Control Hub");
         left = hardwareMap.get(Servo.class, "ARM_L");
         right = hardwareMap.get(Servo.class, "ARM_R");
         left.setPosition(0.8); // left start pos
@@ -67,6 +74,7 @@ public class IntakeMec  {
 
     public IntakeMec(HardwareMap hardwareMap){
         intake = (DcMotorEx) hardwareMap.dcMotor.get("IN");
+        //vS = hardwareMap.get(VoltageSensor.class, "Control Hub");
         left = hardwareMap.get(Servo.class, "ARM_L");
         right = hardwareMap.get(Servo.class, "ARM_R");
 
@@ -89,6 +97,15 @@ public void start(){
     intake.setPower(power);
 }
 
+public void reverse(){
+    setIntake();
+    state = State.RUNNING;
+    intake.setPower(ejectPower);
+}
+
+public double getIntakeVoltage(){
+        return intake.getCurrent(CurrentUnit.AMPS);
+}
 public void stop(){
     setNeutral();
     state = State.STOPPED;
