@@ -216,44 +216,36 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(3, () -> {
                         slide.setIntakeOrGround();
                     })
+                    .waitSeconds(5)
+                    .lineToLinearHeading(new Pose2d(49, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
+                    .waitSeconds(.5)
+                    .back(106.5)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        timer.reset();
+                        counter = 0;
+                       /*
+                       while(timer.seconds()<6)
+                       {
+                           intake.start();
+                           if(intake.getIntakeVoltage()>thresholdCurrent){
+                               counter++;
+                               telemetry.addData("voltage", intake.getIntakeVoltage());
+                           }
+                           if(counter>2){
+                               intake.reverse();
+                           }
+                       }
+
+                        */
+                    })
+                    .waitSeconds(1)
+                    .UNSTABLE_addTemporalMarkerOffset(10, () -> {
+                        //intake.stop();
+                    })
+                    .forward(102)
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X,rightLineToLinear3Y,Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(2)
-//                    .lineToLinearHeading(new Pose2d(toStackLinetoLinear1X,toStackLinetoLinear1Y,Math.toRadians(toStackLineToLinear1Heading)))
-//                    .UNSTABLE_addTemporalMarkerOffset(0, () ->{
-//                        intake.getLeft().setPosition(0.9);
-//                        intake.getRight().setPosition(0.1);
-//                    })
-//                    .lineToLinearHeading(new Pose2d(toStackLinetoLinear2X,toStackLinetoLinear2Y,Math.toRadians(toStackLineToLinear2Heading)))
-//                    .UNSTABLE_addTemporalMarkerOffset(0,()->{
-//                        intake.getIntake().setPower(0.75);
-//                    })
-//                    .UNSTABLE_addTemporalMarkerOffset(0.15,()->{
-//                        intake.getLeft().setPosition(0.8);
-//                        intake.getRight().setPosition(0.2);
-//                    })
-//                    .waitSeconds(1.5)
-//                    .UNSTABLE_addTemporalMarkerOffset(0,()->{
-//                        intake.getIntake().setPower(0);
-//                    })
-//                    .lineToLinearHeading(new Pose2d(toBackBoardLinetoLinear1X, toBackBoardLinetoLinear1Y, Math.toRadians(toBackBoardLinetoLinear1Heading)))
-//                    .lineToLinearHeading(new Pose2d(toBackBoardLinetoLinear2X,toBackBoardLinetoLinear2Y,Math.toRadians(toBackBoardLinetoLinear2Heading)))
-//                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
-//                        clawMech.open();
-//                    })
-//                    .waitSeconds(2)
-//                    .back(5)
-//
-//                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
-//                        slide.setLowJunction();
-//                    })
-//                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
-//                        arm.setIntake();
-//                        clawMech.close();
-//                    })
-//                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
-//                        slide.setIntakeOrGround();
-//                    })
-//                    .waitSeconds(5)
-                    .strafeLeft(28)
+                    .lineToLinearHeading(new Pose2d(45,rightLineToLinear2Y,Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
                     .forward(11)
                     .build();
@@ -311,7 +303,7 @@ public class BlueCloseSide extends LinearOpMode {
                         slide.setIntakeOrGround();
                     })
                     .waitSeconds(2)
-                    .strafeRight(23)
+                    .lineToLinearHeading(new Pose2d(49, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .waitSeconds(.5)
                     .back(106.5)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -332,9 +324,16 @@ public class BlueCloseSide extends LinearOpMode {
 
                         */
                     })
+                    .waitSeconds(1)
                     .UNSTABLE_addTemporalMarkerOffset(10, () -> {
-                        intake.stop();
+                        //intake.stop();
                     })
+                    .forward(102)
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X,rightLineToLinear3Y,Math.toRadians(rightLineToLinear2deg)))
+                    .waitSeconds(2)
+                    .lineToLinearHeading(new Pose2d(55,rightLineToLinear2Y,Math.toRadians(rightLineToLinear2deg)))
+                    .waitSeconds(.5)
+                    .forward(11)
                     .build();
 
 
@@ -386,9 +385,38 @@ public class BlueCloseSide extends LinearOpMode {
                         slide.setIntakeOrGround();
                     })
                     .waitSeconds(5)
-                    .strafeLeft(20)
+                    .lineToLinearHeading(new Pose2d(49, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
+                    .waitSeconds(.5)
+                    .back(106.5)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        timer.reset();
+                        counter = 0;
+                       /*
+                       while(timer.seconds()<6)
+                       {
+                           intake.start();
+                           if(intake.getIntakeVoltage()>thresholdCurrent){
+                               counter++;
+                               telemetry.addData("voltage", intake.getIntakeVoltage());
+                           }
+                           if(counter>2){
+                               intake.reverse();
+                           }
+                       }
+
+                        */
+                    })
+                    .waitSeconds(1)
+                    .UNSTABLE_addTemporalMarkerOffset(10, () -> {
+                        //intake.stop();
+                    })
+                    .forward(102)
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X,rightLineToLinear3Y,Math.toRadians(rightLineToLinear2deg)))
+                    .waitSeconds(2)
+                    .lineToLinearHeading(new Pose2d(45,rightLineToLinear2Y,Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
                     .forward(11)
+
                     .build();
 
         } else {
