@@ -31,9 +31,9 @@ public class SlideMech {
     public static double slideKd = 0.000000; //0.000001;
     public static double slideKf = 0.00000; //0.000069;
     public static double slideKpClimb = 0.003;
-    public static double slideKpClimbDown=0.036;
+    public static double slideKpClimbDown=0.08;
     public boolean isClimbing;
-    public static double targetclimb = 3400;
+    public static double targetclimb = 3750;
 
     private final double[] PIDF_COFFECIENTS = {slideKp, slideKi, slideKd, slideKf};
 
@@ -44,7 +44,7 @@ public class SlideMech {
     public CurrentPosition targetPosQueued;
 
     public enum CurrentPosition{
-        ZERO,LEVEl1,LEVEL2,LEVEL3,LEVEL4,CUSTOM
+        ZERO,LEVEl1,LEVEL2,LEVEL3,LEVEL4,CUSTOM,CLIMB
     }
 
     private CurrentPosition currentPosition = CurrentPosition.ZERO;
@@ -159,5 +159,9 @@ public class SlideMech {
 
     public void setTargetPosQueued(CurrentPosition posQueued){
         targetPosQueued = posQueued;
+    }
+
+    public boolean isClimbing(){
+        return isClimbing;
     }
 }
