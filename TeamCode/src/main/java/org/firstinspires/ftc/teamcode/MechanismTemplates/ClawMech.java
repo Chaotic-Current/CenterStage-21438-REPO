@@ -82,9 +82,9 @@ public class ClawMech {
         return claw;
     }
 
-    public void run(IntakeMec.State e) {
+    public void run(IntakeMech.State e) {
 
-        if (e == IntakeMec.State.RUNNING) {
+        if (e == IntakeMech.State.RUNNING) {
             claw.setPosition(openPos);
             state = ClawState.OPEN;
             rightBumper.update();

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 
@@ -17,7 +17,7 @@ public class motorTest extends OpMode {
     // (づ￣ 3￣)づ hellohello
     private DcMotorEx motorFrontLeft, motorBackLeft, motorFrontRight, motorBackRight;
     private SlideMech slides;
-    private IntakeMec intake;
+    private IntakeMech intake;
     private ClawMech claw;
     private Servo wrist;
     private ArmPID arm;
@@ -73,7 +73,7 @@ public class motorTest extends OpMode {
 
         slides = new SlideMech(hardwareMap);
 
-        intake = new IntakeMec(hardwareMap,telemetry,gamepad1);
+        intake = new IntakeMech(hardwareMap,telemetry,gamepad1);
 
         claw = new ClawMech(hardwareMap,telemetry,gamepad2);
         //claw.initialize();

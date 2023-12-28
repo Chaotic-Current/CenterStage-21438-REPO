@@ -9,11 +9,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.DroneThrower;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 
@@ -23,7 +22,7 @@ public class DT_TeleOp extends OpMode {
     // (づ￣ 3￣)づ hellohello
     private DcMotorEx motorFrontLeft, motorBackLeft, motorFrontRight, motorBackRight;
     private SlideMech slides;
-    private IntakeMec intake;
+    private IntakeMech intake;
     private ClawMech claw;
     private Servo wrist;
     //private Servo planeLaucher;
@@ -98,7 +97,7 @@ public class DT_TeleOp extends OpMode {
         slides = new SlideMech(hardwareMap);
 
 
-        intake = new IntakeMec(hardwareMap,telemetry,gamepad1);
+        intake = new IntakeMech(hardwareMap,telemetry,gamepad1);
 
         claw = new ClawMech(hardwareMap,telemetry,gamepad2);
         //claw.initialize();
@@ -111,7 +110,6 @@ public class DT_TeleOp extends OpMode {
 
     @Override
     public void loop(){
-
         if(gamePad_2_Y.isRisingEdge()){
             claw.close();
             isGoingUp = true;
@@ -129,7 +127,6 @@ public class DT_TeleOp extends OpMode {
         if(gamePad_1_DpadLeft.isRisingEdge()){
             planeLaucher.setPosition(0.5);
         }
-
          */
 
         if(gamePad_2_X.isRisingEdge()){
@@ -157,7 +154,7 @@ public class DT_TeleOp extends OpMode {
             telemetry.addLine("setFalse");
         }
 
-        // TARGETPOSQUEUE :
+        // TARGET_POS QUEUE :
         // used to set slide pos after a delay and keep everything in for the slides in one area
         if(isGoingUp && timer.milliseconds() > clawDelay){
             if(slides.targetPosQueued.equals(SlideMech.CurrentPosition.LEVEl1)){
@@ -185,6 +182,8 @@ public class DT_TeleOp extends OpMode {
         telemetry.addData("slides.isUp()", slides.isUp(telemetry));
         telemetry.addData("timer", timer.milliseconds());
         telemetry.addData("slidesUp", slidesUp);
+        telemetry.addData("left servo position: ", IntakeMech.getLeft().getPosition());
+        telemetry.addData("right servo position: ", IntakeMech.getRight().getPosition());
         if(gamepad_2_A.isRisingEdge()){
 
             claw.close();

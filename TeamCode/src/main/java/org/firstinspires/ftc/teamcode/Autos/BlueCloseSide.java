@@ -5,17 +5,12 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
@@ -30,47 +25,52 @@ import org.openftc.easyopencv.OpenCvWebcam;
 @Config
 @Autonomous
 public class BlueCloseSide extends LinearOpMode {
-    // edit for webhook test 4
     private SampleMecanumDrive drive;
     private ElapsedTime timer = new ElapsedTime();
     private OpenCvWebcam frontCam, backCam;
-    private IntakeMec intake;
+    private IntakeMech intake;
     private ArmMecNew arm;
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector;
     private AprilTagDetectionPipeline aprilTagPipeline;
+
+    // CENTER
     public static double centerFrwDistance1 = 30;
     public static double centerBackwardsDistance1 = 12;
     public static double frwDistance2 = 5;
     public static double frwDistance3 = 12;
     public static double wait01 = 1;
     public static double wait02 = 1;
-    public static double rightSpline1deg = -75;
     public static double leftBackDist = 10;
-    public static double rightLineToLinear2deg = 90;
-
-    public static double leftLinetoLinear1X = 26, leftLinetoLinear1Y = 6, leftLineToLinear1Heading = 30;
-    public static double rightSplineTo1X = 26, rightSplineTo1Y = -2.5, splineToLinear1Heading = -80;
-    public static double rightLineToLinear2X = 32, rightLineToLinear2Y = 37.5, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
-    public static double rightLineToLinear3Y = 41;
     public static double centerLineToLinear1X = 26, centerLineToLinear1Y = 30, centerLineToLinear1Heading = 90, wait1Center = 3;
     public static double centerLineToLinear2Y = 39.5;
+
+    // LEFT
     public static double leftLineToLinear2X = 20, leftLineToLinear2Y = 33.5, leftLineToLinear2Heading = 90, wait1Left = 3, wait2Left = 1;
     public static double leftLinetoLinear3Y = 40.5;
+    public static double leftLinetoLinear1X = 26, leftLinetoLinear1Y = 6, leftLineToLinear1Heading = 30;
+
+    // RIGHT
+    public static double rightSpline1deg = -75;
+    public static double rightLineToLinear2deg = 90;
+    public static double rightSplineTo1X = 26, rightSplineTo1Y = -2.5, splineToLinear1Heading = -80;
+    public static double rightLineToLinear2X = 32, rightLineToLinear2Y = 37.5, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
+    public static double rightLineToLinear3Y = 37.5; // changed
+
+
+    // OTHER
     public static double parkX = 4, parkY = 37, parkHeading = 90;
     public static double degree = 90;
-
     double errorx, errory, errorheading;
-
     public static double toStackLinetoLinear1X, toStackLinetoLinear1Y, toStackLineToLinear1Heading;
     public static double toStackLinetoLinear2X, toStackLinetoLinear2Y, toStackLineToLinear2Heading;
     public static double toBackBoardLinetoLinear1X, toBackBoardLinetoLinear1Y, toBackBoardLinetoLinear1Heading;
     public static double toBackBoardLinetoLinear2X, toBackBoardLinetoLinear2Y, toBackBoardLinetoLinear2Heading;
     String x;
+    private int numOfPixels;
 
-    private int counter;
-    private double thresholdCurrent = 0.5;
+    private double thresholdCurrent = 0.5; // threshold for current draw from intake motor
 
     TrajectorySequence autoTrajectory;
 
@@ -115,14 +115,12 @@ public class BlueCloseSide extends LinearOpMode {
     }
 
     public void initialize() {
-        //intake = new IntakeMec(hardwareMap);
+        //intake = new IntakeMech(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
-        intake = new IntakeMec(hardwareMap);
-
-
+        intake = new IntakeMech(hardwareMap);
         cameraInit();
     }
 
@@ -133,7 +131,6 @@ public class BlueCloseSide extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d());
 
         DetectColor.ColorLocation e = detector.getLocate();
-
 
         while(!isStarted()) {
             ElapsedTime time = new ElapsedTime();
@@ -150,9 +147,7 @@ public class BlueCloseSide extends LinearOpMode {
             }
         }
         frontCam.stopStreaming();
-        //telemetry.addLine(e.name());
         telemetry.update();
-
         frontCam.setPipeline(aprilTagPipeline);
         frontCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -165,8 +160,6 @@ public class BlueCloseSide extends LinearOpMode {
                 telemetry.addLine("not open");
             }
         });
-
-
 
         if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
             aprilTagPipeline.setTargetTag(3);
@@ -222,7 +215,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .back(106.5)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         timer.reset();
-                        counter = 0;
+                        numOfPixels = 0;
                        /*
                        while(timer.seconds()<6)
                        {
@@ -251,24 +244,24 @@ public class BlueCloseSide extends LinearOpMode {
                     .build();
 
 
-        } else if (e == DetectColor.ColorLocation.CENTER) {
+        }
+        else if (e == DetectColor.ColorLocation.CENTER) {
             aprilTagPipeline.setTargetTag(2);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(centerFrwDistance1)
+
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
-                        telemetry.addData("slides?", 0);
                     })
-
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
                         arm.setExtake();
-                        telemetry.addData("arm?", 0);
                     })
                     .waitSeconds(.1)
 
                     .back(centerBackwardsDistance1)
 
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+                    /*
                     .UNSTABLE_addTemporalMarkerOffset(0.15,() ->{
                         x = "old: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                         double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
@@ -277,19 +270,16 @@ public class BlueCloseSide extends LinearOpMode {
                         //drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
                         x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
                     })
+                     */
                     .waitSeconds(0.5)
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X,centerLineToLinear2Y,Math.toRadians(centerLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(1000);
-                        telemetry.addData("slides again?", 0);
-
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(0.1)
-
-                    .waitSeconds(2)
+                    .waitSeconds(2.1)
                     .back(5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
@@ -303,12 +293,14 @@ public class BlueCloseSide extends LinearOpMode {
                         slide.setIntakeOrGround();
                     })
                     .waitSeconds(2)
-                    .lineToLinearHeading(new Pose2d(49, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+
+                    // TAKE FROM STACK
+                    .lineToLinearHeading(new Pose2d(47.5, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .waitSeconds(.5)
-                    .back(106.5)
+                    .back(101.5) // changed
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                        timer.reset();
-                       counter = 0;
+                       numOfPixels = 0;
                        /*
                        while(timer.seconds()<6)
                        {
@@ -328,16 +320,19 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(10, () -> {
                         //intake.stop();
                     })
-                    .forward(102)
-                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X,rightLineToLinear3Y,Math.toRadians(rightLineToLinear2deg)))
+                    .forward(98) // changed
+
+                    // DEPOSIT
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X-3,rightLineToLinear3Y,Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(2)
-                    .lineToLinearHeading(new Pose2d(55,rightLineToLinear2Y,Math.toRadians(rightLineToLinear2deg)))
+
+                    // PARK
+                    .lineToLinearHeading(new Pose2d(46,rightLineToLinear2Y,Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
-                    .forward(11)
+                    .forward(10) // changed
                     .build();
-
-
-        } else if (e == DetectColor.ColorLocation.LEFT) {
+        }
+        else if (e == DetectColor.ColorLocation.LEFT) {
             aprilTagPipeline.setTargetTag(1);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
@@ -390,7 +385,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .back(106.5)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         timer.reset();
-                        counter = 0;
+                        numOfPixels = 0;
                        /*
                        while(timer.seconds()<6)
                        {
@@ -419,22 +414,20 @@ public class BlueCloseSide extends LinearOpMode {
 
                     .build();
 
-        } else {
-            telemetry.addLine("ruh roh");
+        }
+
+        else {
+            telemetry.addLine("ruh-roh (´▽`ʃ♡ƪ)");
         }
 
         waitForStart();
         telemetry.update();
-        telemetry.addLine(x + " \nyes");
-        telemetry.update();
-
 
         drive.followTrajectorySequenceAsync(autoTrajectory);
 
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
             slide.update(telemetry);
-
         }
     }
 }

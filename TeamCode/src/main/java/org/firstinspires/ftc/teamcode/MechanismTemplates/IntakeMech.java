@@ -14,13 +14,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-public class IntakeMec  {
+public class IntakeMech {
     //"MC ABHI IS ON THE REPO!!!"
 
     // Declaring intake motors
     private DcMotorEx intake; // pin 0
     private Telemetry telemetry;
-    private Servo left, right; // left -> 0, right -> 1
+    private static Servo left, right; // left -> 0, right -> 1
     private SignalEdgeDetector buttonY,buttonB, bumperLeft, bumperRight, dPadDown;
     private Gamepad gamepad;
     public static double leftFinalPos = 0.63;//moving a dist on 0.06
@@ -45,7 +45,7 @@ public class IntakeMec  {
     private boolean isIntaking = false;
 
 
-    public IntakeMec(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
+    public IntakeMech(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
         intake = (DcMotorEx) hardwareMap.dcMotor.get("IN");
         //vS = hardwareMap.get(VoltageSensor.class, "Control Hub");
         left = hardwareMap.get(Servo.class, "ARM_L");
@@ -72,7 +72,7 @@ public class IntakeMec  {
         this.bumperLeft = new SignalEdgeDetector(() -> this.gamepad.left_bumper);
     }
 
-    public IntakeMec(HardwareMap hardwareMap){
+    public IntakeMech(HardwareMap hardwareMap){
         intake = (DcMotorEx) hardwareMap.dcMotor.get("IN");
         //vS = hardwareMap.get(VoltageSensor.class, "Control Hub");
         left = hardwareMap.get(Servo.class, "ARM_L");
@@ -154,7 +154,6 @@ public void stop(){
         }
 
         if(bumperRight.isRisingEdge()){
-            telemetry.addData("Line down", 1);
             left.setPosition(left.getPosition() - increment);
             right.setPosition(right.getPosition() + increment);
         }
@@ -170,11 +169,11 @@ public void stop(){
         return intake;
     }
 
-    public Servo getLeft() {
+    public static Servo getLeft() {
         return left;
     }
 
-    public Servo getRight() {
+    public static Servo getRight() {
         return right;
     }
 

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Autos.Stack_Autos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMec;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
@@ -28,7 +27,7 @@ public class BlueCloseStack extends LinearOpMode {
 
     private SampleMecanumDrive drive;
     private OpenCvWebcam frontCam, backCam;
-    private IntakeMec intake;
+    private IntakeMech intake;
     private ArmMecNew arm;
     private SlideMech slide;
     private ClawMech clawMech;
@@ -106,7 +105,7 @@ public class BlueCloseStack extends LinearOpMode {
     }
 
     public void initialize() {
-        //intake = new IntakeMec(hardwareMap);
+        //intake = new IntakeMech(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
