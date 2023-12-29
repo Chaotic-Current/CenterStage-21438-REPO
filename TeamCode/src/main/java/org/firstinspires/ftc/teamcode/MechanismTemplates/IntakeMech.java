@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 
@@ -21,13 +22,17 @@ public class IntakeMech {
     private DcMotorEx intake; // pin 0
     private Telemetry telemetry;
     private static Servo left, right; // left -> 0, right -> 1
-    private SignalEdgeDetector buttonY,buttonB, bumperLeft, bumperRight, dPadDown;
+    private SignalEdgeDetector buttonY, buttonB, bumperLeft, bumperRight, dPadDown;
     private Gamepad gamepad;
     public static double leftFinalPos = 0.63;//moving a dist on 0.06
     public static double rightFinalPos = 0.37;
     public static double increment = 0.025;
     public static double leftFinalUp = 0.9;
     public static double rightFinalUp = 0.1;
+    public static double leftAutoApproachPosition = .775;
+    public static double rightAutoApproachPosition = .225;
+    public static double leftAutoIntakePosition = .725;
+    public static double rightAutoIntakePosition = .275;
 
     public static double power = 0.75;
 
@@ -36,8 +41,8 @@ public class IntakeMech {
     private VoltageSensor vS;
 
 
-    public enum State{
-        RUNNING,STOPPED, REVERSE
+    public enum State {
+        RUNNING, STOPPED, REVERSE
     }
 
     private State state;
@@ -61,18 +66,19 @@ public class IntakeMech {
 
         this.telemetry = telemetry;
 
-        this.buttonY =  new SignalEdgeDetector(() -> this.gamepad.y);
+        this.buttonY = new SignalEdgeDetector(() -> this.gamepad.y);
 
-        this.buttonB = new SignalEdgeDetector(()-> this.gamepad.b);
+        this.buttonB = new SignalEdgeDetector(() -> this.gamepad.b);
 
         this.gamepad = gamepad;
 
-        this.bumperRight = new SignalEdgeDetector(() -> this.gamepad.right_bumper);;
+        this.bumperRight = new SignalEdgeDetector(() -> this.gamepad.right_bumper);
+        ;
 
         this.bumperLeft = new SignalEdgeDetector(() -> this.gamepad.left_bumper);
     }
 
-    public IntakeMech(HardwareMap hardwareMap){
+    public IntakeMech(HardwareMap hardwareMap) {
         intake = (DcMotorEx) hardwareMap.dcMotor.get("IN");
         //vS = hardwareMap.get(VoltageSensor.class, "Control Hub");
         left = hardwareMap.get(Servo.class, "ARM_L");
@@ -88,41 +94,52 @@ public class IntakeMech {
         left.setPosition(0.2);
     }
 
-    public State getState(){
+    public State getState() {
         return state;
     }
-public void start(){
-    setIntake();
-    state = State.RUNNING;
-    intake.setPower(power);
-}
 
-public void reverse(){
-    setIntake();
-    state = State.RUNNING;
-    intake.setPower(ejectPower);
-}
+    public void start() {
+        left.setPosition(leftAutoIntakePosition);
+        right.setPosition(rightAutoIntakePosition);
+        isIntaking = true;
+        state = State.RUNNING;
+        intake.setPower(power);
+    }
 
-public double getIntakeVoltage(){
+    public void startAuto() {
+        setIntake();
+        state = State.RUNNING;
+        intake.setPower(power);
+    }
+
+    public void reverse() {
+        setIntake();
+        state = State.RUNNING;
+        intake.setPower(ejectPower);
+    }
+
+    public double getIntakeVoltage() {
         return intake.getCurrent(CurrentUnit.AMPS);
-}
-public void stop(){
-    setNeutral();
-    state = State.STOPPED;
-    intake.setPower(0);
-}
+    }
+
+    public void stop() {
+        setNeutral();
+        state = State.STOPPED;
+        intake.setPower(0);
+    }
+
     public void run() {
-        if(gamepad.left_trigger > 0.1) {
+        if (gamepad.left_trigger > 0.1) {
             setIntake();
             state = State.RUNNING;
             intake.setPower(power);
 
-        } else if(gamepad.dpad_down){
+        } else if (gamepad.dpad_down) {
             state = State.REVERSE;
             intake.setPower(ejectPower);
             gamepad.setLedColor(255, 0, 0, 1000);
 
-        } else{
+        } else {
             setNeutral();
             state = State.STOPPED;
             intake.setPower(0);
@@ -136,24 +153,24 @@ public void stop(){
         }
          */
 
-        if(buttonY.isRisingEdge()){
-           telemetry.addData("yea", 1);
+        if (buttonY.isRisingEdge()) {
+            telemetry.addData("yea", 1);
             left.setPosition(leftFinalPos);
             right.setPosition(rightFinalPos);
         }
-        if(buttonB.isRisingEdge()){
+        if (buttonB.isRisingEdge()) {
             telemetry.addData("idk", 1);
             left.setPosition(leftFinalUp);
             right.setPosition(rightFinalUp);
         }
 
-        if(bumperLeft.isRisingEdge()){
+        if (bumperLeft.isRisingEdge()) {
             telemetry.addData("Line up", 1);
             left.setPosition(left.getPosition() + increment);
             right.setPosition(right.getPosition() - increment);
         }
 
-        if(bumperRight.isRisingEdge()){
+        if (bumperRight.isRisingEdge()) {
             left.setPosition(left.getPosition() - increment);
             right.setPosition(right.getPosition() + increment);
         }
@@ -177,19 +194,24 @@ public void stop(){
         return right;
     }
 
-    public void setIntake(){
-        if(!isIntaking) {
+    public void setIntake() {
+        if (!isIntaking) {
             left.setPosition(leftFinalPos);
             right.setPosition(rightFinalPos);
             isIntaking = true;
         }
     }
 
-    public void setNeutral(){
-        if(isIntaking) {
+    public void setNeutral() {
+        if (isIntaking) {
             left.setPosition(leftFinalUp);
             right.setPosition(rightFinalUp);
             isIntaking = false;
         }
+    }
+
+    public void setServosUp() {
+        left.setPosition(leftAutoApproachPosition);
+        right.setPosition(rightAutoApproachPosition);
     }
 }

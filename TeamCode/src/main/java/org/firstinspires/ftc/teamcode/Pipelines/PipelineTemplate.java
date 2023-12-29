@@ -24,8 +24,15 @@ public class PipelineTemplate extends OpenCvPipeline {
         this.telemetry = tel;
     }
 
+    public PipelineTemplate(Telemetry tel){
+        telemetry = tel;
+    }
+
     @Override
     public Mat processFrame(Mat input) {
+    if(upper == null)
+        return input;
+
         Mat mat = new Mat();
 
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
