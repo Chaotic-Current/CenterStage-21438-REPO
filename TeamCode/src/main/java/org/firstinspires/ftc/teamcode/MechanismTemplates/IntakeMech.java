@@ -31,8 +31,8 @@ public class IntakeMech {
     public static double rightFinalUp = 0.1;
     public static double leftAutoApproachPosition = .775;
     public static double rightAutoApproachPosition = .225;
-    public static double leftAutoIntakePosition = .725;
-    public static double rightAutoIntakePosition = .275;
+    public static double leftAutoIntakePosition = .75;
+    public static double rightAutoIntakePosition = .25;
 
     public static double power = 0.75;
 
@@ -90,8 +90,8 @@ public class IntakeMech {
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        left.setPosition(0.8);
-        left.setPosition(0.2);
+        left.setPosition(leftFinalPos);
+        right.setPosition(rightFinalPos);
     }
 
     public State getState() {
@@ -99,11 +99,16 @@ public class IntakeMech {
     }
 
     public void start() {
-        left.setPosition(leftAutoIntakePosition);
-        right.setPosition(rightAutoIntakePosition);
+        left.setPosition(leftAutoApproachPosition);
+        right.setPosition(rightAutoApproachPosition);
         isIntaking = true;
         state = State.RUNNING;
         intake.setPower(power);
+    }
+
+    public void AutoIntakeServoPosition(){
+        left.setPosition(leftAutoIntakePosition);
+        right.setPosition(rightAutoIntakePosition);
     }
 
     public void startAuto() {
