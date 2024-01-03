@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Autos.Stack_Autos;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -23,6 +24,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 @Config
 @Autonomous
+@Disabled
 public class BlueCloseStack extends LinearOpMode {
 
     private SampleMecanumDrive drive;

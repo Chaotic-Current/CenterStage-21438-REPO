@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -63,7 +64,7 @@ public class BlueCloseSide extends LinearOpMode {
     public static double parkX = 4, parkY = 37, parkHeading = 90;
     public static double degree = 90;
     double errorx, errory, errorheading;
-    public static double toStackLinetoLinear1X, toStackLinetoLinear1Y = -70.5, toStackLineToLinear1Heading;
+    public static double toStackLinetoLinear1X, toStackLinetoLinear1Y = -70.25, toStackLineToLinear1Heading;
     public static double toStackLinetoLinear2X, toStackLinetoLinear2Y, toStackLineToLinear2Heading;
     public static double toBackBoardLinetoLinear1X, toBackBoardLinetoLinear1Y, toBackBoardLinetoLinear1Heading;
     public static double toBackBoardLinetoLinear2X, toBackBoardLinetoLinear2Y, toBackBoardLinetoLinear2Heading;
@@ -122,6 +123,9 @@ public class BlueCloseSide extends LinearOpMode {
         clawMech = new ClawMech(hardwareMap, telemetry);
         intake = new IntakeMech(hardwareMap);
         cameraInit();
+
+        Servo wrist = hardwareMap.get(Servo.class,"WRIST");
+        wrist.setPosition(0.5);
     }
 
     @Override
@@ -322,19 +326,15 @@ public class BlueCloseSide extends LinearOpMode {
                     .waitSeconds(.25)
                     .lineToLinearHeading(new Pose2d(47.5, toStackLinetoLinear1Y, Math.toRadians(centerLineToLinear1Heading)))// changed
                     .UNSTABLE_addTemporalMarkerOffset(-1.25, () -> {
-
-                        timer.reset();
-                        numOfPixels = 0;
-                        int counter = 0;
                         intake.start();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(-0.25,()->{
                         intake.AutoIntakeServoPosition();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(1,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(3,()->{
                         intake.reverse();
                     })
-                    .waitSeconds(1)
+                    .waitSeconds(1.5)
                     .forward(98) // changed
                     .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
                         intake.stop();
@@ -347,11 +347,11 @@ public class BlueCloseSide extends LinearOpMode {
                     })
 
                     // MOVE TO BACKDROP AND DEPOSIT \\
-                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X - 3, rightLineToLinear3Y, Math.toRadians(rightLineToLinear2deg)))
-                    .UNSTABLE_addTemporalMarkerOffset(-0.9, () -> {
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X - 3, rightLineToLinear3Y-0.25, Math.toRadians(rightLineToLinear2deg)))
+                    .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
                         slide.setCustom(1000);
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(-0.75,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(-0.45,()->{
                         arm.setExtake();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
