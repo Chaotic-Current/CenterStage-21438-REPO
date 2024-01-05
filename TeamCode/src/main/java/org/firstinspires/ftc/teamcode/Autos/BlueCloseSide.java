@@ -43,7 +43,6 @@ public class BlueCloseSide extends LinearOpMode {
     public static double frwDistance3 = 12;
     public static double wait01 = 1;
     public static double wait02 = 1;
-    public static double leftBackDist = 10;
     public static double centerLineToLinear1X = 26, centerLineToLinear1Y = 30, centerLineToLinear1Heading = 90, wait1Center = 3;
     public static double centerLineToLinear2Y = 39.5;
 
@@ -51,20 +50,21 @@ public class BlueCloseSide extends LinearOpMode {
     public static double leftLineToLinear2X = 20, leftLineToLinear2Y = 33.5, leftLineToLinear2Heading = 90, wait1Left = 3, wait2Left = 1;
     public static double leftLinetoLinear3Y = 40.5;
     public static double leftLinetoLinear1X = 26, leftLinetoLinear1Y = 6, leftLineToLinear1Heading = 30;
+    public static double leftBackDist = 10;
 
     // RIGHT
     public static double rightSpline1deg = -75;
     public static double rightLineToLinear2deg = 90;
     public static double rightSplineTo1X = 26, rightSplineTo1Y = -2.5, splineToLinear1Heading = -80;
     public static double rightLineToLinear2X = 32, rightLineToLinear2Y = 37.5, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
-    public static double rightLineToLinear3Y = 37.5; // changed
+    public static double rightLineToLinear3Y = 37.5;
 
 
     // OTHER
     public static double parkX = 4, parkY = 37, parkHeading = 90;
     public static double degree = 90;
     double errorx, errory, errorheading;
-    public static double toStackLinetoLinear1X, toStackLinetoLinear1Y = -70.25, toStackLineToLinear1Heading;
+    public static double toStackLinetoLinear1X, toStackLinetoLinear1Y = -69.75, toStackLineToLinear1Heading;
     public static double toStackLinetoLinear2X, toStackLinetoLinear2Y, toStackLineToLinear2Heading;
     public static double toBackBoardLinetoLinear1X, toBackBoardLinetoLinear1Y, toBackBoardLinetoLinear1Heading;
     public static double toBackBoardLinetoLinear2X, toBackBoardLinetoLinear2Y, toBackBoardLinetoLinear2Heading;
@@ -324,21 +324,28 @@ public class BlueCloseSide extends LinearOpMode {
                         clawMech.open();
                     })
                     .waitSeconds(.25)
-                    .lineToLinearHeading(new Pose2d(47.5, toStackLinetoLinear1Y, Math.toRadians(centerLineToLinear1Heading)))// changed
+                    .lineToLinearHeading(new Pose2d(48, toStackLinetoLinear1Y, Math.toRadians(centerLineToLinear1Heading)))// changed
                     .UNSTABLE_addTemporalMarkerOffset(-1.25, () -> {
                         intake.start();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(-0.25,()->{
-                        intake.AutoIntakeServoPosition();
+                        intake.AutoIntakeServoPositionStage1();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(2.5,()->{
+                        clawMech.close();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(3,()->{
+
                         intake.reverse();
                     })
-                    .waitSeconds(1.5)
+                    .UNSTABLE_addTemporalMarkerOffset(.25,()->{
+                        intake.AutoIntakeServoPositionStage2();
+                    })
+                    .waitSeconds(2)
                     .forward(98) // changed
                     .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
                         intake.stop();
-                        clawMech.close();
+
 
                     })
                     .UNSTABLE_addTemporalMarkerOffset(2, () -> {

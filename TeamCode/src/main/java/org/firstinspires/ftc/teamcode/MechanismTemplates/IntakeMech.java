@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MechanismTemplates;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -24,23 +25,29 @@ public class IntakeMech {
     private static Servo left, right; // left -> 0, right -> 1
     private SignalEdgeDetector buttonY, buttonB, bumperLeft, bumperRight, dPadDown;
     private Gamepad gamepad;
-    public static double leftFinalPos = 0.63;//moving a dist on 0.06
-    public static double rightFinalPos = 0.37;
-    public static double increment = 0.025;
-    public static double leftFinalUp = 0.9;
-    public static double rightFinalUp = 0.1;
-    public static double leftAutoApproachPosition = .775;
-    public static double rightAutoApproachPosition = .225;
-    public static double leftAutoIntakePosition = .7;
-    public static double rightAutoIntakePosition = .3;
 
+    // LEFT
+    public static double leftFinalPos = 0.63; //moving a dist on 0.06
+    public static double leftFinalUp = 0.9;
+    public static double leftAutoApproachPosition = .775;
+    public static double leftAutoIntakePositionStage1 = .75;
+    public static double leftAutoIntakePositionStage2 = .725;
+
+    // RIGHT
+    public static double rightFinalUp = 0.1;
+    public static double rightAutoApproachPosition = .225;
+    public static double rightAutoIntakePositionStage1 = .25;
+    public static double rightAutoIntakePositionStage2 = .275;
+    public static double rightFinalPos = 0.37;
+
+    // OTHER
+    public static double increment = 0.025;
     public static double power = 0.75;
     public static double AutoPower = 0.65;
-
+    public static double AutoExtakePower = 0.7;
     public static double ejectPower = -1.0;
 
     private VoltageSensor vS;
-
 
     public enum State {
         RUNNING, STOPPED, REVERSE
@@ -93,6 +100,8 @@ public class IntakeMech {
 
         left.setPosition(leftFinalPos);
         right.setPosition(rightFinalPos);
+
+
     }
 
     public State getState() {
@@ -107,9 +116,14 @@ public class IntakeMech {
         intake.setPower(AutoPower);
     }
 
-    public void AutoIntakeServoPosition(){
-        left.setPosition(leftAutoIntakePosition);
-        right.setPosition(rightAutoIntakePosition);
+    public void AutoIntakeServoPositionStage1(){
+        left.setPosition(leftAutoIntakePositionStage1);
+        right.setPosition(rightAutoIntakePositionStage1);
+    }
+
+    public void AutoIntakeServoPositionStage2(){
+        left.setPosition(leftAutoIntakePositionStage2);
+        right.setPosition(rightAutoIntakePositionStage2);
     }
 
     public void startAuto() {
@@ -121,7 +135,7 @@ public class IntakeMech {
     public void reverse() {
         setIntake();
         state = State.RUNNING;
-        intake.setPower(ejectPower);
+        intake.setPower(AutoExtakePower);
     }
 
     public double getIntakeVoltage() {
@@ -198,6 +212,10 @@ public class IntakeMech {
 
     public static Servo getRight() {
         return right;
+    }
+
+    public static void setServoPower(){
+
     }
 
     public void setIntake() {

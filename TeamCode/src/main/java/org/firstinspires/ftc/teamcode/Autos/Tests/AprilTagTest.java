@@ -27,7 +27,11 @@ public class AprilTagTest extends LinearOpMode {
 
     SampleMecanumDrive drive;
 
-    Double error ;
+    private Pose2d startingPose = new Pose2d(0,0,0);
+
+    double error = 2.0;
+
+    double x;
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
@@ -55,7 +59,7 @@ public class AprilTagTest extends LinearOpMode {
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == 2) {
-                error = detection.ftcPose.y;
+                x = detection.ftcPose.y;
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
@@ -148,8 +152,8 @@ public class AprilTagTest extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     telemetryAprilTag();
                 })
-                .waitSeconds(5)
-                .forward(error - 1)
+                .waitSeconds(0.25)
+                .lineToLinearHeading(new Pose2d(error,0,0))
                 .build();
 
         waitForStart();
@@ -157,9 +161,10 @@ public class AprilTagTest extends LinearOpMode {
         drive.followTrajectorySequenceAsync(move);
 
         while (opModeIsActive()) {
-
             telemetryAprilTag();
             drive.update();
+            if(Math.abs(drive.getPoseEstimate().getX() - startingPose.getX()) < 1 && Math.abs(drive.getPoseEstimate().getY() - startingPose.getY()) < 1)
+                drive.setPoseEstimate(new Pose2d(x-2,0,0));
             telemetry.update();
         }
 

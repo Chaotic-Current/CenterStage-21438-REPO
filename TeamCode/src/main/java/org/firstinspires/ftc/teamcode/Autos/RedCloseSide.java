@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
+import org.firstinspires.ftc.teamcode.Pipelines.PipelineTemplate;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.opencv.core.Scalar;
@@ -65,14 +66,14 @@ public class RedCloseSide extends LinearOpMode {
         detector = new DetectColor(width, telemetry, new Scalar(10,255,255),new Scalar(2,100,100));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
+         backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "BackCam"), cameraMonitorViewId);
         frontCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamFront"), cameraMonitorViewId);
-        // backCam.setPipeline(detector);
+         backCam.setPipeline(new PipelineTemplate(telemetry));
         frontCam.setPipeline(detector);
 
-        // backCam.setMillisecondsPermissionTimeout(2500);
+         backCam.setMillisecondsPermissionTimeout(2500);
         frontCam.setMillisecondsPermissionTimeout(2500);
-        /*backCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        backCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
                 telemetry.addLine("started");
@@ -83,7 +84,7 @@ public class RedCloseSide extends LinearOpMode {
             public void onError(int errorCode) {
                 telemetry.addLine("not open");
             }
-        });*/
+        });
         frontCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
