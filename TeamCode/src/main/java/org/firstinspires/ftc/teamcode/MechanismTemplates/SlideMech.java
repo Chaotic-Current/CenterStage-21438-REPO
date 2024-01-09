@@ -70,7 +70,7 @@ public class SlideMech {
         isClimbing = false;
     }
 
-    public void update(Telemetry telemetry) {
+    public void update() {
         int avg = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
 
 
@@ -82,6 +82,35 @@ public class SlideMech {
             slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
         }
     }
+        correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
+        correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
+
+     /* telemetry.addData("targetPosition: ", targetPos);
+        telemetry.addData("Right motor position: ", slideRight.getCurrentPosition());
+        telemetry.addData("Left motor position: ", slideLeft.getCurrentPosition());
+        telemetry.addData("Left correction: ", correctionLeft);
+        telemetry.addData("Right correction: ", correctionRight);
+        telemetry.update();*/
+
+
+
+        // sets the output power of the motor
+        slideLeft.set(correctionLeft);
+        slideRight.set(correctionRight);
+    }
+
+    public void update(Telemetry telemetry) {
+        int avg = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
+
+
+
+        if(!isClimbing) {
+            if (avg > targetPos) {
+                slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
+            } else {
+                slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
+            }
+        }
         correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
         correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
 

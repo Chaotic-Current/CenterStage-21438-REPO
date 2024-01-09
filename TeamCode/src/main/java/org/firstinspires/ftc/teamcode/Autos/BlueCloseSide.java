@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
@@ -17,11 +18,17 @@ import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
 @Autonomous
@@ -35,6 +42,14 @@ public class BlueCloseSide extends LinearOpMode {
     private ClawMech clawMech;
     private DetectColor detector;
     private AprilTagDetectionPipeline aprilTagPipeline;
+    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+    private AprilTagProcessor aprilTag;
+    private VisionPortal visionPortal;
+    private int tagUse;
+    private double errorX;
+    private double errorY;
+    private double errorYaw;
+
 
     // CENTER
     public static double centerFrwDistance1 = 30;
@@ -124,13 +139,109 @@ public class BlueCloseSide extends LinearOpMode {
         intake = new IntakeMech(hardwareMap);
         cameraInit();
 
-        Servo wrist = hardwareMap.get(Servo.class,"WRIST");
+        Servo wrist = hardwareMap.get(Servo.class, "WRIST");
         wrist.setPosition(0.5);
     }
+
+    private void initAprilTag() {
+
+        // Create the AprilTag processor.
+        aprilTag = new AprilTagProcessor.Builder()
+
+                // The following default settings are available to un-comment and edit as needed.
+                //.setDrawAxes(false)
+                //.setDrawCubeProjection(false)
+                //.setDrawTagOutline(true)
+                //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+
+                // == CAMERA CALIBRATION ==
+                // If you do not manually specify calibration parameters, the SDK will attempt
+                // to load a predefined calibration for your camera.
+                .setLensIntrinsics(1430, 1430, 480, 620)
+                // ... these parameters are fx, fy, cx, cy.
+
+                .build();
+
+        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+        // eg: Some typical detection data using a Logitech C920 WebCam
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second (default)
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second (default)
+        // Note: Decimation can be changed on-the-fly to adapt during a match.
+        //aprilTag.setDecimation(3);
+
+        // Create the vision portal by using a builder.
+        VisionPortal.Builder builder = new VisionPortal.Builder();
+
+        // Set the camera (webcam vs. built-in RC phone camera).
+        if (USE_WEBCAM) {
+            builder.setCamera(hardwareMap.get(WebcamName.class, "WebcamFront"));
+        } else {
+            builder.setCamera(BuiltinCameraDirection.BACK);
+        }
+
+        // Choose a camera resolution. Not all cameras support all resolutions.
+        //builder.setCameraResolution(new Size(640, 480));
+
+        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
+        //builder.enableLiveView(true);
+
+        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
+        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+
+        // Choose whether or not LiveView stops if no processors are enabled.
+        // If set "true", monitor shows solid orange screen if no processors enabled.
+        // If set "false", monitor shows camera view without annotations.
+        //builder.setAutoStopLiveView(false);
+
+        // Set and enable the processor.
+        builder.addProcessor(aprilTag);
+
+        // Build the Vision Portal, using the above settings.
+        visionPortal = builder.build();
+
+        // Disable or re-enable the aprilTag processor at any time.
+        //visionPortal.setProcessorEnabled(aprilTag, true);
+
+    }
+
+    private void telemetryAprilTag(int tagUse) {
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.id == tagUse) {
+            errorX = detection.ftcPose.x;
+            errorY = detection.ftcPose.y-25;
+            errorYaw = detection.ftcPose.yaw;
+                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y-11, detection.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+            }
+        }   // end for() loop
+
+        // Add "key" information to telemetry
+        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        telemetry.addLine("RBE = Range, Bearing & Elevation");
+        telemetry.update();
+
+    }   // end method telemetryAprilTag()
 
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
+
+        AtomicBoolean t = new AtomicBoolean(false);
 
         drive.setPoseEstimate(new Pose2d());
 
@@ -151,20 +262,10 @@ public class BlueCloseSide extends LinearOpMode {
             }
         }
         frontCam.stopStreaming();
+        frontCam.closeCameraDevice();
+        initAprilTag();
         telemetry.update();
-        frontCam.setPipeline(aprilTagPipeline);
-        frontCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                telemetry.addLine("started apriltag");
-                frontCam.startStreaming(160, 120, OpenCvCameraRotation.UPRIGHT);
-            }
 
-            @Override
-            public void onError(int errorCode) {
-                telemetry.addLine("not open");
-            }
-        });
 
         if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
             aprilTagPipeline.setTargetTag(3);
@@ -263,9 +364,8 @@ public class BlueCloseSide extends LinearOpMode {
                     .forward(11)
                     .build();
 
-        }
-        else if (e == DetectColor.ColorLocation.CENTER) {
-            aprilTagPipeline.setTargetTag(2);
+        } else if (e == DetectColor.ColorLocation.CENTER) {
+            tagUse = 2;
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(centerFrwDistance1)
 
@@ -281,17 +381,12 @@ public class BlueCloseSide extends LinearOpMode {
                     .back(centerBackwardsDistance1)
 
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
-                    /*
-                    .UNSTABLE_addTemporalMarkerOffset(0.15,() ->{
-                        x = "old: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
-                        double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
-                        // double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
-                        double newAngle = drive.getPoseEstimate().getHeading() - Math.toRadians(aprilTagPipeline.getErrorYaw());
-                        //drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
-                        x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" +  drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
+
+                    .UNSTABLE_addTemporalMarkerOffset(0,() ->{
+                        t.set(true);
                     })
-                     */
-                    .waitSeconds(0.25)
+
+                    .waitSeconds(0.65)
 
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
 
@@ -320,7 +415,7 @@ public class BlueCloseSide extends LinearOpMode {
 
                     // TAKE FROM STACK  \\
                     .lineToLinearHeading(new Pose2d(47.5, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
-                    .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         clawMech.open();
                     })
                     .waitSeconds(.25)
@@ -328,17 +423,17 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(-1.25, () -> {
                         intake.start();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(-0.25,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(-0.25, () -> {
                         intake.AutoIntakeServoPositionStage1();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(2.5,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         clawMech.close();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(3,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(3, () -> {
 
                         intake.reverse();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(.25,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(.25, () -> {
                         intake.AutoIntakeServoPositionStage2();
                     })
                     .waitSeconds(2)
@@ -354,11 +449,12 @@ public class BlueCloseSide extends LinearOpMode {
                     })
 
                     // MOVE TO BACKDROP AND DEPOSIT \\
-                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X - 3, rightLineToLinear3Y-0.25, Math.toRadians(rightLineToLinear2deg)))
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X - 3, rightLineToLinear3Y - 0.25, Math.toRadians(rightLineToLinear2deg)))
                     .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
-                        slide.setCustom(1000);
+                        slide.setLowJunction();
+                        intake.setServosUp();
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(-0.45,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(-0.45, () -> {
                         arm.setExtake();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
@@ -481,8 +577,18 @@ public class BlueCloseSide extends LinearOpMode {
         drive.followTrajectorySequenceAsync(autoTrajectory);
 
         while (opModeIsActive() && !isStopRequested()) {
+            telemetryAprilTag(tagUse);
+
             drive.update();
-            slide.update(telemetry);
+
+            if(Math.abs(drive.getPoseEstimate().getX() - 26) < 3 && Math.abs(drive.getPoseEstimate().getY() - 30) < 3 && t.get()){
+            Pose2d x = new Pose2d(drive.getPoseEstimate().getX()-errorX, drive.getPoseEstimate().getY()-errorY, Math.toRadians(90));
+                drive.setPoseEstimate(x);
+                tagUse = 3;
+            }
+
+            slide.update();
+            telemetry.update();
         }
     }
 }

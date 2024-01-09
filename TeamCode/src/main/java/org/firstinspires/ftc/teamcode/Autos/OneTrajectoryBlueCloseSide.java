@@ -239,7 +239,7 @@ public class OneTrajectoryBlueCloseSide extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
-            slide.update(telemetry);
+            slide.update();
 
 
         }

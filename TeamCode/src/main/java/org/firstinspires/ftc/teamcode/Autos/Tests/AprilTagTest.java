@@ -3,24 +3,18 @@ package org.firstinspires.ftc.teamcode.Autos.Tests;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.Pipelines.PipelineTemplate;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Autonomous
 public class AprilTagTest extends LinearOpMode {
@@ -32,6 +26,7 @@ public class AprilTagTest extends LinearOpMode {
     double error = 2.0;
 
     double x;
+    double y;
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
@@ -59,9 +54,10 @@ public class AprilTagTest extends LinearOpMode {
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == 2) {
-                x = detection.ftcPose.y;
+                x = detection.ftcPose.x;
+                y = detection.ftcPose.y - 10;
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y-10, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
             } else {
@@ -71,9 +67,7 @@ public class AprilTagTest extends LinearOpMode {
         }   // end for() loop
 
         // Add "key" information to telemetry
-        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-        telemetry.addLine("RBE = Range, Bearing & Elevation");
+        telemetry.addLine(drive.getPoseEstimate().getX() + " " + drive.getPoseEstimate().getY() + " " + drive.getPoseEstimate().getHeading() );
 
     }   // end method telemetryAprilTag()
 
@@ -146,14 +140,20 @@ public class AprilTagTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        SlideMech mech = new SlideMech(hardwareMap);
+
+       AtomicBoolean t = new AtomicBoolean(false);
         initialize();
 
         TrajectorySequence move = drive.trajectorySequenceBuilder(new Pose2d())
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    telemetryAprilTag();
+                .lineToLinearHeading(new Pose2d(3, 0, Math.toRadians(90)))
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                    //telemetryAprilTag();
+                    mech.setLowJunction();
+                    t.set(true);
                 })
-                .waitSeconds(0.25)
-                .lineToLinearHeading(new Pose2d(error,0,0))
+                .waitSeconds(6)
+                .lineToLinearHeading(new Pose2d(0,10,Math.toRadians(90)))
                 .build();
 
         waitForStart();
@@ -162,9 +162,11 @@ public class AprilTagTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             telemetryAprilTag();
+            mech.update();
             drive.update();
-            if(Math.abs(drive.getPoseEstimate().getX() - startingPose.getX()) < 1 && Math.abs(drive.getPoseEstimate().getY() - startingPose.getY()) < 1)
-                drive.setPoseEstimate(new Pose2d(x-2,0,0));
+            if(Math.abs(drive.getPoseEstimate().getX() - 3) < 3 && Math.abs(drive.getPoseEstimate().getY() - startingPose.getY()) < 3 && t.get())
+                drive.setPoseEstimate(new Pose2d(-x,-(y-13.8),Math.toRadians(90)));
+                t.set(false);
             telemetry.update();
         }
 
