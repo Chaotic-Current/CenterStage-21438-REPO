@@ -39,10 +39,21 @@ public class BlueCloseTests {
                                 .build()
                 );
 
+        RoadRunnerBotEntity center = new DefaultBotBuilder(meepMeep)
+                .setConstraints(50, 40, 2.225, 1.895, 11.5)
+                .followTrajectorySequence(drive ->
+                        drive.trajectorySequenceBuilder(new Pose2d(12, 62, Math.toRadians(270)))
+                                .forward(30)
+                                .back(3)
+                                .lineToLinearHeading(new Pose2d(49,36,Math.toRadians(360)))
+                                .splineToLinearHeading(new Pose2d(0,0,0),0)
+                                .build()
+                );
+
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(spikeRight)
+                .addEntity(center)
                 .start();
     }
 }

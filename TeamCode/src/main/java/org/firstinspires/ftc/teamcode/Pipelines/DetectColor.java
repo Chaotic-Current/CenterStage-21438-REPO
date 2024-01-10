@@ -75,8 +75,8 @@ public class DetectColor extends OpenCvPipeline {
 
         // The HSV values for the lower bound of red, and the higher bound of red
         //Values from https://cvexplained.wordpress.com/2020/04/28/color-detection-hsv/#:~:text=The%20HSV%20values%20for%20true,10%20and%20160%20to%20180.
-//       Scalar lowerBound = new Scalar(2, 100, 100);
-//        Scalar upperBound = new Scalar(4, 255, 255);
+//       Scalar lowerBound = new Scalar(2, 105, 105);
+//        Scalar upperBound = new Scalar(10, 255, 255);
 
         Mat thresh = new Mat();
 
@@ -181,11 +181,11 @@ public class DetectColor extends OpenCvPipeline {
             } else {
                 locate = ColorLocation.RIGHT;
             }
-//            telemetry.update();
-//
-//            telemetry.addData("Location pre run", locate);
-//            telemetry.addData("Center location: ", avgColorWidth);
-//            telemetry.update();
+            telemetry.update();
+
+            telemetry.addData("Location pre run", locate);
+            telemetry.addData("Center location: ", avgColorWidth);
+            telemetry.update();
 
 
             if (!contours.isEmpty()) {

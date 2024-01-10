@@ -103,8 +103,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     @Override
     public List<Double> getWheelPositions() {
         return Arrays.asList(
-                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + (hasRan ? xOffset : 0),
-                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER + (hasRan ? yOffset : 0)
+                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + (BlueCloseSide.t.get() ? BlueCloseSide.errorX : 0),
+                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER + (BlueCloseSide.t.get() ? BlueCloseSide.errorY : 0)
         );
     }
 
@@ -129,14 +129,5 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         TwoWheelTrackingLocalizer.yOffset = yOffset;
     }
 
-    public static void setOffsets(SampleMecanumDrive drive, double xError, double yError, AtomicBoolean t) {
-        if (Math.abs(drive.getPoseEstimate().getX() - 26) < 1.5 && Math.abs(drive.getPoseEstimate().getY() - 30) < 1.5 && t.get()) {
-            setxOffset(xError);
-            setyOffset(-(yError));
-            BlueCloseSide.t.set(false);
-        } else {
-            setyOffset(0);
-            setxOffset(0);
-        }
-    }
+
 }

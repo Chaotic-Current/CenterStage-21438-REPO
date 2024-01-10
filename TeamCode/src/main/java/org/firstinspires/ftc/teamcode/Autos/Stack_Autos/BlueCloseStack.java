@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
-import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -34,7 +33,6 @@ public class BlueCloseStack extends LinearOpMode {
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector;
-    private AprilTagDetectionPipeline aprilTagPipeline;
     public static double centerFrwDistance1 = 30;
     public static double centerBackwardsDistance1 = 12;
     public static double frwDistance2 = 5;
@@ -58,7 +56,7 @@ public class BlueCloseStack extends LinearOpMode {
 
     double errorx, errory, errorheading;
 
-    public static double toStackLinetoLinear1X, toStackLinetoLinear1Y, toStackLineToLinear1Heading;
+    public static double toStackLinetoLinear1X = 40, toStackLinetoLinear1Y = -2, toStackLineToLinear1Heading = 90;
     public static double toStackLinetoLinear2X, toStackLinetoLinear2Y, toStackLineToLinear2Heading;
     public static double toBackBoardLinetoLinear1X, toBackBoardLinetoLinear1Y, toBackBoardLinetoLinear1Heading;
     public static double toBackBoardLinetoLinear2X, toBackBoardLinetoLinear2Y, toBackBoardLinetoLinear2Heading;
@@ -70,7 +68,7 @@ public class BlueCloseStack extends LinearOpMode {
         int width = 160;
 
         detector = new DetectColor(width, telemetry, new Scalar(140, 255, 255), new Scalar(75, 100, 100));
-        aprilTagPipeline = new AprilTagDetectionPipeline();
+       // aprilTagPipeline = new AprilTagDetectionPipeline();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
@@ -141,7 +139,7 @@ public class BlueCloseStack extends LinearOpMode {
         frontCam.stopStreaming();
         telemetry.update();
 
-        frontCam.setPipeline(aprilTagPipeline);
+        //frontCam.setPipeline(aprilTagPipeline);
         frontCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
@@ -154,6 +152,8 @@ public class BlueCloseStack extends LinearOpMode {
                 telemetry.addLine("not open");
             }
         });
+
+        frontCam.stopStreaming();
 
         stackTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                 .forward(centerFrwDistance1)
@@ -180,7 +180,7 @@ public class BlueCloseStack extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                     clawMech.open();
                 })
-                .waitSeconds(2)
+                .waitSeconds(1.25)
                 .back(5)
 
                 .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
@@ -194,6 +194,7 @@ public class BlueCloseStack extends LinearOpMode {
                     slide.setIntakeOrGround();
                 })
                 .waitSeconds(5)
+                .lineToLinearHeading(new Pose2d(toStackLinetoLinear1X,toStackLinetoLinear1Y,Math.toRadians(toStackLineToLinear1Heading)))
                 .build();
 
         waitForStart();

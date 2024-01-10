@@ -15,10 +15,8 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
-import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.TwoWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -34,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
 @Autonomous
+@SuppressWarnings("all")
 public class BlueCloseSide extends LinearOpMode {
     private SampleMecanumDrive drive;
     private ElapsedTime timer = new ElapsedTime();
@@ -43,14 +42,14 @@ public class BlueCloseSide extends LinearOpMode {
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector;
-    private AprilTagDetectionPipeline aprilTagPipeline;
+   // private AprilTagDetectionPipeline aprilTagPipeline;
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private int tagUse;
-    private double errorX;
-    private double errorY;
-    private double errorYaw;
+    public static double errorX;
+    public static double errorY;
+    public static double errorYaw;
 
 
     // CENTER
@@ -98,7 +97,7 @@ public class BlueCloseSide extends LinearOpMode {
         int width = 160;
 
         detector = new DetectColor(width, telemetry, new Scalar(140, 255, 255), new Scalar(75, 100, 100));
-        aprilTagPipeline = new AprilTagDetectionPipeline();
+      //  aprilTagPipeline = new AprilTagDetectionPipeline();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
@@ -269,7 +268,7 @@ public class BlueCloseSide extends LinearOpMode {
 
 
         if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
-            aprilTagPipeline.setTargetTag(3);
+           // aprilTagPipeline.setTargetTag(3);
 
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
@@ -288,13 +287,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
 
                     .UNSTABLE_addTemporalMarkerOffset(0.15, () -> {
-                        x = "old: x-" + drive.getPoseEstimate().getX() + " y-" + drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
-                        double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
-                        errorx = aprilTagPipeline.getErrorX();
-                        // double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
-                        double newAngle = drive.getPoseEstimate().getHeading() - Math.toRadians(aprilTagPipeline.getErrorYaw());
-                        //.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(),newAngle));
-                        x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" + drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
+                       // t.set(true);
                     })
 
                     .waitSeconds(0.5)
@@ -321,101 +314,10 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(3, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
-
-                    .lineToLinearHeading(new Pose2d(49, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
-
-                    .waitSeconds(.5)
-
-                    .back(106.5)
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        timer.reset();
-                        numOfPixels = 0;
-                       /*
-                       while(timer.seconds()<6)
-                       {
-                           intake.start();
-                           if(intake.getIntakeVoltage()>thresholdCurrent){
-                               counter++;
-                               telemetry.addData("voltage", intake.getIntakeVoltage());
-                           }
-                           if(counter>2){
-                               intake.reverse();
-                           }
-                       }
-
-                        */
-                    })
-                    .waitSeconds(1)
-
-                    .UNSTABLE_addTemporalMarkerOffset(10, () -> {
-                        //intake.stop();
-                    })
-                    .forward(102)
-
-                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y, Math.toRadians(rightLineToLinear2deg)))
-
-                    .waitSeconds(2)
-
-                    .lineToLinearHeading(new Pose2d(45, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
-
-                    .waitSeconds(.5)
-
-                    .forward(11)
-                    .build();
-
-        } else if (e == DetectColor.ColorLocation.CENTER) {
-            tagUse = 2;
-            autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-                    .forward(centerFrwDistance1)
-
-                    .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
-                        slide.setLowJunction();
-                        intake.setServosUp();
-                    })
-                    .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
-                        arm.setExtake();
-                    })
-                    .waitSeconds(.1)
-
-                    .back(centerBackwardsDistance1)
-
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
-
-                    .UNSTABLE_addTemporalMarkerOffset(0.15, () -> {
-                        t.set(true);
-                    })
-
-                    .waitSeconds(1)
-
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
-
-                    .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(1000);
-                    })
-                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
-                        clawMech.open();
-                    })
-                    .waitSeconds(0.75)
-
-                    .back(5)
-
-                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
-                        slide.setLowJunction();
-                    })
-                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
-                        arm.setIntake();
-                        clawMech.close();
-                    })
-                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
-                        slide.setIntakeOrGround();
-
-                    })
                     .waitSeconds(2)
 
                     // TAKE FROM STACK  \\
-                    .lineToLinearHeading(new Pose2d(47.5, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+                    /*.lineToLinearHeading(new Pose2d(47.5, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         clawMech.open();
                     })
@@ -477,7 +379,128 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
 
+                    })*/
+                    .waitSeconds(2)
+
+                    // PARK \\
+                    .lineToLinearHeading(new Pose2d(47, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
+                    .waitSeconds(.5)
+                    .forward(10) // changed
+                    .build();
+
+        } else if (e == DetectColor.ColorLocation.CENTER) {
+            tagUse = 2;
+            autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
+                    .forward(centerFrwDistance1)
+
+                    .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
+                        slide.setLowJunction();
+                        intake.setServosUp();
                     })
+                    .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
+                        arm.setExtake();
+                    })
+                    .waitSeconds(.1)
+
+                    .back(centerBackwardsDistance1)
+
+                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+
+                    .UNSTABLE_addTemporalMarkerOffset(0.15, () -> {
+                       // t.set(true);
+                    })
+
+                    .waitSeconds(1)
+
+                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
+
+                    .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
+                        slide.setCustom(1000);
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+                        clawMech.open();
+                    })
+                    .waitSeconds(0.75)
+
+                    .back(5)
+
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+                        slide.setLowJunction();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+                        arm.setIntake();
+                        clawMech.close();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
+                        slide.setIntakeOrGround();
+
+                    })
+                    .waitSeconds(2)
+
+                    // TAKE FROM STACK  \\
+                    /*.lineToLinearHeading(new Pose2d(47.5, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        clawMech.open();
+                    })
+                    .waitSeconds(.25)
+                    .lineToLinearHeading(new Pose2d(48, toStackLinetoLinear1Y, Math.toRadians(centerLineToLinear1Heading)))// changed
+                    .UNSTABLE_addTemporalMarkerOffset(-1.25, () -> {
+                        intake.start();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(-0.25, () -> {
+                        intake.AutoIntakeServoPositionStage1();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
+                        clawMech.close();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(3, () -> {
+
+                        intake.reverse();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(.25, () -> {
+                        intake.AutoIntakeServoPositionStage2();
+                    })
+                    .waitSeconds(2)
+                    .forward(98) // changed
+                    .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
+                        intake.stop();
+
+
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(2, () -> {
+                        slide.setLowJunction();
+                        intake.setServosUp();
+                    })
+
+                    // MOVE TO BACKDROP AND DEPOSIT \\
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X - 3, rightLineToLinear3Y - 0.25, Math.toRadians(rightLineToLinear2deg)))
+                    .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
+                        slide.setLowJunction();
+                        intake.setServosUp();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(-0.45, () -> {
+                        arm.setExtake();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+                        clawMech.halfOpen();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(.8, () -> {
+                        clawMech.open();
+                    })
+                    .waitSeconds(2)
+                    .back(5)
+
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+                        slide.setLowJunction();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+                        arm.setIntake();
+                        clawMech.close();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
+                        slide.setIntakeOrGround();
+
+                    })*/
                     .waitSeconds(2)
 
                     // PARK \\
@@ -487,7 +510,6 @@ public class BlueCloseSide extends LinearOpMode {
                     .build();
 
         } else if (e == DetectColor.ColorLocation.LEFT) {
-            aprilTagPipeline.setTargetTag(1);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -503,12 +525,7 @@ public class BlueCloseSide extends LinearOpMode {
 
                     .lineToLinearHeading(new Pose2d(leftLineToLinear2X, leftLineToLinear2Y, Math.toRadians(leftLineToLinear2Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(0.15, () -> {
-                        x = "old: x-" + drive.getPoseEstimate().getX() + " y-" + drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
-                        double newX = drive.getPoseEstimate().getX() + aprilTagPipeline.getErrorX();
-                        // double newY = drive.getPoseEstimate().getY() - (aprilTagPipeline.getErrorY() - 4);
-                        double newAngle = drive.getPoseEstimate().getHeading() - Math.toRadians(aprilTagPipeline.getErrorYaw());
-                        drive.setPoseEstimate(new Pose2d(newX, drive.getPoseEstimate().getY(), newAngle));
-                        x += "\nnew: x-" + drive.getPoseEstimate().getX() + " y-" + drive.getPoseEstimate().getY() + " rad-" + drive.getPoseEstimate().getHeading();
+                        //t.set(true);
                     })
                     .waitSeconds(0.5)
                     .lineToLinearHeading(new Pose2d(leftLineToLinear2X, leftLinetoLinear3Y, Math.toRadians(leftLineToLinear2Heading)))
@@ -533,39 +550,78 @@ public class BlueCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
-                    .lineToLinearHeading(new Pose2d(49, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
-                    .waitSeconds(.5)
-                    .back(106.5)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        timer.reset();
-                        numOfPixels = 0;
-                       /*
-                       while(timer.seconds()<6)
-                       {
-                           intake.start();
-                           if(intake.getIntakeVoltage()>thresholdCurrent){
-                               counter++;
-                               telemetry.addData("voltage", intake.getIntakeVoltage());
-                           }
-                           if(counter>2){
-                               intake.reverse();
-                           }
-                       }
-
-                        */
-                    })
-                    .waitSeconds(1)
-                    .UNSTABLE_addTemporalMarkerOffset(10, () -> {
-                        //intake.stop();
-                    })
-                    .forward(102)
-                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y, Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(2)
-                    .lineToLinearHeading(new Pose2d(45, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
-                    .waitSeconds(.5)
-                    .forward(11)
 
+                    // TAKE FROM STACK  \\
+                    /*.lineToLinearHeading(new Pose2d(47.5, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        clawMech.open();
+                    })
+                    .waitSeconds(.25)
+                    .lineToLinearHeading(new Pose2d(48, toStackLinetoLinear1Y, Math.toRadians(centerLineToLinear1Heading)))// changed
+                    .UNSTABLE_addTemporalMarkerOffset(-1.25, () -> {
+                        intake.start();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(-0.25, () -> {
+                        intake.AutoIntakeServoPositionStage1();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
+                        clawMech.close();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(3, () -> {
+
+                        intake.reverse();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(.25, () -> {
+                        intake.AutoIntakeServoPositionStage2();
+                    })
+                    .waitSeconds(2)
+                    .forward(98) // changed
+                    .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
+                        intake.stop();
+
+
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(2, () -> {
+                        slide.setLowJunction();
+                        intake.setServosUp();
+                    })
+
+                    // MOVE TO BACKDROP AND DEPOSIT \\
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X - 3, rightLineToLinear3Y - 0.25, Math.toRadians(rightLineToLinear2deg)))
+                    .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
+                        slide.setLowJunction();
+                        intake.setServosUp();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(-0.45, () -> {
+                        arm.setExtake();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+                        clawMech.halfOpen();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(.8, () -> {
+                        clawMech.open();
+                    })
+                    .waitSeconds(2)
+                    .back(5)
+
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+                        slide.setLowJunction();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+                        arm.setIntake();
+                        clawMech.close();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
+                        slide.setIntakeOrGround();
+
+                    })*/
+                    .waitSeconds(2)
+
+                    // PARK \\
+                    .lineToLinearHeading(new Pose2d(47, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
+                    .waitSeconds(.5)
+                    .forward(10) // changed
                     .build();
 
         } else {
@@ -578,13 +634,10 @@ public class BlueCloseSide extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
             telemetryAprilTag(tagUse);
-
             drive.update();
-             TwoWheelTrackingLocalizer.setOffsets(drive, errorX, errorY, t);
-
-            }
-
             slide.update();
             telemetry.update();
+
+        }
         }
     }
