@@ -8,10 +8,12 @@ import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Autos.BlueCloseSide;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * Sample tracking wheel localizer implementation assuming the standard configuration:
@@ -48,6 +50,10 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public static double PERPENDICULAR_Y = -1.4;
     public static double X_MULTIPLIER = 0.99338783679;
     public static double Y_MULTIPLIER = 1.0063490194;
+    public static double xOffset = 0;
+    public static double yOffset = 0;
+    public static boolean hasRan = false;
+
 
     // Parallel/Perpendicular to the forward axis
     // Parallel wheel is parallel to the forward axis
@@ -70,13 +76,13 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
     }
 
-    public double getAverage(double[] x){
+    public double getAverage(double[] x) {
         double sum = 0;
-        for(double t: x){
+        for (double t : x) {
             sum += t;
         }
 
-        return sum/x.length;
+        return sum / x.length;
     }
 
     public static double encoderTicksToInches(double ticks) {
@@ -97,8 +103,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     @Override
     public List<Double> getWheelPositions() {
         return Arrays.asList(
-                encoderTicksToInches(parallelEncoder.getCurrentPosition()) * X_MULTIPLIER,
-                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER
+                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + (hasRan ? xOffset : 0),
+                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER + (hasRan ? yOffset : 0)
         );
     }
 
@@ -113,5 +119,24 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
                 encoderTicksToInches(parallelEncoder.getCorrectedVelocity()) * X_MULTIPLIER,
                 encoderTicksToInches(perpendicularEncoder.getCorrectedVelocity()) * Y_MULTIPLIER
         );
+    }
+
+    public static void setxOffset(double xOffset) {
+        TwoWheelTrackingLocalizer.xOffset = xOffset;
+    }
+
+    public static void setyOffset(double yOffset) {
+        TwoWheelTrackingLocalizer.yOffset = yOffset;
+    }
+
+    public static void setOffsets(SampleMecanumDrive drive, double xError, double yError, AtomicBoolean t) {
+        if (Math.abs(drive.getPoseEstimate().getX() - 26) < 1.5 && Math.abs(drive.getPoseEstimate().getY() - 30) < 1.5 && t.get()) {
+            setxOffset(xError);
+            setyOffset(-(yError));
+            BlueCloseSide.t.set(false);
+        } else {
+            setyOffset(0);
+            setxOffset(0);
+        }
     }
 }

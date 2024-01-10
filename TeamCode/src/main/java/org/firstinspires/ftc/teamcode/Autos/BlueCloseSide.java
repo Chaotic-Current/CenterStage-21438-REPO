@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.TwoWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -87,6 +89,8 @@ public class BlueCloseSide extends LinearOpMode {
     private int numOfPixels;
 
     private double thresholdCurrent = 0.5; // threshold for current draw from intake motor
+
+    public static AtomicBoolean t = new AtomicBoolean(false);
 
     TrajectorySequence autoTrajectory;
 
@@ -215,12 +219,12 @@ public class BlueCloseSide extends LinearOpMode {
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.id == tagUse) {
-            errorX = detection.ftcPose.x;
-            errorY = detection.ftcPose.y-25;
-            errorYaw = detection.ftcPose.yaw;
+            if (detection.id == 2) {
+                errorX = detection.ftcPose.x;
+                errorY = detection.ftcPose.y - 15.1825;
+                errorYaw = detection.ftcPose.yaw;
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y-11, detection.ftcPose.z));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y - 11, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
             } else {
@@ -233,15 +237,12 @@ public class BlueCloseSide extends LinearOpMode {
         telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
         telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
         telemetry.addLine("RBE = Range, Bearing & Elevation");
-        telemetry.update();
 
     }   // end method telemetryAprilTag()
 
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
-
-        AtomicBoolean t = new AtomicBoolean(false);
 
         drive.setPoseEstimate(new Pose2d());
 
@@ -253,18 +254,18 @@ public class BlueCloseSide extends LinearOpMode {
                 e = detector.getLocate();
                 if (e != null) {
                     telemetry.addLine("in loop " + e.name());
-                    telemetry.update();
+
                 }
 
                 if (e == null && time.milliseconds() >= 3700)
                     e = DetectColor.ColorLocation.UNDETECTED;
 
             }
+            telemetry.update();
         }
         frontCam.stopStreaming();
         frontCam.closeCameraDevice();
         initAprilTag();
-        telemetry.update();
 
 
         if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
@@ -382,11 +383,11 @@ public class BlueCloseSide extends LinearOpMode {
 
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 
-                    .UNSTABLE_addTemporalMarkerOffset(0,() ->{
+                    .UNSTABLE_addTemporalMarkerOffset(0.15, () -> {
                         t.set(true);
                     })
 
-                    .waitSeconds(0.65)
+                    .waitSeconds(1)
 
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
 
@@ -572,7 +573,6 @@ public class BlueCloseSide extends LinearOpMode {
         }
 
         waitForStart();
-        telemetry.update();
 
         drive.followTrajectorySequenceAsync(autoTrajectory);
 
@@ -580,15 +580,11 @@ public class BlueCloseSide extends LinearOpMode {
             telemetryAprilTag(tagUse);
 
             drive.update();
+             TwoWheelTrackingLocalizer.setOffsets(drive, errorX, errorY, t);
 
-            if(Math.abs(drive.getPoseEstimate().getX() - 26) < 3 && Math.abs(drive.getPoseEstimate().getY() - 30) < 3 && t.get()){
-            Pose2d x = new Pose2d(drive.getPoseEstimate().getX()-errorX, drive.getPoseEstimate().getY()-errorY, Math.toRadians(90));
-                drive.setPoseEstimate(x);
-                tagUse = 3;
             }
 
             slide.update();
             telemetry.update();
         }
     }
-}
