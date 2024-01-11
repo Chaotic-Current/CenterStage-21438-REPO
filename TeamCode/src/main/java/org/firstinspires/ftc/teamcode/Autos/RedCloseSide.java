@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -33,6 +34,7 @@ public class RedCloseSide extends LinearOpMode {
     private ArmMecNew arm;
     private SlideMech slide;
     private ClawMech clawMech;
+    private Servo wrist;
     private DetectColor detector; //This will be out of the frame for know, along with the april tag pipeline
     public static double frwDistance1 = 30;
     public static double backwardsDistance1 = 12;
@@ -104,19 +106,17 @@ public class RedCloseSide extends LinearOpMode {
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap,telemetry);
-
+        wrist = hardwareMap.get(Servo.class,"WRIST");
+        wrist.setPosition(0.5);
         cameraInit();
     }
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
 
-        //cameraInit();
-
         drive.setPoseEstimate(new Pose2d());
 
         DetectColor.ColorLocation e = detector.getLocate();
-
 
         while(!isStarted()) {
             ElapsedTime time = new ElapsedTime();
@@ -129,16 +129,13 @@ public class RedCloseSide extends LinearOpMode {
 
                 if (e == null && time.milliseconds() >= 3700)
                     e = DetectColor.ColorLocation.UNDETECTED;
-
             }
         }
-        //e=detector.getLocate();
-
         frontCam.stopStreaming();
+        frontCam.closeCameraDevice();
         telemetry.addLine(e.name());
         telemetry.update();
 
-        //I added what I think would be proper points for mechanisms to do what they need to do, but I commented them out just for now
         if (e == DetectColor.ColorLocation.LEFT || e == DetectColor.ColorLocation.UNDETECTED) {
 
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
@@ -276,43 +273,16 @@ public class RedCloseSide extends LinearOpMode {
                     .build();
 
         }else {
-            telemetry.addLine("its curtins");
-            firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                    .forward(frwDistance1)
-                    .waitSeconds(wait01)
-                    .back(backwardsDistance1)
-                    .waitSeconds(wait02)
-                    .turn(Math.toRadians(degree))
-                    .forward(frwDistance2)
-                    .build();
-
-                /*
-                moveBack = drive.trajectorySequenceBuilder(new Pose2d())
-                        .back(backwardsDistance1)
-                        .build();
-                        */
-
+            telemetry.addLine("ruh-roh (´▽`ʃ♡ƪ)");
         }
-/*
-        park = drive.trajectorySequenceBuilder(moveToBackboard.end())
-                .lineToLinearHeading(new Pose2d(parkX,parkY,parkHeading))
-                .forward(frwDistance2)
-                .build();
+            waitForStart();
 
- */
+            drive.followTrajectorySequenceAsync(firstMove);
 
-        waitForStart();
-        telemetry.update();
-        telemetry.addLine(e.name());
-        telemetry.update();
-
-        frontCam.stopStreaming();
-
-        drive.followTrajectorySequenceAsync(firstMove);
-
-        while (opModeIsActive() && !isStopRequested()) {
-            drive.update();
-            slide.update(telemetry);
-        }
+            while (opModeIsActive() && !isStopRequested()) {
+                drive.update();
+                slide.update(telemetry);
+                telemetry.update();
+            }
     }
 }

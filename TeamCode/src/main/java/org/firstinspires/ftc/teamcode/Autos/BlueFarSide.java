@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
-import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
+//import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -30,7 +30,7 @@ public class BlueFarSide extends LinearOpMode {
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector;
-    private AprilTagDetectionPipeline aprilTagPipeline;
+    //private AprilTagDetectionPipeline aprilTagPipeline;
     public static double centerFrwDistance1 = 30;
     public static double centerBackwardsDistance1 = 12;
     public static double frwDistance2 = 5;
@@ -68,7 +68,7 @@ public class BlueFarSide extends LinearOpMode {
         int width = 160;
 
         detector = new DetectColor(width, telemetry, new Scalar(140, 255, 255), new Scalar(75, 100, 100));
-        aprilTagPipeline = new AprilTagDetectionPipeline();
+        //aprilTagPipeline = new AprilTagDetectionPipeline();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
@@ -149,14 +149,14 @@ public class BlueFarSide extends LinearOpMode {
                     .back(6)
                     .build();
         } else if (e == DetectColor.ColorLocation.CENTER) {
-            aprilTagPipeline.setTargetTag(2);
+            //aprilTagPipeline.setTargetTag(2);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(centerFrwDistance1)
                     .waitSeconds(1)
                     .back(6)
                     .build();
         } else if (e == DetectColor.ColorLocation.LEFT) {
-            aprilTagPipeline.setTargetTag(1);
+            //aprilTagPipeline.setTargetTag(1);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
                     .waitSeconds(1)
