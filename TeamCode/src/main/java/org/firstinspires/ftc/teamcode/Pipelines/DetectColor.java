@@ -61,9 +61,11 @@ public class DetectColor extends OpenCvPipeline {
     }
 
     public DetectColor(Telemetry tel) { //never gonna use this constructor in the real world
-
+        isBlue = true;
         telemetry = tel;
         width = 180;
+        lowerBound = new Scalar(75, 100, 100);
+        upperBound = new Scalar(140, 255, 255);
     }
 
     @Override
@@ -192,7 +194,7 @@ public class DetectColor extends OpenCvPipeline {
                 locate = ColorLocation.LEFT;
             } else if (right ) {
                 locate = ColorLocation.RIGHT;
-            } else if (center && avgColorWidth > (isBlue ? 110 : 35)) {
+            } else if (center && avgColorWidth > (isBlue ? 95 : 35)) {
                 locate = ColorLocation.CENTER;
             } else {
                 locate = ColorLocation.UNDETECTED;
