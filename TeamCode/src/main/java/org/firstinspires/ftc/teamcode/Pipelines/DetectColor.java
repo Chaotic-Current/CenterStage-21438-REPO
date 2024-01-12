@@ -31,6 +31,7 @@ public class DetectColor extends OpenCvPipeline {
     private Scalar upperBound, lowerBound;
     private final int width;//width of the image
     public int blur = 13;
+    private boolean isBlue;
     private Telemetry telemetry;
     private ColorLocation locate;
 
@@ -48,6 +49,15 @@ public class DetectColor extends OpenCvPipeline {
          upperBound = upper;
          lowerBound = lower;
          //locate = ColorLocation.UNDETECTED;
+    }
+
+    public DetectColor(int width, Telemetry telemetry, Scalar upper, Scalar lower, boolean isBlue){
+        this.width = width;
+        this.telemetry = telemetry;
+        upperBound = upper;
+        lowerBound = lower;
+        this.isBlue = isBlue;
+        //locate = ColorLocation.UNDETECTED;
     }
 
     public DetectColor(Telemetry tel) { //never gonna use this constructor in the real world
@@ -130,8 +140,14 @@ public class DetectColor extends OpenCvPipeline {
          * image to find the relative location of the tape to the image (i.e. towards the left, right, or center)
          */
 
+
         double leftImage = 0.2 * width;//the left of the image can be classified as everything bellow this value
-        double rightImage = 0.7 * width;//the right of the image can be classified as everything above this value
+        double rightImage = 0.6 * width;//the right of the image can be classified as everything above this value
+
+        if(isBlue){
+            leftImage = 0.4 * width;
+            rightImage = 0.8 * width;
+        }
         //TODO need to tune these values to make sure they actually work and done under or overshoot
 
         boolean left = false;//conditionals for the if statements later
@@ -174,12 +190,12 @@ public class DetectColor extends OpenCvPipeline {
             //officially stating what the location of the tape is
             if (left) {
                 locate = ColorLocation.LEFT;
-            } else if (right) {
+            } else if (right ) {
                 locate = ColorLocation.RIGHT;
-            } else if (center) {
+            } else if (center && avgColorWidth > (isBlue ? 110 : 35)) {
                 locate = ColorLocation.CENTER;
             } else {
-                locate = ColorLocation.RIGHT;
+                locate = ColorLocation.UNDETECTED;
             }
             telemetry.update();
 

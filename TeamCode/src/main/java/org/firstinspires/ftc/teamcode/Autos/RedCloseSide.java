@@ -60,7 +60,6 @@ public class RedCloseSide extends LinearOpMode {
     TrajectorySequence firstMove;
     TrajectorySequence park;
 
-    //Fuck this shit
     public void cameraInit(){
         int width = 160;
 
@@ -68,14 +67,14 @@ public class RedCloseSide extends LinearOpMode {
         detector = new DetectColor(width, telemetry, new Scalar(10,255,255),new Scalar(2,100,100));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-         backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "BackCam"), cameraMonitorViewId);
+        // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
         frontCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamFront"), cameraMonitorViewId);
-         backCam.setPipeline(new PipelineTemplate(telemetry));
+        // backCam.setPipeline(detector);
         frontCam.setPipeline(detector);
 
-         backCam.setMillisecondsPermissionTimeout(2500);
+        // backCam.setMillisecondsPermissionTimeout(2500);
         frontCam.setMillisecondsPermissionTimeout(2500);
-        backCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        /*backCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
                 telemetry.addLine("started");
@@ -86,7 +85,7 @@ public class RedCloseSide extends LinearOpMode {
             public void onError(int errorCode) {
                 telemetry.addLine("not open");
             }
-        });
+        });*/
         frontCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
@@ -114,27 +113,25 @@ public class RedCloseSide extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
 
-        drive.setPoseEstimate(new Pose2d());
+        drive.setPoseEstimate(new Pose2d(0,-3,0));
 
         DetectColor.ColorLocation e = detector.getLocate();
 
-        while(!isStarted()) {
-            ElapsedTime time = new ElapsedTime();
-            while (time.milliseconds() <= 8000) {
+        while (!isStarted()) {
                 e = detector.getLocate();
                 if (e != null) {
-                    telemetry.addLine("in loop " + e.name());
-                    telemetry.update();
-                }
+                    //telemetry.addLine("in loop " + e.name());
 
-                if (e == null && time.milliseconds() >= 3700)
-                    e = DetectColor.ColorLocation.UNDETECTED;
+
+
             }
+            telemetry.update();
         }
         frontCam.stopStreaming();
         frontCam.closeCameraDevice();
         telemetry.addLine(e.name());
         telemetry.update();
+
 
         if (e == DetectColor.ColorLocation.LEFT || e == DetectColor.ColorLocation.UNDETECTED) {
 
@@ -157,7 +154,7 @@ public class RedCloseSide extends LinearOpMode {
 
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(1000);
+                        slide.setCustom(880);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
@@ -202,7 +199,7 @@ public class RedCloseSide extends LinearOpMode {
                     .forward(4.5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(1000);
+                        slide.setCustom(880);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
@@ -231,7 +228,7 @@ public class RedCloseSide extends LinearOpMode {
 
         } else if(e == DetectColor.ColorLocation.RIGHT) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                    .lineToLinearHeading(new Pose2d(linetoLinear1X, linetoLinear1Y, Math.toRadians(lineToLinear1Heading)))
+                    .lineToLinearHeading(new Pose2d(linetoLinear1X, -8, Math.toRadians(lineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
                     })
@@ -242,11 +239,11 @@ public class RedCloseSide extends LinearOpMode {
                     .waitSeconds(.2)
                     .back(backdist2)
                     .waitSeconds(.3)
-                    .lineToLinearHeading(new Pose2d(splineToLinear4X, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)))
+                    .lineToLinearHeading(new Pose2d(22, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)))
                     .forward(frw)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(1000);
+                        slide.setCustom(880);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();

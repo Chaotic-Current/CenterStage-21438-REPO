@@ -295,7 +295,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y, Math.toRadians(rightLineToLinear2deg)))
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(1000);
+                        slide.setCustom(880);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
@@ -415,7 +415,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(1000);
+                        slide.setCustom(880);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
@@ -530,7 +530,7 @@ public class BlueCloseSide extends LinearOpMode {
                     .waitSeconds(0.5)
                     .lineToLinearHeading(new Pose2d(leftLineToLinear2X, leftLinetoLinear3Y, Math.toRadians(leftLineToLinear2Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(1000);
+                        slide.setCustom(880);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();

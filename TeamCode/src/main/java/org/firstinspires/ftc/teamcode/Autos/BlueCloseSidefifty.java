@@ -8,8 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
@@ -19,7 +17,6 @@ import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -27,11 +24,10 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
-@Autonomous (name = "AA blue close side")
+@Autonomous(name = "AA blue close side")
 @SuppressWarnings("all")
 public class BlueCloseSidefifty extends LinearOpMode {
     private SampleMecanumDrive drive;
@@ -97,7 +93,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
     public void cameraInit() {
         int width = 160;
 
-        detector = new DetectColor(width, telemetry, new Scalar(140, 255, 255), new Scalar(75, 100, 100));
+        detector = new DetectColor(width, telemetry, new Scalar(140, 255, 255), new Scalar(75, 100, 100),true);
         //  aprilTagPipeline = new AprilTagDetectionPipeline();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -129,7 +125,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
         intake = new IntakeMech(hardwareMap);
-        wrist = hardwareMap.get(Servo.class,"WRIST");
+        wrist = hardwareMap.get(Servo.class, "WRIST");
         wrist.setPosition(0.5);
         cameraInit();
     }
@@ -138,29 +134,21 @@ public class BlueCloseSidefifty extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
 
-        drive.setPoseEstimate(new Pose2d());
+        drive.setPoseEstimate(new Pose2d(0,3,0));
 
         DetectColor.ColorLocation e = detector.getLocate();
 
         while (!isStarted()) {
-            ElapsedTime time = new ElapsedTime();
-            while (time.milliseconds() <= 8000 && time.milliseconds() % 500 <= 10) {
-                e = detector.getLocate();
-                if (e != null) {
-                    telemetry.addLine("in loop " + e.name());
-                }
+            e = detector.getLocate();
 
-                if (e == null && time.milliseconds() >= 3700)
-                    e = DetectColor.ColorLocation.UNDETECTED;
 
-            }
             telemetry.update();
         }
         frontCam.stopStreaming();
         frontCam.closeCameraDevice();
 
 //|| e == DetectColor.ColorLocation.UNDETECTED
-        if(e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED){
+        if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
             // aprilTagPipeline.setTargetTag(3);
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
