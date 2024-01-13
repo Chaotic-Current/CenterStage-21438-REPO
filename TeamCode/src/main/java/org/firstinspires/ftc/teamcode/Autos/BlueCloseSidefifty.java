@@ -68,9 +68,9 @@ public class BlueCloseSidefifty extends LinearOpMode {
     // RIGHT
     public static double rightSpline1deg = -75;
     public static double rightLineToLinear2deg = 90;
-    public static double rightSplineTo1X = 26, rightSplineTo1Y = -2.5, splineToLinear1Heading = -80;
-    public static double rightLineToLinear2X = 32, rightLineToLinear2Y = 37.5, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
-    public static double rightLineToLinear3Y = 37.5;
+    public static double rightSplineTo1X = 26, rightSplineTo1Y = -3.5, splineToLinear1Heading = -80;
+    public static double rightLineToLinear2X = 32.75, rightLineToLinear2Y = 37.5, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
+    public static double rightLineToLinear3Y = 40.25;
 
 
     // OTHER

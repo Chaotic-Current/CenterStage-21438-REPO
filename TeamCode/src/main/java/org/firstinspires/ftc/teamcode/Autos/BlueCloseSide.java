@@ -73,7 +73,7 @@ public class BlueCloseSide extends LinearOpMode {
     public static double rightLineToLinear2deg = 90;
     public static double rightSplineTo1X = 26, rightSplineTo1Y = -2.5, splineToLinear1Heading = -80;
     public static double rightLineToLinear2X = 32, rightLineToLinear2Y = 37.5, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
-    public static double rightLineToLinear3Y = 37.5;
+    public static double rightLineToLinear3Y = 39.5;
 
 
     // OTHER
@@ -292,7 +292,7 @@ public class BlueCloseSide extends LinearOpMode {
 
                     .waitSeconds(0.5)
 
-                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y, Math.toRadians(rightLineToLinear2deg)))
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y+2, Math.toRadians(rightLineToLinear2deg)))
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(880);
