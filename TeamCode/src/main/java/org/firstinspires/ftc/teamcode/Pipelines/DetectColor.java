@@ -174,6 +174,12 @@ public class DetectColor extends OpenCvPipeline {
             }
         }
 
+        if(maxContourIdx == -1){
+            locate = ColorLocation.UNDETECTED;
+
+            return scaledMask;
+        }
+
         Point centerPoint = findContourCenter(contours, maxContourIdx);
 
         if(centerPoint != null) {
