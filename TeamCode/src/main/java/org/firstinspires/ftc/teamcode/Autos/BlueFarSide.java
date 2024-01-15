@@ -122,7 +122,7 @@ public class BlueFarSide extends LinearOpMode {
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
-        intake = new IntakeMech(hardwareMap);
+       // intake = new IntakeMech(hardwareMap);
         wrist = hardwareMap.get(Servo.class, "WRIST");
         wrist.setPosition(0.5);
         cameraInit();

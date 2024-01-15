@@ -56,7 +56,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
     public static double frwDistance3 = 12;
     public static double wait01 = 1;
     public static double wait02 = 1;
-    public static double centerLineToLinear1X = 26, centerLineToLinear1Y = 30, centerLineToLinear1Heading = 90, wait1Center = 3;
+    public static double centerLineToLinear1X = 25.75, centerLineToLinear1Y = 30, centerLineToLinear1Heading = 90, wait1Center = 3;
     public static double centerLineToLinear2Y = 41;
 
     // LEFT
@@ -124,7 +124,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
-        intake = new IntakeMech(hardwareMap);
+       // intake = new IntakeMech(hardwareMap);
         wrist = hardwareMap.get(Servo.class, "WRIST");
         wrist.setPosition(0.5);
         cameraInit();
@@ -209,7 +209,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
 
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
-                        intake.setServosUp();
+                       // intake.setServosUp();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
                         arm.setExtake();
@@ -229,7 +229,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y, Math.toRadians(centerLineToLinear1Heading)))
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(870);
+                        slide.setCustom(970);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(1, () -> {
                         clawMech.open();

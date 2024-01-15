@@ -28,14 +28,14 @@ public class IntakeMech {
 
     // LEFT
     public static double leftFinalPos = 0.65; //also the down position in teleOPp
-    public static double leftFinalUp = 0.95;
+    public static double leftFinalUp = 1;
     public static double leftTeleOpUp = 0.8;
     public static double leftAutoApproachPosition = .775;
     public static double leftAutoIntakePositionStage1 = .75;
     public static double leftAutoIntakePositionStage2 = .725;
 
     // RIGHT
-    public static double rightFinalUp = 0.05;
+    public static double rightFinalUp = 0;
     public static double rightTeleOp = 0.2;
     public static double rightAutoApproachPosition = .225;
     public static double rightAutoIntakePositionStage1 = .25;
@@ -100,8 +100,8 @@ public class IntakeMech {
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        left.setPosition(leftFinalPos);
-        right.setPosition(rightFinalPos);
+        left.setPosition(leftFinalUp);
+        right.setPosition(rightFinalUp);
 
 
     }
