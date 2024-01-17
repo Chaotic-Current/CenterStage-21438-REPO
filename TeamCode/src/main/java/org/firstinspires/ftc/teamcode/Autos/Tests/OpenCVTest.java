@@ -23,9 +23,7 @@ public class OpenCVTest extends LinearOpMode {
 
     private Pose2d x = new Pose2d();
     private SampleMecanumDrive drive;
-
     private DetectColor detector;
-
     public void initialize() {
         //initializing the basic variables and objects
         width = 160;
@@ -55,7 +53,6 @@ public class OpenCVTest extends LinearOpMode {
         telemetry.addLine("Waiting for start");
         telemetry.update();
     }
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -95,10 +92,6 @@ public class OpenCVTest extends LinearOpMode {
         TrajectorySequence work = drive.trajectorySequenceBuilder(x)
                 .forward(10)
                 .build();
-
-
-
-
         waitForStart();
 
 

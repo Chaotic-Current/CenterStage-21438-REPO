@@ -170,10 +170,16 @@ public class DetectColor extends OpenCvPipeline {
         int maxContourIdx = -1;
         for (int i = 0; i < contours.size(); i++) {
             double area = Imgproc.contourArea(contours.get(i));
-            if (area > maxArea) {
+            if (area > maxArea  && area > 40) {
                 maxArea = area;
                 maxContourIdx = i;
             }
+        }
+
+        if(maxContourIdx == -1){
+            locate = ColorLocation.UNDETECTED;
+
+            return scaledMask;
         }
 
         Point centerPoint = findContourCenter(contours, maxContourIdx);
@@ -220,9 +226,13 @@ public class DetectColor extends OpenCvPipeline {
                 Imgproc.drawContours(resultImage, contours, maxContourIdx, new Scalar(255, 0, 0), 1);
 
 
+
+
                 return resultImage;
             }
         }
+
+        locate = ColorLocation.UNDETECTED;
 
         return scaledMask;  //displaying edges of all red objects cuz i think it looks cool
     }

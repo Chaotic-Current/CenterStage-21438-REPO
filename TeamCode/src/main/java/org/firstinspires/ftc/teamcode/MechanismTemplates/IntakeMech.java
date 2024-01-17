@@ -27,18 +27,20 @@ public class IntakeMech {
     private Gamepad gamepad;
 
     // LEFT
-    public static double leftFinalPos = 0.63; //moving a dist on 0.06
-    public static double leftFinalUp = 0.9;
+    public static double leftFinalPos = 0.65; //also the down position in teleOPp
+    public static double leftFinalUp = 1;
+    public static double leftTeleOpUp = 0.8;
     public static double leftAutoApproachPosition = .775;
     public static double leftAutoIntakePositionStage1 = .75;
     public static double leftAutoIntakePositionStage2 = .725;
 
     // RIGHT
-    public static double rightFinalUp = 0.1;
+    public static double rightFinalUp = 0;
+    public static double rightTeleOp = 0.2;
     public static double rightAutoApproachPosition = .225;
     public static double rightAutoIntakePositionStage1 = .25;
     public static double rightAutoIntakePositionStage2 = .275;
-    public static double rightFinalPos = 0.37;
+    public static double rightFinalPos = 0.35; //also the down position in teleOPp
 
     // OTHER
     public static double increment = 0.025;
@@ -98,8 +100,8 @@ public class IntakeMech {
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        left.setPosition(leftFinalPos);
-        right.setPosition(rightFinalPos);
+        left.setPosition(leftFinalUp);
+        right.setPosition(rightFinalUp);
 
 
     }
@@ -228,8 +230,8 @@ public class IntakeMech {
 
     public void setNeutral() {
         if (isIntaking) {
-            left.setPosition(leftFinalUp);
-            right.setPosition(rightFinalUp);
+            left.setPosition(leftTeleOpUp);
+            right.setPosition(rightTeleOp);
             isIntaking = false;
         }
     }

@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.Pipelines.PipelineTemplate;
@@ -35,6 +36,7 @@ public class RedCloseSide extends LinearOpMode {
     private SlideMech slide;
     private ClawMech clawMech;
     private Servo wrist;
+    private IntakeMech intakeMech;
     private DetectColor detector; //This will be out of the frame for know, along with the april tag pipeline
     public static double frwDistance1 = 30;
     public static double backwardsDistance1 = 12;
@@ -43,15 +45,15 @@ public class RedCloseSide extends LinearOpMode {
     public static double wait01 = 1;
     public static double wait02 = 1;
     public static double spline1deg = 75;
-    public static double backdist2 = 6;
+    public static double backdist2 = 8;
     public static double spline2deg = 90;
     public static double frw = 10.25;
 
     public static double linetoLinear1X = 26, linetoLinear1Y = -6, lineToLinear1Heading = -30;
-    public static double splineToLinear1X = 26, splineToLinear1Y = 1.75, splineToLinear1Heading = 80;
-    public static double splineToLinear2X = 29, splineToLinear2Y = -34, splineToLinear2Heading = -90, wait1 = 3;
-    public static double splineToLinear3X = 26, splineToLinear3Y = -38, splineToLinear3Heading = -90, wait2 = 3;
-    public static double splineToLinear4X = 20, splineToLinear4Y = -33.5, splineToLinear4Heading = -90, wait3 = 3;
+    public static double splineToLinear1X = 26, splineToLinear1Y = 5.25, splineToLinear1Heading = 80;
+    public static double splineToLinear2X = 29, splineToLinear2Y = -39.5, splineToLinear2Heading = -90, wait1 = 3;
+    public static double splineToLinear3X = 26, splineToLinear3Y = -39.5, splineToLinear3Heading = -90, wait2 = 3;
+    public static double splineToLinear4X = 20, splineToLinear4Y = -39.5, splineToLinear4Heading = -90, wait3 = 3;
     public static double frparkX = 4, frparkY=-38, frparkHeading = -90;
 
     public static double parkX = 4, parkY = 37, parkHeading = 90;
@@ -105,6 +107,7 @@ public class RedCloseSide extends LinearOpMode {
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap,telemetry);
+        //intakeMech = new IntakeMech(hardwareMap);
         wrist = hardwareMap.get(Servo.class,"WRIST");
         wrist.setPosition(0.5);
         cameraInit();
@@ -138,7 +141,7 @@ public class RedCloseSide extends LinearOpMode {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
                     .splineTo(new Vector2d(splineToLinear1X, splineToLinear1Y), Math.toRadians(spline1deg))
-                    .waitSeconds(0.1)
+                    .waitSeconds(0.75)
                     .back(5)
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
@@ -150,11 +153,11 @@ public class RedCloseSide extends LinearOpMode {
                     .waitSeconds(.1)
                     .lineToLinearHeading(new Pose2d(splineToLinear2X+3, splineToLinear2Y, Math.toRadians(-spline2deg)))
                     .waitSeconds(0.25)
-                    .forward(8)
+                    //.forward(8)
 
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(880);
+                        slide.setCustom(980);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
@@ -196,15 +199,15 @@ public class RedCloseSide extends LinearOpMode {
 
                     .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y, Math.toRadians(splineToLinear3Heading)))
 
-                    .forward(4.5)
+                    //.forward(4.5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(880);
+                        slide.setCustom(980);
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(0.1)
+                    .waitSeconds(1)
 
                     .waitSeconds(2)
                     .back(5)
@@ -228,7 +231,7 @@ public class RedCloseSide extends LinearOpMode {
 
         } else if(e == DetectColor.ColorLocation.RIGHT) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                    .lineToLinearHeading(new Pose2d(linetoLinear1X, -8, Math.toRadians(lineToLinear1Heading)))
+                    .lineToLinearHeading(new Pose2d(linetoLinear1X, -6.15, Math.toRadians(lineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
                     })
@@ -236,19 +239,19 @@ public class RedCloseSide extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
                         arm.setExtake();
                     })
-                    .waitSeconds(.2)
+                    .waitSeconds(1)
                     .back(backdist2)
                     .waitSeconds(.3)
-                    .lineToLinearHeading(new Pose2d(22, splineToLinear4Y, Math.toRadians(splineToLinear4Heading)))
-                    .forward(frw)
+                    .lineToLinearHeading(new Pose2d(20, splineToLinear4Y-1, Math.toRadians(splineToLinear4Heading)))
+                    //.forward(frw)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(880);
+                        slide.setCustom(980);
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(0.1)
+                    .waitSeconds(1)
 
                     .waitSeconds(2)
                     .back(5)
@@ -264,7 +267,7 @@ public class RedCloseSide extends LinearOpMode {
                         slide.setIntakeOrGround();
                     })
                     .waitSeconds(5)
-                    .strafeRight(20)
+                    .strafeRight(18)
                     .waitSeconds(.5)
                     .forward(11)
                     .build();

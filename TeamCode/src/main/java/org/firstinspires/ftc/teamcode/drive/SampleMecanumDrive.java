@@ -204,6 +204,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         if (signal != null) setDriveSignal(signal);
     }
 
+    public void returnPose(){
+        getPoseEstimate();
+    }
+
     public void waitForIdle() {
         while (!Thread.currentThread().isInterrupted() && isBusy())
             update();
