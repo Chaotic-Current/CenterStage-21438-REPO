@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.util.Encoder;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * Sample tracking wheel localizer implementation assuming the standard configuration:
@@ -52,7 +51,7 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public static double Y_MULTIPLIER = 1.0063490194;
     public static double xOffset = 0;
     public static double yOffset = 0;
-    public static boolean hasRan = false;
+    public  static boolean readyToScan = false;
 
 
     // Parallel/Perpendicular to the forward axis
@@ -103,8 +102,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     @Override
     public List<Double> getWheelPositions() {
         return Arrays.asList(
-                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + (BlueCloseSide.t.get() ? BlueCloseSide.errorX : 0),
-                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER + (BlueCloseSide.t.get() ? BlueCloseSide.errorY : 0)
+                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + ( readyToScan ? BlueCloseSide.errorY : 0),
+                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER + (readyToScan ? BlueCloseSide.errorX : 0)
         );
     }
 
@@ -127,6 +126,10 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
     public static void setyOffset(double yOffset) {
         TwoWheelTrackingLocalizer.yOffset = yOffset;
+    }
+
+    public static void isReadyToScan(SampleMecanumDrive drive){
+        readyToScan = ((Math.abs(drive.getPoseEstimate().getX()-26) <3) && (Math.abs(drive.getPoseEstimate().getY()-30) <3));
     }
 
 

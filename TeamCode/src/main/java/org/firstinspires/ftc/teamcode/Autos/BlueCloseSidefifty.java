@@ -27,7 +27,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
-@Autonomous(name = "AA blue close side")
+@Autonomous(name = "blue close side fifty pts")
 @SuppressWarnings("all")
 public class BlueCloseSidefifty extends LinearOpMode {
     private SampleMecanumDrive drive;
