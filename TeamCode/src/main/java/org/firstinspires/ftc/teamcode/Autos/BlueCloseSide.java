@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Autos;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -86,6 +87,8 @@ public class BlueCloseSide extends LinearOpMode {
     public static double toBackBoardLinetoLinear1X, toBackBoardLinetoLinear1Y, toBackBoardLinetoLinear1Heading;
     public static double toBackBoardLinetoLinear2X, toBackBoardLinetoLinear2Y, toBackBoardLinetoLinear2Heading;
     String x;
+    public static double deltaX, deltaY;
+    private double offsetY, offsetX;
     private int numOfPixels;
 
     private double thresholdCurrent = 0.5; // threshold for current draw from intake motor
@@ -224,7 +227,7 @@ public class BlueCloseSide extends LinearOpMode {
                 errorY = -detection.ftcPose.y;
                 errorYaw = detection.ftcPose.yaw;
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y - 11, detection.ftcPose.z));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, -detection.ftcPose.y, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
             } else {
@@ -636,14 +639,29 @@ public class BlueCloseSide extends LinearOpMode {
 
         waitForStart();
 
-        drive.followTrajectorySequenceAsync(autoTrajectory);
+        ElapsedTime timer = new ElapsedTime();
 
+        drive.followTrajectorySequenceAsync(autoTrajectory);
+boolean ranOnce = false;
         while (opModeIsActive() && !isStopRequested()) {
+            boolean readyToScan = ((Math.abs(drive.getPoseEstimate().getX()-26) <0.5) && (Math.abs(drive.getPoseEstimate().getY()-30) <0.5));
+
+            if(timer.seconds() > 5){
+                deltaX = drive.getEncoder().getPerpendicularEncoderPos() + offsetX;
+                deltaY = drive.getEncoder().getParallelEncoderPos() + offsetY;
+            }
+
+            if(!ranOnce && readyToScan){
+                offsetX = errorx;
+                offsetY = errory;
+            }
+
+
             telemetryAprilTag(tagUse);
             TwoWheelTrackingLocalizer.isReadyToScan(drive);
             telemetry.addLine(""+drive.getPoseEstimate());
             drive.update();
-            slide.update();
+           // slide.update();
             telemetry.update();
 
         }
