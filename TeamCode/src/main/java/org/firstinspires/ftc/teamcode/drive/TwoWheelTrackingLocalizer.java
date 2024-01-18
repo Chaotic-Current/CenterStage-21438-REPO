@@ -102,9 +102,17 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     @Override
     public List<Double> getWheelPositions() {
         return Arrays.asList(
-                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + ( readyToScan ? BlueCloseSide.errorY : 0),
-                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER + (readyToScan ? BlueCloseSide.errorX : 0)
+                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER ,
+                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER
         );
+    }
+
+    public double getParallelEncoderPos(){
+        return (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER;
+    }
+
+    public double getPerpendicularEncoderPos(){
+        return (encoderTicksToInches(perpendicularEncoder.getCurrentPosition())) * Y_MULTIPLIER;
     }
 
     @NonNull
@@ -113,6 +121,10 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         // TODO: If your encoder velocity can exceed 32767 counts / second (such as the REV Through Bore and other
         //  competing magnetic encoders), change Encoder.getRawVelocity() to Encoder.getCorrectedVelocity() to enable a
         //  compensation method
+        if(BlueCloseSide.deltaY != 0 && BlueCloseSide.deltaX !=0){
+            return Arrays.asList(BlueCloseSide.deltaY,BlueCloseSide.deltaX);
+        }
+
 
         return Arrays.asList(
                 encoderTicksToInches(parallelEncoder.getCorrectedVelocity()) * X_MULTIPLIER,

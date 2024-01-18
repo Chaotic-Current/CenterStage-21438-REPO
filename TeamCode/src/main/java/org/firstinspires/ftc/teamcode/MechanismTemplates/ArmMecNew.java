@@ -35,15 +35,15 @@ public class ArmMecNew {
     }
 
     public void setExtake(){
-        leftAxon.setPosition(extakePosLeft);
-        rightAxon.setPosition(extakePosRight);
-        isIntake = false;
+//        leftAxon.setPosition(extakePosLeft);
+//        rightAxon.setPosition(extakePosRight);
+//        isIntake = false;
     }
 
     public void setIntake(){
-        leftAxon.setPosition(intakePosLeft);
-        rightAxon.setPosition(intakePosRight);
-        isIntake = true;
+//        leftAxon.setPosition(intakePosLeft);
+//        rightAxon.setPosition(intakePosRight);
+//        isIntake = true;
     }
 
 
