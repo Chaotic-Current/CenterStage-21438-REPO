@@ -38,6 +38,7 @@ import java.util.List;
 
 @Config
 public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
+    private double errorX, errorY;
     public static double TICKS_PER_REV = 8192;
     public static double WHEEL_RADIUS = 0.688976378; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
@@ -52,6 +53,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public static double xOffset = 0;
     public static double yOffset = 0;
     public  static boolean readyToScan = false;
+
+    public static boolean hasScanned = false;
 
 
     // Parallel/Perpendicular to the forward axis
@@ -73,6 +76,9 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "IN"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+
+        errorX = 0;
+        errorY = 0;
     }
 
     public double getAverage(double[] x) {
@@ -101,9 +107,10 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
+
         return Arrays.asList(
-                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER ,
-                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER
+                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + errorX,
+                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER + errorY
         );
     }
 
@@ -132,17 +139,19 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         );
     }
 
-    public static void setxOffset(double xOffset) {
-        TwoWheelTrackingLocalizer.xOffset = xOffset;
+    public void setErrorX(double errorX) {
+        this.errorX = errorX;
     }
 
-    public static void setyOffset(double yOffset) {
-        TwoWheelTrackingLocalizer.yOffset = yOffset;
+    public double getErrorX() {
+        return errorX;
     }
 
-    public static void isReadyToScan(SampleMecanumDrive drive){
-        readyToScan = ((Math.abs(drive.getPoseEstimate().getX()-26) <3) && (Math.abs(drive.getPoseEstimate().getY()-30) <3));
+    public void setErrorY(double errorY) {
+        this.errorY = errorY;
     }
 
-
+    public double getErrorY() {
+        return errorY;
+    }
 }

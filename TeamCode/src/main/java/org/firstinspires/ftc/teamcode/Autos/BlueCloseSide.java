@@ -642,26 +642,21 @@ public class BlueCloseSide extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
 
         drive.followTrajectorySequenceAsync(autoTrajectory);
-boolean ranOnce = false;
+        boolean hasRanOnce = false;
         while (opModeIsActive() && !isStopRequested()) {
-            boolean readyToScan = ((Math.abs(drive.getPoseEstimate().getX()-26) <0.5) && (Math.abs(drive.getPoseEstimate().getY()-30) <0.5));
+            boolean readyToScan = ((Math.abs(drive.getPoseEstimate().getX()-26) <0.25) && (Math.abs(drive.getPoseEstimate().getY()-30) <0.25));
 
-            if(timer.seconds() > 5){
-                deltaX = drive.getEncoder().getPerpendicularEncoderPos() + offsetX;
-                deltaY = drive.getEncoder().getParallelEncoderPos() + offsetY;
+            if(readyToScan && !hasRanOnce){
+                drive.getEncoder().setErrorX(errorX);
+                drive.getEncoder().setErrorY(errorY);
+                hasRanOnce = true;
             }
-
-            if(!ranOnce && readyToScan){
-                offsetX = errorx;
-                offsetY = errory;
-            }
-
 
             telemetryAprilTag(tagUse);
-            TwoWheelTrackingLocalizer.isReadyToScan(drive);
             telemetry.addLine(""+drive.getPoseEstimate());
+            telemetry.addLine("DeltaX: " + deltaX +"\nDeltaY: " + deltaY);
             drive.update();
-           // slide.update();
+            slide.update();
             telemetry.update();
 
         }
