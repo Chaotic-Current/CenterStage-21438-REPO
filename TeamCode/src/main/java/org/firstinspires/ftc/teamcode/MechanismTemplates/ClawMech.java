@@ -141,6 +141,7 @@ public class ClawMech {
 
     public void open(){
         claw.setPosition(openPos);
+        state= ClawState.OPEN;
     }
 
     public void halfOpen(){

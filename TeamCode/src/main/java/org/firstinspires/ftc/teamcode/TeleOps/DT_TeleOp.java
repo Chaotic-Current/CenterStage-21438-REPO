@@ -105,6 +105,7 @@ public class DT_TeleOp extends OpMode {
         //claw.initialize();
 
         arm = new ArmMecNew(hardwareMap);
+        arm.setIntake();
 
         thrower = new DroneThrower(hardwareMap);
     }

@@ -31,15 +31,15 @@ public class IntakeMech {
     public static double leftFinalUp = 1;
     public static double leftTeleOpUp = 0.8;
     public static double leftAutoApproachPosition = .775;
-    public static double leftAutoIntakePositionStage1 = .75;
-    public static double leftAutoIntakePositionStage2 = .725;
+    public static double leftAutoIntakePositionStage1 = .45;
+    public static double leftAutoIntakePositionStage2 = .425;
 
     // RIGHT
     public static double rightFinalUp = 0;
     public static double rightTeleOp = 0.2;
     public static double rightAutoApproachPosition = .225;
-    public static double rightAutoIntakePositionStage1 = .25;
-    public static double rightAutoIntakePositionStage2 = .275;
+    public static double rightAutoIntakePositionStage1 = 0.55;
+    public static double rightAutoIntakePositionStage2 = 0.575;
     public static double rightFinalPos = 0.35; //also the down position in teleOPp
 
     // OTHER
@@ -135,9 +135,8 @@ public class IntakeMech {
     }
 
     public void reverse() {
-        setIntake();
-        state = State.RUNNING;
-        intake.setPower(AutoExtakePower);
+        state = State.REVERSE;
+        intake.setPower(ejectPower);
     }
 
     public double getIntakeVoltage() {

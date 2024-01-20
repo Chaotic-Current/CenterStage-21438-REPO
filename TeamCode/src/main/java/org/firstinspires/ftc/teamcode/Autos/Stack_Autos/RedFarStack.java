@@ -26,7 +26,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Autonomous
+@Autonomous(name = "AAA redfarsideSTACK")
 public class RedFarStack extends LinearOpMode {
 	private SampleMecanumDrive drive;
 	private ElapsedTime timer = new ElapsedTime();
@@ -133,9 +133,10 @@ public class RedFarStack extends LinearOpMode {
 		arm = new ArmMecNew(hardwareMap);
 		slide = new SlideMech(hardwareMap);
 		clawMech = new ClawMech(hardwareMap, telemetry);
-		// intake = new IntakeMech(hardwareMap);
+		intake = new IntakeMech(hardwareMap);
 		wrist = hardwareMap.get(Servo.class, "WRIST");
 		wrist.setPosition(0.5);
+		clawMech.open();
 		cameraInit();
 	}
 
@@ -160,9 +161,10 @@ public class RedFarStack extends LinearOpMode {
 		if (e == DetectColor.ColorLocation.RIGHT  || e == DetectColor.ColorLocation.UNDETECTED) {
 			// aprilTagPipeline.setTargetTag(3);
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-					.forward(frwDistance3)
-					.splineTo(new Vector2d(rightSplineTo1X, rightSplineTo1Y), Math.toRadians(rightSpline1deg))
+					//.forward(frwDistance3)
+					//.splineTo(new Vector2d(rightSplineTo1X, rightSplineTo1Y), Math.toRadians(rightSpline1deg))
 					//.back(7)
+					.lineToLinearHeading(new Pose2d(25, -14, Math.toRadians(-45)))
 					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
@@ -174,9 +176,27 @@ public class RedFarStack extends LinearOpMode {
 		} else if (e == DetectColor.ColorLocation.CENTER) {
 			tagUse = 2;
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-					.forward(centerFrwDistance1)
+					.lineToLinearHeading(new Pose2d(31.5, -7, Math.toRadians(-45)))
+					//.forward(centerFrwDistance1)
 					//.back(7)
 					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+					.UNSTABLE_addTemporalMarkerOffset(-0.75, () -> {
+						intake.start();
+					})
+					.UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
+						intake.AutoIntakeServoPositionStage1();
+					})
+					.UNSTABLE_addTemporalMarkerOffset(.25, () -> {
+						intake.AutoIntakeServoPositionStage2();
+					})
+					.UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+						clawMech.close();
+					})
+					.UNSTABLE_addTemporalMarkerOffset(2, () -> {
+						//intake.reverse();
+					})
+
+					.waitSeconds(2)
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X, centerSplineToLinearHeading2Y, Math.toRadians(centerSplineToLinearHeading2Heading)), Math.toRadians(centerSplineToLinearHeading2EndTangent))
@@ -186,7 +206,8 @@ public class RedFarStack extends LinearOpMode {
 
 		} else if (e == DetectColor.ColorLocation.LEFT) {
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-					.lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
+					//.lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
+					.lineToLinearHeading(new Pose2d(27, -2.5, Math.toRadians(45)))
 					//.back(7)
 					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
