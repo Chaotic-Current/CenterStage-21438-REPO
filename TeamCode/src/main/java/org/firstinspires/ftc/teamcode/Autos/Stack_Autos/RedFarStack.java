@@ -176,24 +176,28 @@ public class RedFarStack extends LinearOpMode {
 		} else if (e == DetectColor.ColorLocation.CENTER) {
 			tagUse = 2;
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-					.lineToLinearHeading(new Pose2d(31.5, -7, Math.toRadians(-45)))
+					.lineToLinearHeading(new Pose2d(31.5, -6, Math.toRadians(-45)))
 					//.forward(centerFrwDistance1)
 					//.back(7)
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
-					.UNSTABLE_addTemporalMarkerOffset(-0.75, () -> {
+					.UNSTABLE_addTemporalMarkerOffset(0, () -> {
 						intake.start();
 					})
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+
 					.UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
 						intake.AutoIntakeServoPositionStage1();
 					})
 					.UNSTABLE_addTemporalMarkerOffset(.25, () -> {
-						intake.AutoIntakeServoPositionStage2();
+						//intake.AutoIntakeServoPositionStage2();
 					})
 					.UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
 						clawMech.close();
 					})
 					.UNSTABLE_addTemporalMarkerOffset(2, () -> {
-						//intake.reverse();
+						intake.reverse();
+					})
+					.UNSTABLE_addTemporalMarkerOffset(2,()->{
+						intake.stop();
 					})
 
 					.waitSeconds(2)
@@ -225,6 +229,7 @@ public class RedFarStack extends LinearOpMode {
 		drive.followTrajectorySequenceAsync(autoTrajectory);
 
 		while (opModeIsActive() && !isStopRequested()) {
+			telemetry.addLine(intake.getServosPos());
 			drive.update();
 			telemetry.update();
 		}

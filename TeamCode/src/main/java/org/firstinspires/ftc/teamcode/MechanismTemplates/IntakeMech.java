@@ -30,22 +30,22 @@ public class IntakeMech {
     public static double leftFinalPos = 0.65; //also the down position in teleOPp
     public static double leftFinalUp = 1;
     public static double leftTeleOpUp = 0.8;
-    public static double leftAutoApproachPosition = .775;
-    public static double leftAutoIntakePositionStage1 = .45;
-    public static double leftAutoIntakePositionStage2 = .425;
+    public static double leftAutoApproachPosition = .8;
+    public static double leftAutoIntakePositionStage1 = .777;
+    public static double leftAutoIntakePositionStage2 = .475;
 
     // RIGHT
     public static double rightFinalUp = 0;
     public static double rightTeleOp = 0.2;
-    public static double rightAutoApproachPosition = .225;
-    public static double rightAutoIntakePositionStage1 = 0.55;
-    public static double rightAutoIntakePositionStage2 = 0.575;
+    public static double rightAutoApproachPosition = .2;
+    public static double rightAutoIntakePositionStage1 = 0.223;
+    public static double rightAutoIntakePositionStage2 = 0.525;
     public static double rightFinalPos = 0.35; //also the down position in teleOPp
 
     // OTHER
     public static double increment = 0.025;
     public static double power = 0.75;
-    public static double AutoPower = 0.65;
+    public static double AutoPower = 0.85;
     public static double AutoExtakePower = 0.7;
     public static double ejectPower = -1.0;
 
@@ -238,5 +238,9 @@ public class IntakeMech {
     public void setServosUp() {
         left.setPosition(leftAutoApproachPosition);
         right.setPosition(rightAutoApproachPosition);
+    }
+
+    public String getServosPos(){
+        return "Left Servo Pos: " + left.getPosition() + "\nRight Servo Pos " + right.getPosition();
     }
 }

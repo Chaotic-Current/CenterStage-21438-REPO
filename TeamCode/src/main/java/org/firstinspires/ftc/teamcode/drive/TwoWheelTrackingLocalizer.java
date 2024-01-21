@@ -109,8 +109,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public List<Double> getWheelPositions() {
 
         return Arrays.asList(
-                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + errorX,
-                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER + errorY
+                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + errorY,
+                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER - errorX
         );
     }
 

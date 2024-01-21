@@ -119,9 +119,9 @@ public class ArmPID {
         }
     }
     public void setIntake() {
-        armPIDF.setPIDF(armKpDown, armKi, armKd, armKf);
-        pow = -powDOWN;
-        targetPos = INTAKE_POS;
+//        armPIDF.setPIDF(armKpDown, armKi, armKd, armKf);
+//        pow = -powDOWN;
+//        targetPos = INTAKE_POS;
 
     }
 
