@@ -16,11 +16,13 @@ import java.util.List;
 
 public class StackDetectionPipeline extends OpenCvPipeline {
 
-    public static double blur = 0;
+    public static double blur = 5;
 
-    public Scalar lowerBound = new Scalar(0, 0, 201.2);
+    private int sensativity = 50;
 
-    public Scalar upperBound = new Scalar(42.32, 200, 255);
+    public Scalar lowerBound = new Scalar(0, 0,255 -sensativity);
+
+    public Scalar upperBound = new Scalar(180, sensativity, 255);
 
     private int width = 180;
 
@@ -70,7 +72,7 @@ public class StackDetectionPipeline extends OpenCvPipeline {
         int maxContourIdx = -1;
         for (int i = 0; i < contours.size(); i++) {
             double area = Imgproc.contourArea(contours.get(i));
-            if (area > maxArea) {
+            if (area > maxArea && area <900 && isCenterResonable(contours.get(i),input)) {
                 maxArea = area;
                 maxContourIdx = i;
             }
@@ -79,7 +81,7 @@ public class StackDetectionPipeline extends OpenCvPipeline {
 
 
         // Draw the largest contour on the original image
-        if ((contours.size() >= 0)) {
+        if ((contours.size() >= 0) && maxContourIdx != -1) {
             Mat resultImage = input.clone();
             setDistance(contours, maxContourIdx);
             findError(contours, maxContourIdx);
@@ -100,7 +102,7 @@ public class StackDetectionPipeline extends OpenCvPipeline {
         Rect y = Imgproc.boundingRect(x);
         tel.addLine("pixel height " + (y.height));
 
-        distance = (2.5 * 105.82677165)/(y.height);// real focal length is 113.38582677
+        distance = (2.5 * 378)/(y.height-4);// real focal length is 113.38582677
     }
 
     public void findError(List<MatOfPoint> contours, int i){
@@ -116,6 +118,17 @@ public class StackDetectionPipeline extends OpenCvPipeline {
         xError = w*pixelToInches-5.3;
 
         tel.addLine("x error : " + xError);
+
+    }
+
+    public boolean isCenterResonable(MatOfPoint countour, Mat mat){
+
+
+        Moments moments = Imgproc.moments(countour);
+
+        double y = moments.get_m01()/moments.get_m00();
+
+        return y > 243/6;
 
     }
 }

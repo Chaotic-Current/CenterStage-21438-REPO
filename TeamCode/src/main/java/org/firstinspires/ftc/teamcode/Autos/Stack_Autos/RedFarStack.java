@@ -27,6 +27,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Autonomous(name = "AAA redfarsideSTACK")
+@SuppressWarnings("all")
 public class RedFarStack extends LinearOpMode {
 	private SampleMecanumDrive drive;
 	private ElapsedTime timer = new ElapsedTime();
