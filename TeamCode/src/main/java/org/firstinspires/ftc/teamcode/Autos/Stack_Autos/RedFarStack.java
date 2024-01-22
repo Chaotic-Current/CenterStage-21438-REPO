@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autos.Stack_Autos;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
@@ -17,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -24,9 +27,11 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Autonomous(name = "AAA redfarsideSTACK")
+@Config
 public class RedFarStack extends LinearOpMode {
 	private SampleMecanumDrive drive;
 	private ElapsedTime timer = new ElapsedTime();
@@ -43,8 +48,8 @@ public class RedFarStack extends LinearOpMode {
 	private AprilTagProcessor aprilTag;
 	private VisionPortal visionPortal;
 	private int tagUse;
-	public static double errorX;
-	public static double errorY;
+	public  double errorX;
+	public  double errorY;
 	public static double errorYaw;
 
 	// CENTER
@@ -95,9 +100,112 @@ public class RedFarStack extends LinearOpMode {
 
 	private double thresholdCurrent = 0.5; // threshold for current draw from intake motor
 
-	public static AtomicBoolean t = new AtomicBoolean(false);
+	public static double yReduction = 15;
 
 	TrajectorySequence autoTrajectory;
+
+	private void initAprilTag() {
+
+		// Create the AprilTag processor.
+		aprilTag = new AprilTagProcessor.Builder()
+
+				// The following default settings are available to un-comment and edit as needed.
+				//.setDrawAxes(false)
+				//.setDrawCubeProjection(false)
+				//.setDrawTagOutline(true)
+				//.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+				//.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+				//.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+
+				// == CAMERA CALIBRATION ==
+				// If you do not manually specify calibration parameters, the SDK will attempt
+				// to load a predefined calibration for your camera.
+				.setLensIntrinsics(1430, 1430, 480, 620)
+				// ... these parameters are fx, fy, cx, cy.
+
+				.build();
+
+		// Adjust Image Decimation to trade-off detection-range for detection-rate.
+		// eg: Some typical detection data using a Logitech C920 WebCam
+		// Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+		// Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+		// Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second (default)
+		// Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second (default)
+		// Note: Decimation can be changed on-the-fly to adapt during a match.
+		//aprilTag.setDecimation(3);
+
+		// Create the vision portal by using a builder.
+		VisionPortal.Builder builder = new VisionPortal.Builder();
+
+		// Set the camera (webcam vs. built-in RC phone camera).
+		if (USE_WEBCAM) {
+			builder.setCamera(hardwareMap.get(WebcamName.class, "WebcamFront"));
+		} else {
+			builder.setCamera(BuiltinCameraDirection.BACK);
+		}
+
+		// Choose a camera resolution. Not all cameras support all resolutions.
+		//builder.setCameraResolution(new Size(640, 480));
+
+		// Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
+		//builder.enableLiveView(true);
+
+		// Set the stream format; MJPEG uses less bandwidth than default YUY2.
+		//builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+
+		// Choose whether or not LiveView stops if no processors are enabled.
+		// If set "true", monitor shows solid orange screen if no processors enabled.
+		// If set "false", monitor shows camera view without annotations.
+		//builder.setAutoStopLiveView(false);
+
+		// Set and enable the processor.
+		builder.addProcessor(aprilTag);
+
+		// Build the Vision Portal, using the above settings.
+		visionPortal = builder.build();
+
+		// Disable or re-enable the aprilTag processor at any time.
+		//visionPortal.setProcessorEnabled(aprilTag, true);
+
+	}
+
+	public boolean readyToScan(){
+		if(Math.abs(errorY) != 0 && Math.abs(errorY) < 25){
+			// tagUse = 3;
+			return true;
+		}
+
+		return false;
+	}
+
+	private void telemetryAprilTag(int tagUse) {
+
+		List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+		telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+		// Step through the list of detections and display info for each one.
+		for (AprilTagDetection detection : currentDetections) {
+			if (detection.id == 2) {
+				int multiplier = detection.ftcPose.x >= 0 ? 1 : -1;
+				errorX = -((Math.abs(detection.ftcPose.x)-3.5)*multiplier);
+				errorY = (detection.ftcPose.y- yReduction);
+				errorYaw = detection.ftcPose.yaw;
+				telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+				telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, -detection.ftcPose.y, detection.ftcPose.z));
+				telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+				telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+			} else {
+				telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+				telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+			}
+		}   // end for() loop
+
+		// Add "key" information to telemetry
+		telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+		telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+		telemetry.addLine("RBE = Range, Bearing & Elevation");
+
+	}   // end method telemetryAprilTag()
 
 	public void cameraInit(){
 		int width = 160;
@@ -142,6 +250,9 @@ public class RedFarStack extends LinearOpMode {
 
 	@Override
 	public void runOpMode() throws InterruptedException {
+		errorX = 0;
+		errorY = 0;
+
 		initialize();
 
 		drive.setPoseEstimate(new Pose2d(0,-3,0));
@@ -156,6 +267,7 @@ public class RedFarStack extends LinearOpMode {
 		}
 		frontCam.stopStreaming();
 		frontCam.closeCameraDevice();
+		initAprilTag();
 
 //|| e == DetectColor.ColorLocation.UNDETECTED
 		if (e == DetectColor.ColorLocation.RIGHT  || e == DetectColor.ColorLocation.UNDETECTED) {
@@ -199,13 +311,39 @@ public class RedFarStack extends LinearOpMode {
 					.UNSTABLE_addTemporalMarkerOffset(2,()->{
 						intake.stop();
 					})
+					.UNSTABLE_addTemporalMarkerOffset(2.5,()->{
+						clawMech.close();
+					})
 
 					.waitSeconds(2)
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
-					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X, centerSplineToLinearHeading2Y, Math.toRadians(centerSplineToLinearHeading2Heading)), Math.toRadians(centerSplineToLinearHeading2EndTangent))
+					.UNSTABLE_addTemporalMarkerOffset(0.75,()->{
+						slide.setCustom(1000);
+					})
+					.UNSTABLE_addTemporalMarkerOffset(1.25,()->{
+						arm.setExtake();
+					})
+					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X-4, centerSplineToLinearHeading2Y, Math.toRadians(centerSplineToLinearHeading2Heading)), Math.toRadians(centerSplineToLinearHeading2EndTangent))
+					.waitSeconds(4)
+					.lineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X-4,centerSplineToLinearHeading2Y-8,Math.toRadians(centerSplineToLinearHeading2Heading)))
+					.UNSTABLE_addTemporalMarkerOffset(0,()->{
+						clawMech.halfOpen();
+					})
+					.UNSTABLE_addTemporalMarkerOffset(0.5,()->{
+						clawMech.open();
+					})
+					.UNSTABLE_addTemporalMarkerOffset(1,()->{
+						clawMech.close();
+					})
 					.waitSeconds(1)
-					.forward(8)
+					.UNSTABLE_addTemporalMarkerOffset(0,()->{
+						arm.setIntake();
+					})
+					.UNSTABLE_addTemporalMarkerOffset(1,()->{
+						slide.setIntakeOrGround();
+					})
+					.back(8)
 					.build();
 
 		} else if (e == DetectColor.ColorLocation.LEFT) {
@@ -228,9 +366,28 @@ public class RedFarStack extends LinearOpMode {
 
 		drive.followTrajectorySequenceAsync(autoTrajectory);
 
+		boolean hasRanOnce = false;
 		while (opModeIsActive() && !isStopRequested()) {
+			telemetry.addLine(e.name());
+			telemetry.addLine(errorX + "-x, " + errorY + "-y");
+			telemetry.addLine("Encoder Pos: " + drive.getEncoder().getWheelPositions());
+			boolean readyToScan = readyToScan();
+			telemetry.addLine("Is ready to scan "+ readyToScan);
+
+			if(readyToScan && !hasRanOnce && drive.getEncoder().getWheelVelocitySum() == 0){
+				telemetry.addLine("Offsets added");
+				drive.getEncoder().setErrorX(errorX);
+				drive.getEncoder().setErrorY(errorY);
+				hasRanOnce = true;
+
+			}
+
+			telemetryAprilTag(tagUse);
+			telemetry.addLine(""+drive.getPoseEstimate());
+			telemetry.addLine(drive.getEncoder().getErrorX() + "-x, " + drive.getEncoder().getErrorY() + "-y");
 			telemetry.addLine(intake.getServosPos());
 			drive.update();
+			slide.update();
 			telemetry.update();
 		}
 	}
