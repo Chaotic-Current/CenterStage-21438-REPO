@@ -31,14 +31,14 @@ public class IntakeMech {
     public static double leftFinalUp = 1;
     public static double leftTeleOpUp = 0.8;
     public static double leftAutoApproachPosition = .8;
-    public static double leftAutoIntakePositionStage1 = .785;
+    public static double leftAutoIntakePositionStage1 = .777;
     public static double leftAutoIntakePositionStage2 = .475;
 
     // RIGHT
     public static double rightFinalUp = 0;
     public static double rightTeleOp = 0.2;
     public static double rightAutoApproachPosition = .2;
-    public static double rightAutoIntakePositionStage1 = 0.215;
+    public static double rightAutoIntakePositionStage1 = 0.223;
     public static double rightAutoIntakePositionStage2 = 0.525;
     public static double rightFinalPos = 0.35; //also the down position in teleOPp
 
