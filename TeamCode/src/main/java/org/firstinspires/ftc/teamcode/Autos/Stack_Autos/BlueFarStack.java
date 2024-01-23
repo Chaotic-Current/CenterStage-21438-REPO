@@ -462,6 +462,7 @@ public class BlueFarStack extends LinearOpMode {
         waitForStart();
 
         drive.followTrajectorySequenceAsync(autoTrajectory);
+        //hello
 
         boolean hasRanOnce = false;
         while (opModeIsActive() && !isStopRequested()) {

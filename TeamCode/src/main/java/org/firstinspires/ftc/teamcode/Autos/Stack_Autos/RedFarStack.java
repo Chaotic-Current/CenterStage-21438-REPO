@@ -506,7 +506,7 @@ public class RedFarStack extends LinearOpMode {
 		waitForStart();
 
 		drive.followTrajectorySequenceAsync(autoTrajectory);
-
+		//hello
 		boolean hasRanOnce = false;
 		while (opModeIsActive() && !isStopRequested()) {
 			telemetry.addLine(e.name());
