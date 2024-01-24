@@ -514,7 +514,7 @@ public class RedFarStack extends LinearOpMode {
 			telemetry.addLine(intake.getServosPos());
 			drive.update();
 			slide.update();
-			intake.update();
+			intake.update(drive);
 			telemetry.update();
 		}
 	}

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @Config
 public class IntakeMech {
@@ -52,6 +53,8 @@ public class IntakeMech {
 
     public static double threshHoldPower = 0.2;
 
+    private double lastRecordedTime;
+
     private VoltageSensor vS;
 
     public enum State {
@@ -65,6 +68,10 @@ public class IntakeMech {
     ElapsedTime timer = new ElapsedTime();
 
     boolean isReduced = false;
+
+    boolean hasRanOnce = false;
+
+    double lastRecordedTwo;
 
 
     public IntakeMech(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
@@ -270,15 +277,20 @@ public class IntakeMech {
         return "Left Servo Pos: " + left.getPosition() + "\nRight Servo Pos " + right.getPosition();
     }
 
-    public void update(){
-        telemetry.addLine("" + intake.getCurrent(CurrentUnit.AMPS));
-        if(intake.getCurrent(CurrentUnit.AMPS) > threshHoldPower && !isReduced){
-            isReduced = true;
-            timer.reset();
-            telemetry.addLine("reduced intake power to 0.6");
+    public void update(SampleMecanumDrive drive){
+        if(!isReduced && getState() != State.STOPPED && getState() != State.REVERSE && timer.milliseconds() - lastRecordedTime > 100  && drive.getEncoder().getWheelVelocitySum() == 0){
+            left.setPosition(left.getPosition()-0.01);
+            right.setPosition(right.getPosition()+0.01);
+            lastRecordedTime = timer.milliseconds();
         }
 
-        if(timer.milliseconds() > 50 && isReduced && getState() != State.STOPPED && getState() != State.REVERSE ){
+        telemetry.addLine("" + intake.getCurrent(CurrentUnit.AMPS));
+        isReduced = intake.getCurrent(CurrentUnit.AMPS) > threshHoldPower;
+
+        if(isReduced)
+            lastRecordedTwo = timer.milliseconds();
+
+        if(timer.milliseconds() - lastRecordedTwo > 50 && isReduced && getState() != State.STOPPED && getState() != State.REVERSE ){
             intake.setPower(0.6);
         }
     }
