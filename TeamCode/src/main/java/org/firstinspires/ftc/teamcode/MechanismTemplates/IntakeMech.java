@@ -284,13 +284,13 @@ public class IntakeMech {
             lastRecordedTime = timer.milliseconds();
         }
 
-        telemetry.addLine("" + intake.getCurrent(CurrentUnit.AMPS));
-        isReduced = intake.getCurrent(CurrentUnit.AMPS) > threshHoldPower;
+        if(intake.getCurrent(CurrentUnit.AMPS) > threshHoldPower && !isReduced){
+            isReduced = true;
+            timer.reset();
+            telemetry.addLine("reduced intake power to 0.6");
+        }
 
-        if(isReduced)
-            lastRecordedTwo = timer.milliseconds();
-
-        if(timer.milliseconds() - lastRecordedTwo > 100 && isReduced && getState() != State.STOPPED && getState() != State.REVERSE ){
+        if(timer.milliseconds() > 150 && isReduced && getState() != State.STOPPED && getState() != State.REVERSE ){
             intake.setPower(0.6);
         }
     }
