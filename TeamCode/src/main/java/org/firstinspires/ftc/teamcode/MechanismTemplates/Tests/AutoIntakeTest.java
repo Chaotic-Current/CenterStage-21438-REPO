@@ -15,7 +15,7 @@ private ElapsedTime timer;
     int counter = 0;
     @Override
     public void init() {
-        intake = new IntakeMech(hardwareMap);
+        intake = new IntakeMech(hardwareMap,telemetry);
         timer = new ElapsedTime();
     }
 
