@@ -48,7 +48,7 @@ public class IntakeMech {
     public static double increment = 0.025;
     public static double power = 0.75;
     public static double AutoPower = 1;
-    public static double AutoExtakePower = 0.7;
+    public static double AutoExtakePower = 0.6;
     public static double ejectPower = -1.0;
 
     public static double threshHoldPower = 0.2;
