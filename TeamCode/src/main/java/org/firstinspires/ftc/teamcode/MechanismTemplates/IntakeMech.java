@@ -290,7 +290,7 @@ public class IntakeMech {
         if(isReduced)
             lastRecordedTwo = timer.milliseconds();
 
-        if(timer.milliseconds() - lastRecordedTwo > 50 && isReduced && getState() != State.STOPPED && getState() != State.REVERSE ){
+        if(timer.milliseconds() - lastRecordedTwo > 100 && isReduced && getState() != State.STOPPED && getState() != State.REVERSE ){
             intake.setPower(0.6);
         }
     }
