@@ -33,25 +33,29 @@ public class IntakeMech {
     public static double leftFinalUp = 1;
     public static double leftTeleOpUp = 0.8;
     public static double leftAutoApproachPosition = .8;
-    public static double leftAutoIntakePositionStage1 = .781;
+    public static double leftAutoIntakePositionStage1 = .789;
     public static double leftAutoIntakePositionStage2 = .475;
 
     // RIGHT
     public static double rightFinalUp = 0;
     public static double rightTeleOp = 0.2;
     public static double rightAutoApproachPosition = .2;
-    public static double rightAutoIntakePositionStage1 = 0.219;
+    public static double rightAutoIntakePositionStage1 = 0.211;
     public static double rightAutoIntakePositionStage2 = 0.525;
     public static double rightFinalPos = 0.35; //also the down position in teleOPp
 
     // OTHER
-    public static double increment = 0.025;
+    public static double increment = 0.024;
     public static double power = 0.75;
     public static double AutoPower = 1;
     public static double AutoExtakePower = 0.6;
     public static double ejectPower = -1.0;
 
-    public static double threshHoldPower = 0.2;
+    public static double leftMin = 0.7865;
+
+    public static double rightmax = 0.2135;
+
+    public static double threshHoldPower = 30;
 
     private double lastRecordedTime;
 
@@ -72,6 +76,8 @@ public class IntakeMech {
     boolean hasRanOnce = false;
 
     double lastRecordedTwo;
+
+    public boolean isLowering = false;
 
 
     public IntakeMech(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
@@ -114,8 +120,8 @@ public class IntakeMech {
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        left.setPosition(leftFinalPos);
-        right.setPosition(rightFinalPos);
+       // left.setPosition(0.7);
+      //  right.setPosition(0.32);
 
         this.telemetry = telemetry;
 
@@ -133,8 +139,8 @@ public class IntakeMech {
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        left.setPosition(leftFinalPos);
-        right.setPosition(rightFinalPos);
+       // left.setPosition(leftFinalPos);
+      //  right.setPosition(rightFinalPos);
 
 
     }
@@ -144,8 +150,8 @@ public class IntakeMech {
     }
 
     public void start() {
-        left.setPosition(leftAutoApproachPosition);
-        right.setPosition(rightAutoApproachPosition);
+        //left.setPosition(leftAutoApproachPosition);
+       // right.setPosition(rightAutoApproachPosition);
         isIntaking = true;
         state = State.RUNNING;
         intake.setPower(AutoPower);
@@ -162,9 +168,8 @@ public class IntakeMech {
     }
 
     public void startAuto() {
-        setIntake();
-        state = State.RUNNING;
-        intake.setPower(power);
+        state = IntakeMech.State.REVERSE;
+        intake.setPower(AutoPower);
     }
 
     public void reverse() {
@@ -269,19 +274,32 @@ public class IntakeMech {
     }
 
     public void setServosUp() {
-        left.setPosition(leftAutoApproachPosition);
-        right.setPosition(rightAutoApproachPosition);
+        left.setPosition(0.83);
+        right.setPosition(0.15);
     }
 
     public String getServosPos(){
         return "Left Servo Pos: " + left.getPosition() + "\nRight Servo Pos " + right.getPosition();
     }
 
+    public void setLowering(){
+
+        isLowering = true;
+
+    }
+
     public void update(SampleMecanumDrive drive){
-        if(!isReduced && getState() != State.STOPPED && getState() != State.REVERSE && timer.milliseconds() - lastRecordedTime > 100  && drive.getEncoder().getWheelVelocitySum() == 0){
-            left.setPosition(left.getPosition()-0.01);
-            right.setPosition(right.getPosition()+0.01);
+        if(!isReduced && getState() != State.STOPPED && getState() != State.REVERSE && timer.milliseconds() - lastRecordedTime > 100  && drive.getEncoder().getWheelVelocitySum() == 0 && left.getPosition() > leftMin && right.getPosition() < rightmax){
+            telemetry.addLine("Is in");
+            left.setPosition(left.getPosition()-0.015);
+            right.setPosition(right.getPosition()+0.015);
             lastRecordedTime = timer.milliseconds();
+            intake.setPower(AutoPower);
+        }
+
+        if(left.getPosition() < 0.4){
+            left.setPosition(0.4);
+            right.setPosition(0.6);
         }
 
         if(intake.getCurrent(CurrentUnit.AMPS) > threshHoldPower && !isReduced){
@@ -290,9 +308,18 @@ public class IntakeMech {
             telemetry.addLine("reduced intake power to 0.6");
         }
 
-        if(timer.milliseconds() > 150 && isReduced && getState() != State.STOPPED && getState() != State.REVERSE ){
-            intake.setPower(0.6);
+//6        if(timer.milliseconds() > 150 && isReduced && getState() != State.STOPPED && getState() != State.REVERSE && left.getPosition() > leftMin && right.getPosition() < rightmax){
+//            intake.setPower(0.44);
+//            //left.setPosition(left.getPosition()-0.0005);
+//            //right.setPosition(right.getPosition()+0.0005);
+//        }
+
+        if(isLowering){
+            //left.setPosition(left.getPosition()-0.02);
+            // right.setPosition(right.getPosition()+0.02);
         }
+
+        telemetry.addLine(getServosPos());
     }
 
     //hello

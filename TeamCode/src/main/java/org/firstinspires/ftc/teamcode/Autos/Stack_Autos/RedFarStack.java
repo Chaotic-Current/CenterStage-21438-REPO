@@ -60,7 +60,7 @@ public class RedFarStack extends LinearOpMode {
 	public static double frwDistance3 = 12;
 	public static double wait01 = 1;
 	public static double wait02 = 1;
-	public static double centerLineToLinear1X = 24.5, centerLineToLinear1Y = 13.5, centerLineToLinear1Heading = -92, wait1Center = 3;
+	public static double centerLineToLinear1X = 25.5, centerLineToLinear1Y = 13.5, centerLineToLinear1Heading = -92, wait1Center = 3;
 
 	public static double centerSplineToLinearHeading1X = 1.5, centerSplineToLinearHeading1Y = -6, centerSplineToLinearHeading1EndTangent = -75, centerSplineToLinearHeading1Heading = -90;
 
@@ -102,6 +102,8 @@ public class RedFarStack extends LinearOpMode {
 	private double thresholdCurrent = 0.5; // threshold for current draw from intake motor
 
 	public static double yReduction = 13.45;
+
+	public static double waitAtStack = 2;
 
 	TrajectorySequence autoTrajectory;
 
@@ -296,24 +298,17 @@ public class RedFarStack extends LinearOpMode {
 			// aprilTagPipeline.setTargetTag(3);
 			tagUse = 6;
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-					//.forward(frwDistance3)
-					//.splineTo(new Vector2d(rightSplineTo1X, rightSplineTo1Y), Math.toRadians(rightSpline1deg))
-					//.back(7)
-					.lineToLinearHeading(new Pose2d(25, -14, Math.toRadians(-45)))
-					.UNSTABLE_addTemporalMarkerOffset(0, () -> {
-						intake.start();
-						intake.AutoIntakeServoPositionStage1();
+					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
+						clawMech.open();
+						intake.setServosUp();
 					})
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y+.5, Math.toRadians(centerLineToLinear1Heading)))
-					.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+					.lineToLinearHeading(new Pose2d(25, -14, Math.toRadians(-45)))
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y+.75, Math.toRadians(centerLineToLinear1Heading)))
+					.waitSeconds(waitAtStack)
+					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.reverse();
 					})
-					.waitSeconds(2)
-					.UNSTABLE_addDisplacementMarkerOffset(.5,()->{
-						intake.getLeft().setPosition(0.65);//.65
-						intake.getRight().setPosition(0.35);//.35
-					})
-					.UNSTABLE_addDisplacementMarkerOffset(1,()->{
+					.UNSTABLE_addDisplacementMarkerOffset(2.5,()->{
 						intake.stop();
 						clawMech.close();
 						intake.AutoIntakeServoPositionStage1();
@@ -360,24 +355,17 @@ public class RedFarStack extends LinearOpMode {
 		} else if (e == DetectColor.ColorLocation.CENTER) {
 			tagUse = 5;
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-					.lineToLinearHeading(new Pose2d(31.5, -6, Math.toRadians(-45)))
-					//.forward(centerFrwDistance1)
-					//.back(7)
-					.UNSTABLE_addTemporalMarkerOffset(0, () -> {
-						intake.start();
-						intake.AutoIntakeServoPositionStage1();
+					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
+						clawMech.open();
+						intake.setServosUp();
 					})
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y-1, Math.toRadians(centerLineToLinear1Heading)))
-
-					.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+					.lineToLinearHeading(new Pose2d(31.5, -6, Math.toRadians(-45)))
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y+0.5, Math.toRadians(centerLineToLinear1Heading)))
+					.waitSeconds(waitAtStack)
+					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.reverse();
 					})
-					.waitSeconds(2)
-					.UNSTABLE_addDisplacementMarkerOffset(.5,()->{
-						intake.getLeft().setPosition(0.65);//.65
-						intake.getRight().setPosition(0.35);//.35
-					})
-					.UNSTABLE_addDisplacementMarkerOffset(1,()->{
+					.UNSTABLE_addDisplacementMarkerOffset(2.5,()->{
 						intake.stop();
 						clawMech.close();
 						intake.AutoIntakeServoPositionStage1();
@@ -425,22 +413,17 @@ public class RedFarStack extends LinearOpMode {
 			tagUse = 4;
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
 					//.lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
-					.lineToLinearHeading(new Pose2d(27, -2.5, Math.toRadians(45)))
-					//.back(7)
-					.UNSTABLE_addTemporalMarkerOffset(0, () -> {
-						intake.start();
-						intake.AutoIntakeServoPositionStage1();
+					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
+						clawMech.open();
+						intake.setServosUp();
 					})
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
-					.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+					.lineToLinearHeading(new Pose2d(27, -2.5, Math.toRadians(45)))
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y-0.5, Math.toRadians(centerLineToLinear1Heading)))
+					.waitSeconds(waitAtStack)
+					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.reverse();
 					})
-					.waitSeconds(2)
-					.UNSTABLE_addDisplacementMarkerOffset(.5,()->{
-						intake.getLeft().setPosition(0.65);//.65
-						intake.getRight().setPosition(0.35);//.35
-					})
-					.UNSTABLE_addDisplacementMarkerOffset(1,()->{
+					.UNSTABLE_addDisplacementMarkerOffset(2.5,()->{
 						intake.stop();
 						clawMech.close();
 						intake.AutoIntakeServoPositionStage1();
