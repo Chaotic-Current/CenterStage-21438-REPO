@@ -48,6 +48,10 @@ public class RedFarStack extends LinearOpMode {
 	private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 	private AprilTagProcessor aprilTag;
 	private VisionPortal visionPortal;
+
+	private AprilTagProcessor aprilTagBack;
+
+	private VisionPortal visionPortalBack;
 	private int tagUse;
 	public  double errorX;
 	public  double errorY;
@@ -60,7 +64,7 @@ public class RedFarStack extends LinearOpMode {
 	public static double frwDistance3 = 12;
 	public static double wait01 = 1;
 	public static double wait02 = 1;
-	public static double centerLineToLinear1X = 25.5, centerLineToLinear1Y = 13.5, centerLineToLinear1Heading = -92, wait1Center = 3;
+	public static double centerLineToLinear1X = 25.5, centerLineToLinear1Y = 13, centerLineToLinear1Heading = -92, wait1Center = 3;
 
 	public static double centerSplineToLinearHeading1X = 1.5, centerSplineToLinearHeading1Y = -6, centerSplineToLinearHeading1EndTangent = -75, centerSplineToLinearHeading1Heading = -90;
 
@@ -104,6 +108,12 @@ public class RedFarStack extends LinearOpMode {
 	public static double yReduction = 13.45;
 
 	public static double waitAtStack = 2;
+
+	public static double yreductionBack = 12;
+
+	public static double xreductionBack = 5.3;
+
+	public static double tagUseBack = 10;
 
 	TrajectorySequence autoTrajectory;
 
@@ -162,6 +172,61 @@ public class RedFarStack extends LinearOpMode {
 
 	}   // end method initAprilTag()
 
+	private void initAprilTagBack() {
+
+		// Create the AprilTag processor.
+		aprilTagBack = new AprilTagProcessor.Builder()
+				//.setDrawAxes(false)
+				//.setDrawCubeProjection(false)
+				//.setDrawTagOutline(true)
+				//.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+				//.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+				//.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+
+				// == CAMERA CALIBRATION ==
+				// If you do not manually specify calibration parameters, the SDK will attempt
+				// to load a predefined calibration for your camera.
+				//.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
+
+				// ... these parameters are fx, fy, cx, cy.
+
+				.build();
+
+		// Create the vision portal by using a builder.
+		VisionPortal.Builder builder = new VisionPortal.Builder();
+
+		// Set the camera (webcam vs. built-in RC phone camera).
+		if (USE_WEBCAM) {
+			builder.setCamera(hardwareMap.get(WebcamName.class, "BackCam"));
+		} else {
+			builder.setCamera(BuiltinCameraDirection.BACK);
+		}
+
+		// Choose a camera resolution. Not all cameras support all resolutions.
+		//builder.setCameraResolution(new Size(640, 480));
+
+		// Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
+		//builder.enableCameraMonitoring(true);
+
+		// Set the stream format; MJPEG uses less bandwidth than default YUY2.
+		//builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+
+		// Choose whether or not LiveView stops if no processors are enabled.
+		// If set "true", monitor shows solid orange screen if no processors enabled.
+		// If set "false", monitor shows camera view without annotations.
+		//builder.setAutoStopLiveView(false);
+
+		// Set and enable the processor.
+		builder.addProcessor(aprilTagBack);
+
+		// Build the Vision Portal, using the above settings.
+		visionPortalBack = builder.build();
+
+		// Disable or re-enable the aprilTag processor at any time.
+		//visionPortal.setProcessorEnabled(aprilTag, true);
+
+	}   // end method initAprilTag()
+
 
 	/**
 	 * Add telemetry about AprilTag detections.
@@ -176,6 +241,34 @@ public class RedFarStack extends LinearOpMode {
 			if (detection.id == tagUse) {
 				errorX = -detection.ftcPose.x*0.9;
 				errorY = -(detection.ftcPose.y-yReduction);
+				telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+				telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+				telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+				telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+			} else {
+				telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+				telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+			}
+		}   // end for() loop
+
+		// Add "key" information to telemetry
+		telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+		telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+		telemetry.addLine("RBE = Range, Bearing & Elevation");
+
+	}   // end method telemetryAprilTag()
+
+	private void telemetryAprilTagBack() {
+
+		List<AprilTagDetection> currentDetections = aprilTagBack.getDetections();
+		telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+		// Step through the list of detections and display info for each one.
+		for (AprilTagDetection detection : currentDetections) {
+			if (detection.id == tagUseBack) {
+				errorX = -(detection.ftcPose.x + xreductionBack);
+				errorY = (detection.ftcPose.y - yreductionBack);
+				telemetry.addLine("x " + (detection.ftcPose.x - xreductionBack) + "y " + (detection.ftcPose.y - yreductionBack));
 				telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
 				telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
 				telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
@@ -301,9 +394,15 @@ public class RedFarStack extends LinearOpMode {
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
 						clawMech.open();
 						intake.setServosUp();
+						intake.setIsReduced(true);
 					})
 					.lineToLinearHeading(new Pose2d(25, -14, Math.toRadians(-45)))
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y+.75, Math.toRadians(centerLineToLinear1Heading)))
+					.lineToLinearHeading(new Pose2d(centerLineTo1X, centerLineToLinear1Y-6,Math.toRadians(centerLineToLinear1Heading)))
+					.waitSeconds(0.5)
+					.UNSTABLE_addTemporalMarkerOffset(0,()->{
+						intake.setIsReduced(false);
+					})
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 					.waitSeconds(waitAtStack)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.reverse();
@@ -316,7 +415,7 @@ public class RedFarStack extends LinearOpMode {
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
 					.UNSTABLE_addTemporalMarkerOffset(0.75,()->{
-						slide.setCustom(1030);
+						slide.setCustom(1200);
 					})
 					.UNSTABLE_addTemporalMarkerOffset(1.25,()->{
 						arm.setExtake();
@@ -329,7 +428,7 @@ public class RedFarStack extends LinearOpMode {
 					})
 					.waitSeconds(0.5)
 					.UNSTABLE_addTemporalMarkerOffset(0.2,()->{
-						slide.setCustom(1300);
+						slide.setCustom(1470);
 					})
 					.back(1.5)
 					.waitSeconds(0.5)
@@ -358,9 +457,15 @@ public class RedFarStack extends LinearOpMode {
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
 						clawMech.open();
 						intake.setServosUp();
+						intake.setIsReduced(true);
 					})
 					.lineToLinearHeading(new Pose2d(31.5, -6, Math.toRadians(-45)))
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y+0.5, Math.toRadians(centerLineToLinear1Heading)))
+					.lineToLinearHeading(new Pose2d(centerLineTo1X, centerLineToLinear1Y-6,Math.toRadians(centerLineToLinear1Heading)))
+					.waitSeconds(0.5)
+					.UNSTABLE_addTemporalMarkerOffset(0,()->{
+						intake.setIsReduced(false);
+					})
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 					.waitSeconds(waitAtStack)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.reverse();
@@ -373,7 +478,7 @@ public class RedFarStack extends LinearOpMode {
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
 					.UNSTABLE_addTemporalMarkerOffset(0.75,()->{
-						slide.setCustom(1030);
+						slide.setCustom(1200);
 					})
 					.UNSTABLE_addTemporalMarkerOffset(1.25,()->{
 						arm.setExtake();
@@ -386,9 +491,10 @@ public class RedFarStack extends LinearOpMode {
 					})
 					.waitSeconds(0.5)
 					.UNSTABLE_addTemporalMarkerOffset(0.2,()->{
-						slide.setCustom(1300);
+						slide.setCustom(1470);
 					})
 					.back(1.5)
+					.strafeRight(10)
 					.waitSeconds(0.5)
 					.forward(1.5)
 					.UNSTABLE_addTemporalMarkerOffset(0.5,()->{
@@ -416,9 +522,15 @@ public class RedFarStack extends LinearOpMode {
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
 						clawMech.open();
 						intake.setServosUp();
+						intake.setIsReduced(true);
 					})
 					.lineToLinearHeading(new Pose2d(27, -2.5, Math.toRadians(45)))
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y-0.5, Math.toRadians(centerLineToLinear1Heading)))
+					.lineToLinearHeading(new Pose2d(centerLineTo1X, centerLineToLinear1Y-6,Math.toRadians(centerLineToLinear1Heading)))
+					.waitSeconds(0.5)
+					.UNSTABLE_addTemporalMarkerOffset(0,()->{
+						intake.setIsReduced(false);
+					})
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 					.waitSeconds(waitAtStack)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.reverse();
@@ -431,7 +543,7 @@ public class RedFarStack extends LinearOpMode {
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
 					.UNSTABLE_addTemporalMarkerOffset(0.75,()->{
-						slide.setCustom(1030);
+						slide.setCustom(1200);
 					})
 					.UNSTABLE_addTemporalMarkerOffset(1.25,()->{
 						arm.setExtake();
@@ -445,9 +557,10 @@ public class RedFarStack extends LinearOpMode {
 					})
 					.waitSeconds(0.5)
 					.UNSTABLE_addTemporalMarkerOffset(0.2,()->{
-						slide.setCustom(1300);
+						slide.setCustom(1470);
 					})
 					.back(1.5)
+					.strafeRight(10)
 					.waitSeconds(0.5)
 					.forward(1.5)
 					.UNSTABLE_addTemporalMarkerOffset(0.5,()->{

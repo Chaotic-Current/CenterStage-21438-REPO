@@ -29,7 +29,7 @@ public class IntakeMech {
     private Gamepad gamepad;
 
     // LEFT
-    public static double leftFinalPos = 0.65; //also the down position in teleOPp
+    public static double leftFinalPos = 0.665; //also the down position in teleOPp
     public static double leftFinalUp = 1;
     public static double leftTeleOpUp = 0.8;
     public static double leftAutoApproachPosition = .8;
@@ -42,11 +42,11 @@ public class IntakeMech {
     public static double rightAutoApproachPosition = .2;
     public static double rightAutoIntakePositionStage1 = 0.211;
     public static double rightAutoIntakePositionStage2 = 0.525;
-    public static double rightFinalPos = 0.35; //also the down position in teleOPp
+    public static double rightFinalPos = 0.335; //also the down position in teleOPp
 
     // OTHER
     public static double increment = 0.024;
-    public static double power = 0.75;
+    public static double power = 0.7;
     public static double AutoPower = 1;
     public static double AutoExtakePower = 0.6;
     public static double ejectPower = -1.0;
@@ -320,6 +320,10 @@ public class IntakeMech {
         }
 
         telemetry.addLine(getServosPos());
+    }
+
+    public void setIsReduced(boolean bool) {
+        isReduced = bool;
     }
 
     //hello
