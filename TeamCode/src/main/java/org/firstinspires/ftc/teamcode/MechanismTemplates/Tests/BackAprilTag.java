@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -10,6 +12,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
+@Config
+@TeleOp
 public class BackAprilTag extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
@@ -24,6 +28,9 @@ public class BackAprilTag extends LinearOpMode {
      */
     private VisionPortal visionPortalBack;
 
+    private AprilTagProcessor aprilTag;
+    private VisionPortal visionPortal;
+
     public static double yreductionBack = 12;
 
     public static double xreductionBack = 5.3;
@@ -31,9 +38,11 @@ public class BackAprilTag extends LinearOpMode {
     public static double tagUseBack = 10;
 
     @Override
+
     public void runOpMode() {
 
         initAprilTagBack();
+
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -73,6 +82,7 @@ public class BackAprilTag extends LinearOpMode {
 
         // Create the AprilTag processor.
         aprilTagBack = new AprilTagProcessor.Builder()
+
                 //.setDrawAxes(false)
                 //.setDrawCubeProjection(false)
                 //.setDrawTagOutline(true)
@@ -116,6 +126,8 @@ public class BackAprilTag extends LinearOpMode {
         // Set and enable the processor.
         builder.addProcessor(aprilTagBack);
 
+
+
         // Build the Vision Portal, using the above settings.
         visionPortalBack = builder.build();
 
@@ -153,5 +165,7 @@ public class BackAprilTag extends LinearOpMode {
         telemetry.addLine("RBE = Range, Bearing & Elevation");
 
     }   // end method telemetryAprilTag()
+
+
 
 }

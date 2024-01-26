@@ -246,13 +246,13 @@ public class DT_TeleOp extends OpMode {
 
         wrist.setPosition(wristPos);
 
-//        if (gamepad1.right_trigger > 0.1){
-//            slides.setManualSlide(400); //165 old val
-//        }
-
-//        if (gamepad1.left_trigger > 0.1){
-//            slides.setManualSlide(-200);
-//        }
+        if (gamepad2.right_trigger > 0.1){
+            slides.setManualSlideUp(); //165 old val
+        }else if (gamepad2.left_trigger > 0.1){
+            slides.setManualSlideDown();
+        }else{
+            slides.setCurrentPosition(SlideMech.CurrentPosition.LEVEl1);
+        }
 
 
         claw.run(intake.getState());

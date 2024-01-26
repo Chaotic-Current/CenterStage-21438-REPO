@@ -42,6 +42,7 @@ public class SlideMech {
     double correctionRight;
 
     public CurrentPosition targetPosQueued;
+    private boolean isDirectionUp;
 
     public enum CurrentPosition{
         ZERO,LEVEl1,LEVEL2,LEVEL3,LEVEL4,CUSTOM,CLIMB
@@ -103,16 +104,17 @@ public class SlideMech {
         int avg = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
 
 
+        if(currentPosition != CurrentPosition.CUSTOM) {
 
-        if(!isClimbing) {
-            if (avg > targetPos) {
-                slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
-            } else {
-                slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
+            if (!isClimbing) {
+                if (avg > targetPos) {
+                    slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
+                } else {
+                    slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
+                }
             }
-        }
-        correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
-        correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
+            correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
+            correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
 
      /* telemetry.addData("targetPosition: ", targetPos);
         telemetry.addData("Right motor position: ", slideRight.getCurrentPosition());
@@ -122,10 +124,10 @@ public class SlideMech {
         telemetry.update();*/
 
 
-
-        // sets the output power of the motor
-        slideLeft.set(correctionLeft);
-        slideRight.set(correctionRight);
+            // sets the output power of the motor
+            slideLeft.set(correctionLeft);
+            slideRight.set(correctionRight);
+        }
     }
 
     public void setIntakeOrGround() {
@@ -160,15 +162,20 @@ public class SlideMech {
         currentPosition = CurrentPosition.LEVEL3;
     }
 
-    public void setManualSlide(int increment){
-        double targetManual = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2 + increment;
-
-        if (targetManual <= MAX && targetManual >= ZERO_POSITION)
-            targetPos = targetManual;
-        if(increment < 0){
-            slidePIDF.setPIDF(slideKpManualDown, slideKi, slideKd, slideKf);
-        }
+    public void setManualSlideUp(){
+        slideRight.set(0.05);
+        slideLeft.set(0.05);
+        targetPos = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
         currentPosition = CurrentPosition.CUSTOM;
+
+    }
+
+    public void setManualSlideDown(){
+        slideRight.set(-0.05);
+        slideLeft.set(-0.05);
+        targetPos = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
+        currentPosition = CurrentPosition.CUSTOM;
+
     }
 
     public CurrentPosition getCurrentPosition(){
@@ -192,5 +199,9 @@ public class SlideMech {
 
     public boolean isClimbing(){
         return isClimbing;
+    }
+
+    public void setCurrentPosition(CurrentPosition currentPosition) {
+        this.currentPosition = currentPosition;
     }
 }
