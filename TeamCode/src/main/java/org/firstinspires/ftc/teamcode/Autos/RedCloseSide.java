@@ -121,9 +121,9 @@ public class RedCloseSide extends LinearOpMode {
         DetectColor.ColorLocation e = detector.getLocate();
 
         while (!isStarted()) {
-                e = detector.getLocate();
-                if (e != null) {
-                    //telemetry.addLine("in loop " + e.name());
+            e = detector.getLocate();
+            if (e != null) {
+                //telemetry.addLine("in loop " + e.name());
 
 
 
@@ -135,6 +135,7 @@ public class RedCloseSide extends LinearOpMode {
         telemetry.addLine(e.name());
         telemetry.update();
 
+        e = DetectColor.ColorLocation.RIGHT;
 
         if (e == DetectColor.ColorLocation.LEFT || e == DetectColor.ColorLocation.UNDETECTED) {
 
@@ -151,7 +152,7 @@ public class RedCloseSide extends LinearOpMode {
                         arm.setExtake();
                     })
                     .waitSeconds(.1)
-                    .lineToLinearHeading(new Pose2d(splineToLinear2X+3, splineToLinear2Y, Math.toRadians(-spline2deg)))
+                    .lineToLinearHeading(new Pose2d(splineToLinear2X+3, splineToLinear2Y+4, Math.toRadians(-spline2deg)))
                     .waitSeconds(0.25)
                     //.forward(8)
 
@@ -164,7 +165,7 @@ public class RedCloseSide extends LinearOpMode {
                     })
 
                     .waitSeconds(0.75)
-                    .back(5)
+                    .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         slide.setLowJunction();
@@ -197,7 +198,7 @@ public class RedCloseSide extends LinearOpMode {
 
                     .back(backwardsDistance1)
 
-                    .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y, Math.toRadians(splineToLinear3Heading)))
+                    .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y+1, Math.toRadians(splineToLinear3Heading)))
 
                     //.forward(4.5)
 
@@ -210,7 +211,7 @@ public class RedCloseSide extends LinearOpMode {
                     .waitSeconds(1)
 
                     .waitSeconds(2)
-                    .back(5)
+                    .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         slide.setLowJunction();
@@ -242,7 +243,7 @@ public class RedCloseSide extends LinearOpMode {
                     .waitSeconds(1)
                     .back(backdist2)
                     .waitSeconds(.3)
-                    .lineToLinearHeading(new Pose2d(20, splineToLinear4Y-1, Math.toRadians(splineToLinear4Heading)))
+                    .lineToLinearHeading(new Pose2d(20, splineToLinear4Y+1, Math.toRadians(splineToLinear4Heading)))
                     //.forward(frw)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
@@ -254,7 +255,7 @@ public class RedCloseSide extends LinearOpMode {
                     .waitSeconds(1)
 
                     .waitSeconds(2)
-                    .back(5)
+                    .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         slide.setLowJunction();
@@ -275,14 +276,15 @@ public class RedCloseSide extends LinearOpMode {
         }else {
             telemetry.addLine("ruh-roh (´▽`ʃ♡ƪ)");
         }
-            waitForStart();
+        waitForStart();
 
-            drive.followTrajectorySequenceAsync(firstMove);
 
-            while (opModeIsActive() && !isStopRequested()) {
-                drive.update();
-                slide.update(telemetry);
-                telemetry.update();
-            }
+        drive.followTrajectorySequenceAsync(firstMove);
+
+        while (opModeIsActive() && !isStopRequested()) {
+            drive.update();
+            slide.update(telemetry);
+            telemetry.update();
+        }
     }
 }

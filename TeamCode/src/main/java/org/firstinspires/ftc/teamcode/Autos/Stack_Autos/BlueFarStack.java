@@ -30,7 +30,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.List;
 
-@Autonomous (name = "AA blue far STACK")
+@Autonomous
 @Config
 @SuppressWarnings("all")
 public class BlueFarStack extends LinearOpMode {
@@ -70,18 +70,18 @@ public class BlueFarStack extends LinearOpMode {
 
     public static double centerLineTo1X = 1.5, centerLineTo1Y = 55;
 
-    public static double centerSplineToLinearHeading2X = 27.5, centerSplineToLinearHeading2Y = 77, centerSplineToLinearHeading2EndTangent = 75, centerSplineToLinearHeading2Heading = 90;
+    public static double centerSplineToLinearHeading2X = 27.5, centerSplineToLinearHeading2Y = 71, centerSplineToLinearHeading2EndTangent = 75, centerSplineToLinearHeading2Heading = 90;
 
-    public static double leftSplineToLinearHeading2X = 22.5, leftSplineToLinearHeading2Y = 77, leftSplineToLinearHeading2EndTangent = 75, leftSplineToLinearHeading2Heading = 90;
+    public static double leftSplineToLinearHeading2X = 22.5, leftSplineToLinearHeading2Y = 71, leftSplineToLinearHeading2EndTangent = 75, leftSplineToLinearHeading2Heading = 90;
 
-    public static double rightSplineToLinearHeading2X = 31.5, rightSplineToLinearHeading2Y = 77, rightSplineToLinearHeading2EndTangent = 75, rightSplineToLinearHeading2Heading = 90;
+    public static double rightSplineToLinearHeading2X = 31.5, rightSplineToLinearHeading2Y = 72.25, rightSplineToLinearHeading2EndTangent = 75, rightSplineToLinearHeading2Heading = 90;
 
     public static double centerLineToLinear2Y = 41;
 
     // LEFT
     public static double leftLineToLinear2X = 20, leftLineToLinear2Y = 33.5, leftLineToLinear2Heading = 90, wait1Left = 3, wait2Left = 1;
     public static double leftLinetoLinear3Y = 40.5;
-    public static double leftLinetoLinear1X = 30, leftLinetoLinear1Y = -4, leftLineToLinear1Heading = 45;
+    public static double leftLinetoLinear1X = 31.5, leftLinetoLinear1Y = -4, leftLineToLinear1Heading = 45;
     public static double leftBackDist = 10;
 
     // RIGHT
@@ -105,11 +105,11 @@ public class BlueFarStack extends LinearOpMode {
 
     private double thresholdCurrent = 0.5; // threshold for current draw from intake motor
 
-    public static double yReduction = 13.1;
+    public static double yReduction = 15;
 
     public static double yreductionBack = 12;
 
-    public static double xreductionBack = 7.3;
+    public static double xreductionBack = 1.85;
 
     public static double tagUseBack = 10;
 
@@ -118,24 +118,71 @@ public class BlueFarStack extends LinearOpMode {
     private WebcamName webcam2;
 
     private void initAprilTag() {
+        // Create the AprilTag processor.
+        aprilTag = new AprilTagProcessor.Builder()
 
-        // Create the AprilTag processor by using a builder.
-        aprilTag = new AprilTagProcessor.Builder().build();
+                // The following default settings are available to un-comment and edit as needed.
+                //.setDrawAxes(false)
+                //.setDrawCubeProjection(false)
+                //.setDrawTagOutline(true)
+                //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
 
-        webcam1 = hardwareMap.get(WebcamName.class, "BackCam");
-        webcam2 = hardwareMap.get(WebcamName.class, "WebcamFront");
-        CameraName switchableCamera = ClassFactory.getInstance()
-                .getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
+                // == CAMERA CALIBRATION ==
+                // If you do not manually specify calibration parameters, the SDK will attempt
+                // to load a predefined calibration for your camera.
+                .setLensIntrinsics(1430, 1430, 480, 620)
+                // ... these parameters are fx, fy, cx, cy.
 
-        // Create the vision portal by using a builder.
-        visionPortal = new VisionPortal.Builder()
-                .setCamera(switchableCamera)
-                .addProcessor(aprilTag)
                 .build();
 
-        visionPortal.setActiveCamera(webcam1);
+        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+        // eg: Some typical detection data using a Logitech C920 WebCam
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second (default)
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second (default)
+        // Note: Decimation can be changed on-the-fly to adapt during a match.
+        //aprilTag.setDecimation(3);
+
+        // Create the vision portal by using a builder.
+        VisionPortal.Builder builder = new VisionPortal.Builder();
+
+        // Set the camera (webcam vs. built-in RC phone camera).
+        if (USE_WEBCAM) {
+            builder.setCamera(hardwareMap.get(WebcamName.class, "WebcamFront"));
+        } else {
+            builder.setCamera(BuiltinCameraDirection.BACK);
+        }
+
+        // Choose a camera resolution. Not all cameras support all resolutions.
+        //builder.setCameraResolution(new Size(640, 480));
+
+        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
+        //builder.enableLiveView(true);
+
+        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
+        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+
+        // Choose whether or not LiveView stops if no processors are enabled.
+        // If set "true", monitor shows solid orange screen if no processors enabled.
+        // If set "false", monitor shows camera view without annotations.
+        //builder.setAutoStopLiveView(false);
+
+        // Set and enable the processor.
+        builder.addProcessor(aprilTag);
+
+        // Build the Vision Portal, using the above settings.
+        visionPortal = builder.build();
+
+        // Disable or re-enable the aprilTag processor at any time.
+        //visionPortal.setProcessorEnabled(aprilTag, true);
+
     }   // end method initAprilTag()
 
+    //    errorX = -detection.ftcPose.x * 0.9;
+//    errorY = -(detection.ftcPose.y - yReduction);
     private void telemetryAprilTag() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -143,29 +190,17 @@ public class BlueFarStack extends LinearOpMode {
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
-            if(visionPortal.getActiveCamera().equals(webcam1)) {
-                if (detection.id == tagUseBack) {
-                    errorX = (detection.ftcPose.x + xreductionBack);
-                    telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                    telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-                } else {
-                    telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-                    telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
-                }
-            }else {
-                errorX = -detection.ftcPose.x * 0.9;
-                errorY = -(detection.ftcPose.y - yReduction);
-                if (detection.id == tagUse) {
-                    telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                    telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-                } else {
-                    telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-                    telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
-                }
+            if (detection.id == tagUse) {
+                errorX = detection.ftcPose.x*0.9;
+                errorY = -(detection.ftcPose.y- yReduction);
+                errorYaw = detection.ftcPose.yaw;
+                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, -detection.ftcPose.y, detection.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
         }   // end for() loop
 
@@ -174,18 +209,9 @@ public class BlueFarStack extends LinearOpMode {
         telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
         telemetry.addLine("RBE = Range, Bearing & Elevation");
 
-    }   // end method telemetryAprilTag()
+    }   // end for() loop
 
-    private void doCameraSwitching() {
-        if (visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
-            if(visionPortal.getActiveCamera().equals(webcam1)) {
-                visionPortal.setActiveCamera(webcam2);
-                return;
-            }
-            visionPortal.setActiveCamera(webcam1);
-        }
 
-    }   // end method doCameraSwitching()
 
 
 
@@ -264,14 +290,8 @@ public class BlueFarStack extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
                         clawMech.open();
                         intake.setServosUp();
-                        intake.setIsReduced(true);
                     })
                     .lineToLinearHeading(new Pose2d(rightSplineTo1X, rightSplineTo1Y, Math.toRadians(rightSpline1deg)))
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y -5, Math.toRadians(centerLineToLinear1Heading)))
-                    .waitSeconds(0.5)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        intake.setIsReduced(false);
-                    })
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .waitSeconds(2)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -286,14 +306,14 @@ public class BlueFarStack extends LinearOpMode {
                     .splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X, centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
                     .lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
                     .UNSTABLE_addTemporalMarkerOffset(0.75, () -> {
-                        slide.setCustom(1030);
+                        slide.setCustom(990);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(1.25, () -> {
                         arm.setExtake();
                     })
-                    .splineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X - 2, rightSplineToLinearHeading2Y, Math.toRadians(rightSplineToLinearHeading2Heading)), Math.toRadians(rightSplineToLinearHeading2EndTangent))
+                    .splineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X+1, rightSplineToLinearHeading2Y, Math.toRadians(rightSplineToLinearHeading2Heading)), Math.toRadians(rightSplineToLinearHeading2EndTangent))
                     .waitSeconds(1.5)
-                    .lineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X - 2, toStackLinetoLinear2Y, Math.toRadians(rightSplineToLinearHeading2Heading)))
+                    .lineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X +1, toStackLinetoLinear2Y, Math.toRadians(rightSplineToLinearHeading2Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         clawMech.halfOpen();
                     })
@@ -325,17 +345,11 @@ public class BlueFarStack extends LinearOpMode {
         } else if (e == DetectColor.ColorLocation.LEFT|| e == DetectColor.ColorLocation.UNDETECTED) {
             tagUse = 1;
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
-                    .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                         clawMech.open();
                         intake.setServosUp();
-                        intake.setIsReduced(true);
                     })
-                    .lineToLinearHeading(new Pose2d(28, 6, Math.toRadians(45)))
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y + 5, Math.toRadians(centerLineToLinear1Heading)))
-                    .waitSeconds(3)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        intake.setIsReduced(false);
-                    })
+                    .lineToLinearHeading(new Pose2d(25, 6, Math.toRadians(45)))
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .waitSeconds(2)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -349,7 +363,7 @@ public class BlueFarStack extends LinearOpMode {
                     .splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X, centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
                     .lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
                     .UNSTABLE_addTemporalMarkerOffset(0.75, () -> {
-                        slide.setCustom(1000);
+                        slide.setCustom(990);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(1.25, () -> {
                         arm.setExtake();
@@ -362,7 +376,7 @@ public class BlueFarStack extends LinearOpMode {
                     })
                     .waitSeconds(0.5)
                     .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
-                        slide.setCustom(1200);
+                        slide.setCustom(1470);
                     })
                     .back(1.5)
                     .forward(1.5)
@@ -380,7 +394,7 @@ public class BlueFarStack extends LinearOpMode {
                         slide.setIntakeOrGround();
                     })
                     .back(8)
-                    .lineToLinearHeading(new Pose2d(1, 85, Math.toRadians(-90)))
+                    .lineToLinearHeading(new Pose2d(1, 85, Math.toRadians(90)))
                     .forward(12)
                     .build();
 
@@ -388,17 +402,11 @@ public class BlueFarStack extends LinearOpMode {
             tagUse = 2;
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
-
                         clawMech.open();
                         intake.setServosUp();
-                        intake.setIsReduced(true);
                     })
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y+5,Math.toRadians(centerLineToLinear1Heading)))
-                    .waitSeconds(0.5)
-                    .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                        intake.setIsReduced(false);
-                    })
+
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .waitSeconds(2)
 
@@ -413,7 +421,7 @@ public class BlueFarStack extends LinearOpMode {
                     .splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X, centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
                     .lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
                     .UNSTABLE_addTemporalMarkerOffset(0.75, () -> {
-                        slide.setCustom(1030);
+                        slide.setCustom(990);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(1.25, () -> {
                         arm.setExtake();
@@ -473,7 +481,7 @@ public class BlueFarStack extends LinearOpMode {
 
             }
 
-
+            telemetryAprilTag();
             telemetry.addLine("" + drive.getPoseEstimate());
             telemetry.addLine(drive.getEncoder().getErrorX() + "-x, " + drive.getEncoder().getErrorY() + "-y");
             telemetry.addLine(intake.getServosPos());

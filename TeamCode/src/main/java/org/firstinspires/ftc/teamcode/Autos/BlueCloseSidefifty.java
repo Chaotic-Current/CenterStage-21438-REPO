@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
-@Autonomous(name = "AA blue close side fifty pts")
+@Autonomous(name = "blue close side fifty pts")
 @SuppressWarnings("all")
 public class BlueCloseSidefifty extends LinearOpMode {
     private SampleMecanumDrive drive;
@@ -61,11 +61,11 @@ public class BlueCloseSidefifty extends LinearOpMode {
     public static double wait01 = 1;
     public static double wait02 = 1;
     public static double centerLineToLinear1X = 26, centerLineToLinear1Y = 27, centerLineToLinear1Heading = 90, wait1Center = 3;
-    public static double centerLineToLinear2Y = 41;
+    public static double centerLineToLinear2Y = 38.5;
 
     // LEFT
-    public static double leftLineToLinear2X = 24, leftLineToLinear2Y = 30, leftLineToLinear2Heading = 90, wait1Left = 3, wait2Left = 1;
-    public static double leftLinetoLinear3Y = 40.5;
+    public static double leftLineToLinear2X = 20, leftLineToLinear2Y = 30, leftLineToLinear2Heading = 90, wait1Left = 3, wait2Left = 1;
+    public static double leftLinetoLinear3Y = 38.5;
     public static double leftLinetoLinear1X = 26, leftLinetoLinear1Y = 6, leftLineToLinear1Heading = 30;
     public static double leftBackDist = 10;
 
@@ -74,7 +74,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
     public static double rightLineToLinear2deg = 90;
     public static double rightSplineTo1X = 26, rightSplineTo1Y = -3.5, splineToLinear1Heading = -80;
     public static double rightLineToLinear2X = 32.75, rightLineToLinear2Y = 30, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
-    public static double rightLineToLinear3Y = 40.25;
+    public static double rightLineToLinear3Y = 38.5;
 
 
     // OTHER
@@ -163,7 +163,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
 
     public boolean readyToScan(){
         if(Math.abs(errorY) < 15  && Math.abs(errorY) != 0){
-           // tagUse = 3;
+            // tagUse = 3;
             return true;
         }
 
@@ -298,7 +298,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     })
                     .waitSeconds(1)
 
-                    .back(5)
+                    .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         slide.setLowJunction();
@@ -315,7 +315,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     // PARK \\
                     .lineToLinearHeading(new Pose2d(47, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
-                    .forward(10)
+                    .forward(12)
                     .build();
 
         } else if (e == DetectColor.ColorLocation.CENTER) {
@@ -325,7 +325,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
 
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
-                       // intake.setServosUp();
+                        // intake.setServosUp();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.73, () -> {
                         arm.setExtake();
@@ -352,7 +352,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     })
                     .waitSeconds(1.5)
 
-                    .back(5)
+                    .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         slide.setLowJunction();
@@ -370,7 +370,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     // PARK \\
                     .lineToLinearHeading(new Pose2d(47, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
-                    .forward(10) // changed
+                    .forward(12) // changed
                     .build();
 
         } else if (e == DetectColor.ColorLocation.LEFT) {
@@ -403,7 +403,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     .waitSeconds(1.5)
 
                     .waitSeconds(2)
-                    .back(5)
+                    .back(8)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         slide.setLowJunction();
@@ -420,7 +420,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     // PARK \\
                     .lineToLinearHeading(new Pose2d(50, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
-                    .forward(10) // changed
+                    .forward(13) // changed
                     .build();
 
         } else {
@@ -437,13 +437,13 @@ public class BlueCloseSidefifty extends LinearOpMode {
             boolean readyToScan = readyToScan();
             telemetry.addLine("Is ready to scan "+ readyToScan);
 
-            if(readyToScan && !hasRanOnce){
-                telemetry.addLine("Offsets added");
-                drive.getEncoder().setErrorX(errorX);
-                drive.getEncoder().setErrorY(errorY);
-                hasRanOnce = true;
-
-            }
+//            if(readyToScan && !hasRanOnce){
+//                telemetry.addLine("Offsets added");
+//                drive.getEncoder().setErrorX(errorX);
+//                drive.getEncoder().setErrorY(errorY);
+//                hasRanOnce = true;
+//
+//            }
 
             telemetryAprilTag(tagUse);
             telemetry.addLine(""+drive.getPoseEstimate());
@@ -455,3 +455,5 @@ public class BlueCloseSidefifty extends LinearOpMode {
         }
     }
 }
+
+
