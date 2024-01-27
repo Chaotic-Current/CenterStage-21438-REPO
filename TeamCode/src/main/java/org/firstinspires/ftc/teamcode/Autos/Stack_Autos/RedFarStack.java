@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.LowPass;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 //import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
@@ -66,7 +67,7 @@ public class RedFarStack extends LinearOpMode {
 	public static double frwDistance3 = 12;
 	public static double wait01 = 1;
 	public static double wait02 = 1;
-	public static double centerLineToLinear1X = 25.5, centerLineToLinear1Y = 13, centerLineToLinear1Heading = -92, wait1Center = 3;
+	public static double centerLineToLinear1X = 25.5, centerLineToLinear1Y = 12.75, centerLineToLinear1Heading = -92, wait1Center = 3;
 
 	public static double centerSplineToLinearHeading1X = 1.5, centerSplineToLinearHeading1Y = -6, centerSplineToLinearHeading1EndTangent = -75, centerSplineToLinearHeading1Heading = -90;
 
@@ -111,13 +112,15 @@ public class RedFarStack extends LinearOpMode {
 
 	public static double waitAtStack = 2;
 
-	public static double yreductionBack = 12;
+	public static double yreductionBack = 11.8;
 
-	public static double xreductionBack = 5.3;
+	public static double xreductionBack = -1.85;
 
-	public static double tagUseBack = 7;
+	public static double tagUseBack = 8;
 
 	TrajectorySequence autoTrajectory;
+	LowPass lp = new LowPass(0.7,0.7);
+	double db = lp.execute(0.7);
 
 	private WebcamName webcam1;
 	private WebcamName webcam2;
@@ -139,7 +142,7 @@ public class RedFarStack extends LinearOpMode {
 				.addProcessor(aprilTag)
 				.build();
 
-		visionPortal.setActiveCamera(webcam1);
+
 	}   // end method initAprilTag()
 
 
@@ -155,7 +158,7 @@ public class RedFarStack extends LinearOpMode {
 		// Step through the list of detections and display info for each one.
 		for (AprilTagDetection detection : currentDetections) {
 			if (detection.id == tagUse) {
-				if (visionPortal.getActiveCamera().equals(webcam1)) {
+				if (visionPortal.getActiveCamera().equals(webcam2)) {
 					errorX = -detection.ftcPose.x * 0.9;
 					errorY = -(detection.ftcPose.y - yReduction);
 					telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
@@ -168,8 +171,7 @@ public class RedFarStack extends LinearOpMode {
 				}
 			}else{
 				if (detection.id == tagUseBack) {
-					errorX = detection.ftcPose.x + xreductionBack;
-					errorY = detection.ftcPose.y - yreductionBack;
+					errorX = (detection.ftcPose.x + xreductionBack);
 					telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
 					telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
 					telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
@@ -279,12 +281,12 @@ public class RedFarStack extends LinearOpMode {
 						intake.setIsReduced(true);
 					})
 					.lineToLinearHeading(new Pose2d(25, -14, Math.toRadians(-45)))
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y-4,Math.toRadians(centerLineToLinear1Heading)))
-					.waitSeconds(0.5)
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X-5, centerLineToLinear1Y-5,Math.toRadians(centerLineToLinear1Heading)))
+					.waitSeconds(1)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.setIsReduced(false);
 					})
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y+0.5, Math.toRadians(centerLineToLinear1Heading)))
 					.waitSeconds(waitAtStack)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.reverse();
@@ -293,6 +295,7 @@ public class RedFarStack extends LinearOpMode {
 						intake.stop();
 						clawMech.close();
 						intake.AutoIntakeServoPositionStage1();
+						doCameraSwitching();
 					})
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
@@ -408,7 +411,7 @@ public class RedFarStack extends LinearOpMode {
 					})
 					.lineToLinearHeading(new Pose2d(27, -2.5, Math.toRadians(45)))
 					.lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y-4,Math.toRadians(centerLineToLinear1Heading)))
-					.waitSeconds(0.5)
+					.waitSeconds(37)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.setIsReduced(false);
 					})
@@ -473,6 +476,7 @@ public class RedFarStack extends LinearOpMode {
 		boolean hasRanOnce = false;
 		while (opModeIsActive() && !isStopRequested()) {
 			telemetry.addLine(e.name());
+			telemetry.addLine(""+visionPortal.getActiveCamera().equals(webcam1));
 			telemetry.addLine(errorX + "-x, " + errorY + "-y");
 			telemetry.addLine("Encoder Pos: " + drive.getEncoder().getWheelPositions());
 			boolean readyToScan = readyToScan();
@@ -482,7 +486,6 @@ public class RedFarStack extends LinearOpMode {
 				telemetry.addLine("Offsets added");
 				drive.getEncoder().setErrorX(errorX);
 				drive.getEncoder().setErrorY(errorY);
-				doCameraSwitching();
 				hasRanOnce = true;
 
 			}

@@ -163,16 +163,16 @@ public class SlideMech {
     }
 
     public void setManualSlideUp(){
-        slideRight.set(0.05);
-        slideLeft.set(0.05);
+        slideRight.set(0.25);
+        slideLeft.set(0.25);
         targetPos = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
         currentPosition = CurrentPosition.CUSTOM;
 
     }
 
     public void setManualSlideDown(){
-        slideRight.set(-0.05);
-        slideLeft.set(-0.05);
+        slideRight.set(-0.175);
+        slideLeft.set(-0.175);
         targetPos = (slideRight.getCurrentPosition() + slideLeft.getCurrentPosition()) / 2;
         currentPosition = CurrentPosition.CUSTOM;
 

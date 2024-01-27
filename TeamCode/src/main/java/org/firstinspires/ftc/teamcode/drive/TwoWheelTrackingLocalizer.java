@@ -139,7 +139,7 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public double getWheelVelocitySum(){return encoderTicksToInches(parallelEncoder.getCorrectedVelocity()) * X_MULTIPLIER + encoderTicksToInches(perpendicularEncoder.getCorrectedVelocity()) * Y_MULTIPLIER;}
 
     public void setErrorX(double errorX) {
-        this.errorX += errorX;
+        this.errorX = errorX;
     }
 
     public double getErrorX() {
@@ -147,7 +147,7 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     }
 
     public void setErrorY(double errorY) {
-        this.errorY += errorY;
+        this.errorY = errorY;
     }
 
     public double getErrorY() {

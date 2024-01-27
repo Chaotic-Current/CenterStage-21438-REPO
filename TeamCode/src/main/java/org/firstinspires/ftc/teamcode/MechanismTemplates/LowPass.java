@@ -10,10 +10,8 @@ public class LowPass {
     }
 
     public double execute(double u){
-
         x = x*alpha + (1-alpha)*u;
         return x;
-        //return (int) Math.round(x);
     }
     public double getEstimate(){
         return x;
