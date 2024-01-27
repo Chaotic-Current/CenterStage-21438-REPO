@@ -29,7 +29,7 @@ public class IntakeMech {
     private Gamepad gamepad;
 
     // LEFT
-    public static double leftFinalPos = 0.7; //also the down position in teleOPp
+    public static double leftFinalPos = 0.72; //also the down position in teleOPp
     public static double leftFinalUp = 1;
     public static double leftTeleOpUp = 0.8;
     public static double leftAutoApproachPosition = .8;
@@ -42,7 +42,7 @@ public class IntakeMech {
     public static double rightAutoApproachPosition = .2;
     public static double rightAutoIntakePositionStage1 = 0.211;
     public static double rightAutoIntakePositionStage2 = 0.525;
-    public static double rightFinalPos = 0.3; //also the down position in teleOPp
+    public static double rightFinalPos = 0.28; //also the down position in teleOPp
 
     // OTHER
     public static double increment = 0.024;
@@ -121,7 +121,7 @@ public class IntakeMech {
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
        // left.setPosition(0.7);
-      //  right.setPosition(0.32);
+       //  right.setPosition(0.32);
 
         this.telemetry = telemetry;
 

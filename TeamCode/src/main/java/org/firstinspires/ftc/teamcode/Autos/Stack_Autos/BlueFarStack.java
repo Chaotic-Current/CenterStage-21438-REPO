@@ -30,7 +30,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.List;
 
-@Autonomous
+@Autonomous (name = "AA blue far STACK")
 @Config
 @SuppressWarnings("all")
 public class BlueFarStack extends LinearOpMode {
@@ -144,7 +144,8 @@ public class BlueFarStack extends LinearOpMode {
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if(visionPortal.getActiveCamera().equals(webcam1)) {
-                if (detection.metadata != null) {
+                if (detection.id == tagUseBack) {
+                    errorX = (detection.ftcPose.x + xreductionBack);
                     telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                     telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                     telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
@@ -154,7 +155,9 @@ public class BlueFarStack extends LinearOpMode {
                     telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
                 }
             }else {
-                if (detection.metadata != null) {
+                errorX = -detection.ftcPose.x * 0.9;
+                errorY = -(detection.ftcPose.y - yReduction);
+                if (detection.id == tagUse) {
                     telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                     telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                     telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
@@ -264,8 +267,8 @@ public class BlueFarStack extends LinearOpMode {
                         intake.setIsReduced(true);
                     })
                     .lineToLinearHeading(new Pose2d(rightSplineTo1X, rightSplineTo1Y, Math.toRadians(rightSpline1deg)))
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-2, centerLineToLinear1Y + 5, Math.toRadians(centerLineToLinear1Heading)))
-                    .waitSeconds(3)
+                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y -5, Math.toRadians(centerLineToLinear1Heading)))
+                    .waitSeconds(0.5)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         intake.setIsReduced(false);
                     })
@@ -327,9 +330,9 @@ public class BlueFarStack extends LinearOpMode {
                         intake.setServosUp();
                         intake.setIsReduced(true);
                     })
-                    .lineToLinearHeading(new Pose2d(25, 6, Math.toRadians(45)))
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-4, centerLineToLinear1Y + 12, Math.toRadians(centerLineToLinear1Heading)))
-                    .waitSeconds(50)
+                    .lineToLinearHeading(new Pose2d(28, 6, Math.toRadians(45)))
+                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y + 5, Math.toRadians(centerLineToLinear1Heading)))
+                    .waitSeconds(3)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         intake.setIsReduced(false);
                     })
@@ -391,8 +394,8 @@ public class BlueFarStack extends LinearOpMode {
                         intake.setIsReduced(true);
                     })
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-6, centerLineToLinear1Y+16,Math.toRadians(centerLineToLinear1Heading)))
-                    .waitSeconds(50)
+                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y+5,Math.toRadians(centerLineToLinear1Heading)))
+                    .waitSeconds(0.5)
                     .UNSTABLE_addTemporalMarkerOffset(0,()->{
                         intake.setIsReduced(false);
                     })

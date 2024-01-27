@@ -24,20 +24,19 @@ public class AutoIntakeLogicTest extends LinearOpMode {
         int counter = 0;
         intake.start();
 
-        while(timer.seconds()<6)
-        {
+            while(timer.seconds()<6)
+            {
 
-            if(intake.getIntakeVoltage()>0.5 && delay.seconds() > 0.2){
-                counter++;
+                if(intake.getIntakeVoltage()>0.5 && delay.seconds() > 0.2){
+                    counter++;
+                    delay.reset();
+                }
+                if(counter>2){
+                    intake.reverse();
+                }
 
-                delay.reset();
+                telemetry.addData("voltage", intake.getIntakeVoltage());
+
             }
-            if(counter>2){
-                intake.reverse();
-            }
-
-            telemetry.addData("voltage", intake.getIntakeVoltage());
-
-        }
     }
 }

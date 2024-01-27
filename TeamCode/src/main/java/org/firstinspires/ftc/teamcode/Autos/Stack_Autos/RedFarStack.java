@@ -33,7 +33,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Autonomous(name = "AAA redfarsideSTACK")
+@Autonomous(name = "AAA red far STACK")
 @Config
 @SuppressWarnings("all")
 public class RedFarStack extends LinearOpMode {
@@ -110,7 +110,7 @@ public class RedFarStack extends LinearOpMode {
 
 	public static double yReduction = 13.45;
 
-	public static double waitAtStack = 2;
+	public static double waitAtStack = 1.5;
 
 	public static double yreductionBack = 11.8;
 
@@ -282,7 +282,7 @@ public class RedFarStack extends LinearOpMode {
 					})
 					.lineToLinearHeading(new Pose2d(25, -14, Math.toRadians(-45)))
 					.lineToLinearHeading(new Pose2d(centerLineToLinear1X-5, centerLineToLinear1Y-5,Math.toRadians(centerLineToLinear1Heading)))
-					.waitSeconds(1)
+					.waitSeconds(0.5)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.setIsReduced(false);
 					})
@@ -345,7 +345,7 @@ public class RedFarStack extends LinearOpMode {
 						intake.setIsReduced(true);
 					})
 					.lineToLinearHeading(new Pose2d(31.5, -6, Math.toRadians(-45)))
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y-4,Math.toRadians(centerLineToLinear1Heading)))
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X-5, centerLineToLinear1Y-5,Math.toRadians(centerLineToLinear1Heading)))
 					.waitSeconds(0.5)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.setIsReduced(false);
@@ -410,8 +410,8 @@ public class RedFarStack extends LinearOpMode {
 						intake.setIsReduced(true);
 					})
 					.lineToLinearHeading(new Pose2d(27, -2.5, Math.toRadians(45)))
-					.lineToLinearHeading(new Pose2d(centerLineToLinear1X-1, centerLineToLinear1Y-4,Math.toRadians(centerLineToLinear1Heading)))
-					.waitSeconds(37)
+					.lineToLinearHeading(new Pose2d(centerLineToLinear1X-5, centerLineToLinear1Y-5,Math.toRadians(centerLineToLinear1Heading)))
+					.waitSeconds(0.5)
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						intake.setIsReduced(false);
 					})

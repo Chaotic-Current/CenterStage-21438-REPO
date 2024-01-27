@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
-@Autonomous(name = "blue close side fifty pts")
+@Autonomous(name = "AA blue close side fifty pts")
 @SuppressWarnings("all")
 public class BlueCloseSidefifty extends LinearOpMode {
     private SampleMecanumDrive drive;
