@@ -16,6 +16,6 @@ public class AnalogDistanceDriver {
         // in this case, Vout is the analog reading (that's just how analog sensor work), and Vin (votlage in)
         // is 3.3 since that's the pintout of the actual sensor
 
-        return distance; // in cm
+        return distance * 2.54; // convert cm to inches
     }
 }
