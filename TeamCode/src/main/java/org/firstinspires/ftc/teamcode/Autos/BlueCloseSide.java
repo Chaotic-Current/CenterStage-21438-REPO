@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -37,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
 @Autonomous (name = "AA blue stack auto")
+@Disabled
 @SuppressWarnings("all")
 public class BlueCloseSide extends LinearOpMode {
     private LowPass filter = new LowPass(0,0.3);

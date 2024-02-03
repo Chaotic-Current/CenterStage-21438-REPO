@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 
 import javax.crypto.spec.OAEPParameterSpec;
-
+@Disabled
 @TeleOp
 public class AutoIntakeTest extends OpMode {
 private IntakeMech intake;

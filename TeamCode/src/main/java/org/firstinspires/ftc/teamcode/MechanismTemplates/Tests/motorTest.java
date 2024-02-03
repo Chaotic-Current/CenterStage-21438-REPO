@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 
-@TeleOp(name = "motorTest")
+
 public class motorTest extends OpMode {
     // (づ￣ 3￣)づ hellohello
     private DcMotorEx motorFrontLeft, motorBackLeft, motorFrontRight, motorBackRight;

@@ -32,7 +32,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Autonomous(name = "AAA redfarsideSTACK")
+@Autonomous(name = "AA Red Farside STACK")
 @Config
 @SuppressWarnings("all")
 public class RedFarStack extends LinearOpMode {
@@ -72,7 +72,7 @@ public class RedFarStack extends LinearOpMode {
 
 	public static double centerLineTo1X = 1.5, centerLineTo1Y = -61;
 
-	public static double centerSplineToLinearHeading2X = 27, centerSplineToLinearHeading2Y = -83, centerSplineToLinearHeading2EndTangent = -75, centerSplineToLinearHeading2Heading = -90;
+	public static double centerSplineToLinearHeading2X = 27, centerSplineToLinearHeading2Y = -86, centerSplineToLinearHeading2EndTangent = -75, centerSplineToLinearHeading2Heading = -90;
 
 	public static double leftSplineToLinearHeading2X = 31.5, leftSplineToLinearHeading2Y = -83, leftSplineToLinearHeading2EndTangent = -75, leftSplineToLinearHeading2Heading = -90;
 
@@ -200,7 +200,7 @@ public class RedFarStack extends LinearOpMode {
 		// Step through the list of detections and display info for each one.
 		for (AprilTagDetection detection : currentDetections) {
 			if (detection.id == tagUse) {
-				errorX = -detection.ftcPose.x*0.9;
+				errorX = -detection.ftcPose.x*0.6;
 				errorY = -(detection.ftcPose.y- yReduction);
 				errorYaw = detection.ftcPose.yaw;
 				telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
@@ -305,7 +305,7 @@ public class RedFarStack extends LinearOpMode {
 //|| e == DetectColor.ColorLocation.UNDETECTED
 		if (e == DetectColor.ColorLocation.RIGHT  || e == DetectColor.ColorLocation.UNDETECTED) {
 			// aprilTagPipeline.setTargetTag(3);
-			tagUse = 3;
+			tagUse = 6;
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
 						clawMech.open();
@@ -362,7 +362,7 @@ public class RedFarStack extends LinearOpMode {
 					.build();
 
 		} else if (e == DetectColor.ColorLocation.CENTER) {
-			tagUse = 2;
+			tagUse = 5;
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
 						clawMech.open();
@@ -387,9 +387,9 @@ public class RedFarStack extends LinearOpMode {
 					.UNSTABLE_addTemporalMarkerOffset(1.25,()->{
 						arm.setExtake();
 					})
-					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X, centerSplineToLinearHeading2Y, Math.toRadians(centerSplineToLinearHeading2Heading)), Math.toRadians(centerSplineToLinearHeading2EndTangent))
+					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X-2, centerSplineToLinearHeading2Y, Math.toRadians(centerSplineToLinearHeading2Heading)), Math.toRadians(centerSplineToLinearHeading2EndTangent))
 					.waitSeconds(1.5)
-					.lineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X,centerSplineToLinearHeading2Y-10+0.25,Math.toRadians(centerSplineToLinearHeading2Heading)))
+					.lineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X-2,centerSplineToLinearHeading2Y-10,Math.toRadians(centerSplineToLinearHeading2Heading)))
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						clawMech.halfOpen();
 					})
@@ -420,7 +420,7 @@ public class RedFarStack extends LinearOpMode {
 					.build();
 
 		} else if (e == DetectColor.ColorLocation.LEFT) {
-			tagUse = 1;
+			tagUse = 4;
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
 					//.lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
@@ -496,7 +496,7 @@ public class RedFarStack extends LinearOpMode {
 
 			if(readyToScan && drive.getEncoder().getWheelVelocitySum() == 0){
 				telemetry.addLine("Offsets added");
-				drive.getEncoder().setErrorX(errorX);
+				//drive.getEncoder().setErrorX(errorX);
 				//drive.getEncoder().setErrorY(errorY);
 				;
 				hasRanOnce = true;

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autos.Tests;
 
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.ColorSensorMech;
 
 @Autonomous
 @Config
+@Disabled
 public class ColorSensorTest extends LinearOpMode{
     ColorSensorMech color1;
     ColorSensorMech color2;

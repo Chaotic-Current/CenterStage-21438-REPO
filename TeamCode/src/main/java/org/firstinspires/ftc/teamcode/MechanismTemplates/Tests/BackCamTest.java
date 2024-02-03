@@ -13,7 +13,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
-@TeleOp
+
 public class BackCamTest extends OpMode {
 PipelineTemplate detector;
 OpenCvWebcam frontCam;

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Config
-@TeleOp(name = "NoodleProto")
+
 public class NoodleProto extends OpMode {
     public static double power = 1;
     private DcMotorEx gecko;

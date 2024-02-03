@@ -92,7 +92,6 @@ public class ClawMech {
         }
 
 
-
         if (rightDPadRight.isRisingEdge() || bothOpenRan) {
             setBothOpen(this.bothOpenRan);
         }

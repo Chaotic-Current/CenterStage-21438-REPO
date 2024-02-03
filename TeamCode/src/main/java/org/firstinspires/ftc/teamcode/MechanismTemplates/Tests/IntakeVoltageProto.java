@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @Config
+@Disabled
 @TeleOp(name = "IntakeVoltageProto")
 public class IntakeVoltageProto extends OpMode{
     private static double power = 1;

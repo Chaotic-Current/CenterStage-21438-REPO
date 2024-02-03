@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-
+@Disabled
 @TeleOp(name = "DT_Testing")
 public class DrivetrainWiringTest extends OpMode {
 

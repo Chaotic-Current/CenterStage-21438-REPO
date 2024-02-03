@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autos.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.opencv.core.Mat;
@@ -10,6 +11,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 @Autonomous(name="HuskyLensTest")
+@Disabled
 public class HuskyLensTest extends LinearOpMode {
 
     OpenCvCamera camera;

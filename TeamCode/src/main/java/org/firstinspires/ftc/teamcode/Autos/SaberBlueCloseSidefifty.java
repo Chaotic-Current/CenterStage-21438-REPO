@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
-@Autonomous(name = "AA Blue close side fifty pts")
+@Autonomous(name = "AA sABERS Blue close side fifty pts")
 @SuppressWarnings("all")
-public class BlueCloseSidefifty extends LinearOpMode {
+public class SaberBlueCloseSidefifty extends LinearOpMode {
     private SampleMecanumDrive drive;
     private ElapsedTime timer = new ElapsedTime();
     private OpenCvWebcam frontCam, backCam;
@@ -288,7 +288,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
 
                     .waitSeconds(0.5)
 
-                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y+0.25, Math.toRadians(rightLineToLinear2deg)))
+                    .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y+0.5, Math.toRadians(rightLineToLinear2deg)))
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(930);
@@ -317,7 +317,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     .waitSeconds(1.5)
 
                     // PARK \\
-                    .lineToLinearHeading(new Pose2d(0.5, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
+                    .lineToLinearHeading(new Pose2d(47, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
                     .forward(12)
                     .build();
@@ -346,7 +346,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
 
                     .waitSeconds(1)
 
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y+0.25, Math.toRadians(centerLineToLinear1Heading)))
+                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y+0.5, Math.toRadians(centerLineToLinear1Heading)))
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(930);
@@ -374,7 +374,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     .waitSeconds(2.5)
 
                     // PARK \\
-                    .lineToLinearHeading(new Pose2d(0.5, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
+                    .lineToLinearHeading(new Pose2d(47, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
                     .forward(12) // changed
                     .build();
@@ -399,7 +399,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                         //t.set(true);
                     })
                     .waitSeconds(0.5)
-                    .lineToLinearHeading(new Pose2d(leftLineToLinear2X, leftLinetoLinear3Y+0.25, Math.toRadians(leftLineToLinear2Heading)))
+                    .lineToLinearHeading(new Pose2d(leftLineToLinear2X, leftLinetoLinear3Y+0.5, Math.toRadians(leftLineToLinear2Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(930);
                     })
@@ -427,7 +427,7 @@ public class BlueCloseSidefifty extends LinearOpMode {
                     .waitSeconds(2)
 
                     // PARK \\
-                    .lineToLinearHeading(new Pose2d(0.5, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
+                    .lineToLinearHeading(new Pose2d(47, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
                     .waitSeconds(.5)
                     .forward(13) // changed
                     .build();

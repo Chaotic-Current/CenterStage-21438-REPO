@@ -135,13 +135,13 @@ public class RedCloseSide extends LinearOpMode {
         telemetry.addLine(e.name());
         telemetry.update();
 
-        e = DetectColor.ColorLocation.RIGHT;
+
 
         if (e == DetectColor.ColorLocation.LEFT || e == DetectColor.ColorLocation.UNDETECTED) {
 
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
-                    .splineTo(new Vector2d(splineToLinear1X, splineToLinear1Y), Math.toRadians(spline1deg))
+                    .splineTo(new Vector2d(splineToLinear1X, splineToLinear1Y+0.2), Math.toRadians(spline1deg))
                     .waitSeconds(0.75)
                     .back(5)
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -152,7 +152,7 @@ public class RedCloseSide extends LinearOpMode {
                         arm.setExtake();
                     })
                     .waitSeconds(.1)
-                    .lineToLinearHeading(new Pose2d(splineToLinear2X+3, splineToLinear2Y+4, Math.toRadians(-spline2deg)))
+                    .lineToLinearHeading(new Pose2d(splineToLinear2X+3, splineToLinear2Y, Math.toRadians(-spline2deg)))
                     .waitSeconds(0.25)
                     //.forward(8)
 
@@ -180,7 +180,7 @@ public class RedCloseSide extends LinearOpMode {
                     .waitSeconds(3.25)
                     .strafeRight(28)
                     .waitSeconds(.5)
-                    .forward(11)
+                    .forward(11.5)
                     .build();
 
 
@@ -198,7 +198,7 @@ public class RedCloseSide extends LinearOpMode {
 
                     .back(backwardsDistance1)
 
-                    .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y+1, Math.toRadians(splineToLinear3Heading)))
+                    .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y+.2, Math.toRadians(splineToLinear3Heading)))
 
                     //.forward(4.5)
 
@@ -232,7 +232,7 @@ public class RedCloseSide extends LinearOpMode {
 
         } else if(e == DetectColor.ColorLocation.RIGHT) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
-                    .lineToLinearHeading(new Pose2d(linetoLinear1X, -6.15, Math.toRadians(lineToLinear1Heading)))
+                    .lineToLinearHeading(new Pose2d(linetoLinear1X, -5.4, Math.toRadians(lineToLinear1Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
                         slide.setLowJunction();
                     })
@@ -243,7 +243,7 @@ public class RedCloseSide extends LinearOpMode {
                     .waitSeconds(1)
                     .back(backdist2)
                     .waitSeconds(.3)
-                    .lineToLinearHeading(new Pose2d(20, splineToLinear4Y+1, Math.toRadians(splineToLinear4Heading)))
+                    .lineToLinearHeading(new Pose2d(20, splineToLinear4Y+.5, Math.toRadians(splineToLinear4Heading)))
                     //.forward(frw)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {

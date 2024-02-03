@@ -13,8 +13,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 
-@Config
-
 public class ClawRealign {
     public static double servoPosition = 0.5;
     //private Servo servo; // at pin 0 on control hub

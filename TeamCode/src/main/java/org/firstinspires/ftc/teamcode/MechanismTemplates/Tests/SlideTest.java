@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
-@TeleOp(name = "SlideTest")
+
 public class SlideTest extends OpMode {
     //"MC ABHI IS ON THE REPO!!!"
 

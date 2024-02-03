@@ -30,7 +30,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.List;
 
-@Autonomous
+@Autonomous(name = "AA Blue Far Stack Auto")
 @Config
 @SuppressWarnings("all")
 public class BlueFarStack extends LinearOpMode {

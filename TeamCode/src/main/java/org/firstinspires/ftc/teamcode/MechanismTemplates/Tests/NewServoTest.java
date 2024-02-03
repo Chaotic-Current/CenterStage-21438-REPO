@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
-@TeleOp(name = "NewServoTest")
+
 public class NewServoTest extends OpMode {
     public static double pos = 0.5;
     private Servo servo;

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autos.Tests;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Autonomous
+@Disabled
 public class AprilTagTest extends LinearOpMode {
 
     SampleMecanumDrive drive;

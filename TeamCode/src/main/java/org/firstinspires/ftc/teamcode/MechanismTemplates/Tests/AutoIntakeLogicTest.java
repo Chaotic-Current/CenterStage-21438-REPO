@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
-
+@Disabled
 @Autonomous
 public class AutoIntakeLogicTest extends LinearOpMode {
 

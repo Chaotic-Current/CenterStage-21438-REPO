@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autos.Tests;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
+@Disabled
 public class DistSensorTest_pt2  extends LinearOpMode {
     DistanceSensor dist;
     public double oldDistance;
