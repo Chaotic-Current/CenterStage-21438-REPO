@@ -13,6 +13,8 @@ public class GeckoFlipper extends OpMode {
     public static double power = 1;
     private DcMotorEx gecko;
 
+
+
     @Override
     public void init(){
         gecko = (DcMotorEx) hardwareMap.dcMotor.get("gecko");

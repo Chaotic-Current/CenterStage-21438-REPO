@@ -17,19 +17,19 @@ import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
 
 public class ClawRealign {
     public static double servoPosition = 0.5;
-    private Servo servo; // at pin 0 on control hub
-    private IMU imu;
+    //private Servo servo; // at pin 0 on control hub
+    //private IMU imu;
     private double botHeading;
     private Telemetry telemetry;
     private SignalEdgeDetector Gamepad1_Options;
 
 
-    public ClawRealign(HardwareMap hardwareMap, Telemetry telemetry, SignalEdgeDetector Gamepad1_Options){
+    public ClawRealign(HardwareMap hardwareMap, Telemetry telemetry, Servo servo, IMU imu){
         servo =hardwareMap.get(Servo.class, "WRIST");
         servo.setPosition(servoPosition);
 
         // Retrieve the IMU from the hardware map
-        imu = hardwareMap.get(IMU.class, "imu");
+
 
         // Adjust the orientation parameters to match your robot
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -42,22 +42,26 @@ public class ClawRealign {
     }
 
 
-    public void swivelToPostion(SlideMech.CurrentPosition e, int currentMotorPosition)
+    public void swivelToPostion(SlideMech.CurrentPosition e, Servo servo, double botHeading, boolean canRealign, Telemetry telemetry)
     {
-        if(e == SlideMech.CurrentPosition.ZERO)
-            return;
+
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
             // The equivalent button is start on Xbox-style controllers.
-        if (gamepad1.options) {
-                imu.resetYaw();
+
+
+
+
+        if(!canRealign) {
+            telemetry.addLine("Not changing heading");
+            servo.setPosition(0.5);
+            return;
         }
+        else{
+            telemetry.addData("Bot Heading: ", botHeading);
 
-             botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            servo.setPosition(0.5 - (botHeading/180));
 
-        telemetry.update();
-        telemetry.addData("Bot Heading: ", botHeading);
-
-        servo.setPosition(0.5 + (botHeading/180));
+        }
     }
 }

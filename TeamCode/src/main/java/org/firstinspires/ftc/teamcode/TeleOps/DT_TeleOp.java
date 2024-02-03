@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.TeleOps;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,13 +9,16 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.DroneThrower;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
 import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
+import org.firstinspires.ftc.teamcode.MechanismTemplates.Tests.ClawRealign;
 
 @TeleOp (name = "CS_TeleOpRobotBased")
 @Config
@@ -25,10 +29,17 @@ public class DT_TeleOp extends OpMode {
     private IntakeMech intake;
     private ClawMech claw;
     private Servo wrist;
+    ClawRealign cr;
+    private IMU imu;
+    private double botHeading;
+
+    private boolean canRealign = false;
+
     //private Servo planeLaucher;
     //private ArmPID arm;
     private ArmMecNew arm;
     private DroneThrower thrower;
+    private boolean timerIsready = false;
     SignalEdgeDetector gamepad_2_A = new SignalEdgeDetector(() -> gamepad2.a);
     SignalEdgeDetector gamePad_2_Y = new SignalEdgeDetector(() -> gamepad2.y);
     SignalEdgeDetector gamePad_2_X = new SignalEdgeDetector(() -> gamepad2.x);
@@ -45,6 +56,7 @@ public class DT_TeleOp extends OpMode {
     private final double TURN_PRECESION = 0.65;
 
     private ElapsedTime timer = new ElapsedTime();
+    private ElapsedTime timer2;
     private boolean slidesUp = false;
     private boolean slidesDown = false;
 
@@ -94,6 +106,7 @@ public class DT_TeleOp extends OpMode {
 
         wrist = hardwareMap.get(Servo.class,"WRIST");
         wrist.setPosition(0.5);
+
         //planeLaucher = hardwareMap.get(Servo.class,"plane");
 
         slides = new SlideMech(hardwareMap);
@@ -102,8 +115,16 @@ public class DT_TeleOp extends OpMode {
         intake = new IntakeMech(hardwareMap,telemetry,gamepad1);
 
         claw = new ClawMech(hardwareMap,telemetry,gamepad2);
-        //claw.initialize();
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP));
 
+        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+        imu.initialize(parameters);
+
+        //claw.initialize();
+        cr = new ClawRealign(hardwareMap, telemetry, wrist, imu);
         arm = new ArmMecNew(hardwareMap);
         arm.setIntake();
 
@@ -182,12 +203,22 @@ public class DT_TeleOp extends OpMode {
             slidesDown = false;
             timer.reset();
         }
+
         if(slidesUp){
             if(timer.milliseconds() >= armDelay) {
+                if(!timerIsready){
+                    timer2 =new ElapsedTime();
+                    timerIsready = true;
+                }
                 arm.setExtake();
+                if(timer2 != null && timer2.milliseconds() >1000){
+                    canRealign= true;
+                    telemetry.addLine("Is ready to rotate");
+                }
                 timer.reset();
             }
         }
+        botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         telemetry.addData("isGoingUp", isGoingUp);
         telemetry.addData("slides.isUp()", slides.isUp(telemetry));
@@ -215,6 +246,11 @@ public class DT_TeleOp extends OpMode {
             if(timer.milliseconds() >= 1000   && !slides.isClimbing){
                 slides.setIntakeOrGround();
                 timer.reset();
+            }
+            if(timer2 != null){
+                timer2 = null;
+                timerIsready = false;
+                canRealign=false;
             }
         }
 
@@ -244,7 +280,7 @@ public class DT_TeleOp extends OpMode {
         }
 
 
-        wrist.setPosition(wristPos);
+        //wrist.setPosition(wristPos);
 
         if (gamepad2.right_trigger > 0.1){
             slides.setManualSlideUp(); //165 old val
@@ -271,6 +307,9 @@ public class DT_TeleOp extends OpMode {
         gamePad_1_DpadDown.update();
         gamePad_2_bumperLeft.update();
         GamePad_2_DpadUp.update();
+        cr.swivelToPostion(slides.getCurrentPosition(), wrist, botHeading, canRealign, telemetry);
+
+
 
         GamePad_2_DpadLeft.update();
         //telemetry.addLine("Position : " + arm.getArmPosition());
