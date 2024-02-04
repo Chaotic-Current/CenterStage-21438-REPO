@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 @TeleOp
 public class UltrasonicTest extends OpMode {
     private AnalogDistanceDriver rightUltra, leftUltra; // ctrl+click on AnalogDistanceDriver for class explanation
-    private double leftDist; // in
-  //private double rightDist; // in
+    private double leftDist; // -> inches
+  //private double rightDist;
     private double angle;
-    private final double DIST_BTWN_SENS = 10; // in
+    private final double DIST_BTWN_SENS = 10; // -> in
 
     @Override
     public void init() {
@@ -26,7 +26,7 @@ public class UltrasonicTest extends OpMode {
 
         telemetry.addData("left distance (in): ", leftDist);
         //telemetry.addData("right distance (in): ", rightDist);
-        telemetry.addData("angle (degrees): ", Math.toDegrees(angle)); // atan returns in radians
+        telemetry.addData("angle (degrees): ", Math.toDegrees(angle)); // -> radians
         telemetry.update();
     }
 }

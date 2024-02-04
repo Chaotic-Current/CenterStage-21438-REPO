@@ -3,10 +3,8 @@ package org.firstinspires.ftc.teamcode.Autos.Tests;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
+import org.firstinspires.ftc.teamcode.Mechanisms.ArmMecNew;
 
 @TeleOp
 @Disabled

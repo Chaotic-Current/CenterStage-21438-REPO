@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MechanismTemplates;
+package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;

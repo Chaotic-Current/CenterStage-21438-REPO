@@ -1,12 +1,11 @@
-package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;
+package org.firstinspires.ftc.teamcode.Mechanisms.Tests;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
+import org.firstinspires.ftc.teamcode.Mechanisms.ArmMecNew;
+import org.firstinspires.ftc.teamcode.Mechanisms.SignalEdgeDetector;
 @Disabled
 @TeleOp
 

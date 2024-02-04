@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.MechanismTemplates;
+package org.firstinspires.ftc.teamcode.Mechanisms;
 
 
-import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ColorSensorMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.ColorSensorMech;
 
 @Autonomous
 @Config

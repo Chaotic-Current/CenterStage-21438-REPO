@@ -3,24 +3,21 @@ package org.firstinspires.ftc.teamcode.Autos;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmMecNew;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.LowPass;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.ArmMecNew;
+import org.firstinspires.ftc.teamcode.Mechanisms.ClawMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.IntakeMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.LowPass;
+import org.firstinspires.ftc.teamcode.Mechanisms.SlideMech;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.TwoWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -31,10 +28,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Config
 @Autonomous (name = "AA blue stack auto")

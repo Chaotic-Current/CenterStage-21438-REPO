@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StackDetectionPipeline extends OpenCvPipeline {
+public class StackDetectionPipeline extends OpenCvPipeline{
 
     public static double blur = 5;
 

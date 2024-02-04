@@ -1,16 +1,15 @@
-package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;
+package org.firstinspires.ftc.teamcode.Mechanisms.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ArmPID;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ClawMech;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.IntakeMech;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.SignalEdgeDetector;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.SlideMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.ArmPID;
+import org.firstinspires.ftc.teamcode.Mechanisms.ClawMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.IntakeMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.SignalEdgeDetector;
+import org.firstinspires.ftc.teamcode.Mechanisms.SlideMech;
 
 
 public class motorTest extends OpMode {

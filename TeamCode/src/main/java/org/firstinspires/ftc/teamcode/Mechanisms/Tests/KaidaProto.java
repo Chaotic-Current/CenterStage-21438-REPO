@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MechanismTemplates.Tests;
+package org.firstinspires.ftc.teamcode.Mechanisms.Tests;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -10,27 +10,30 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Config
 @Disabled
-@TeleOp(name = "GeckoFlipper")
-public class GeckoFlipper extends OpMode {
+@TeleOp(name = "KaidaProto") // like Khaidi No. 150, that's crazy
+public class KaidaProto extends OpMode{
     public static double power = 1;
-    private DcMotorEx gecko;
-
-
+    private DcMotorEx left; //right;
 
     @Override
     public void init(){
-        gecko = (DcMotorEx) hardwareMap.dcMotor.get("gecko");
+        left = (DcMotorEx) hardwareMap.dcMotor.get("L");
         //right = (DcMotorEx) hardwareMap.dcMotor.get("R");
 
-        gecko.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        gecko.setDirection(DcMotorSimple.Direction.REVERSE);
+        left.setDirection(DcMotorSimple.Direction.REVERSE);
     }
+
 
     @Override
     public void loop(){
-        gecko.setPower(power);
+        left.setPower(power);
+        //right.setPower(power);
+
     }
+
+
 
 }

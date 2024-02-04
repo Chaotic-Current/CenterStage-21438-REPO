@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MechanismTemplates;
+package org.firstinspires.ftc.teamcode.Mechanisms;
 
 public class LowPass {
     private double alpha = 0.7;

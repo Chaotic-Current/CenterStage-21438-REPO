@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MechanismTemplates;
+package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import java.util.ArrayList;
 import java.util.List;

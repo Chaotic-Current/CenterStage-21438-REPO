@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MechanismTemplates;
+package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.Gamepad;

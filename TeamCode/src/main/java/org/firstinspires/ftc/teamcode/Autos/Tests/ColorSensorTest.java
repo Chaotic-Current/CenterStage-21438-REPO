@@ -14,7 +14,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.MechanismTemplates.ColorSensorMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.ColorSensorMech;
 
 @Autonomous
 @Config
