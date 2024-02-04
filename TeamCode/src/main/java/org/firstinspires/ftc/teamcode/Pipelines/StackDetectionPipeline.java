@@ -84,7 +84,7 @@ public class StackDetectionPipeline extends OpenCvPipeline {
         if ((contours.size() >= 0) && maxContourIdx != -1) {
             Mat resultImage = input.clone();
             setDistance(contours, maxContourIdx);
-            findError(contours, maxContourIdx);
+            findError(contours, maxContourIdx,input);
             Imgproc.drawContours(resultImage, contours, maxContourIdx, new Scalar(255, 0, 0), 1);
 
             tel.addLine("" + distance);
@@ -100,23 +100,26 @@ public class StackDetectionPipeline extends OpenCvPipeline {
     public void setDistance(List<MatOfPoint> contours, int i) {
         MatOfPoint x = contours.get(i);
         Rect y = Imgproc.boundingRect(x);
-        tel.addLine("pixel height " + (y.height));
+        tel.addLine("pixel width " + (y.width));
 
-        distance = (2.5 * 378)/(y.height-4);// real focal length is 113.38582677
+        distance = (3 * (980.0/3))/(y.width);// real focal length is 113.38582677
     }
 
-    public void findError(List<MatOfPoint> contours, int i){
+    public void findError(List<MatOfPoint> contours, int i, Mat mat){
         MatOfPoint x = contours.get(i);
         Rect y = Imgproc.boundingRect(x);
 
-        double pixelToInches = 2.5/(y.height - 8.25);
+        double pixelToInches = 3.0/(y.width);
 
         Moments moments = Imgproc.moments(x);
 
         double w = moments.m10 / moments.m00;
 
-        xError = w*pixelToInches-5.3;
+        xError = (w-mat.cols()/2.0)*pixelToInches;
 
+        tel.addLine("Width " + mat.cols());
+        tel.addLine("Center " + (mat.cols()/2.0));
+        tel.addLine("pixel to inches " + pixelToInches);
         tel.addLine("x error : " + xError);
 
     }
@@ -128,7 +131,7 @@ public class StackDetectionPipeline extends OpenCvPipeline {
 
         double y = moments.get_m01()/moments.get_m00();
 
-        return y > 243/6;
+        return y > mat.rows()/3*2;
 
     }
 }
