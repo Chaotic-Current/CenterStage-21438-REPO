@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode.Autos.Stack_Autos;
+package org.firstinspires.ftc.teamcode.Deprecated;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -33,7 +34,7 @@ import java.util.List;
 @Autonomous (name = "AA blue stack auto")
 @Disabled
 @SuppressWarnings("all")
-public class BlueCloseStack extends LinearOpMode {
+public class BlueCloseSide extends LinearOpMode {
     private LowPass filter = new LowPass(0,0.3);
     private SampleMecanumDrive drive;
     private ElapsedTime timer = new ElapsedTime();
@@ -43,7 +44,7 @@ public class BlueCloseStack extends LinearOpMode {
     private SlideMech slide;
     private ClawMech clawMech;
     private DetectColor detector;
-    // private AprilTagDetectionPipeline aprilTagPipeline;
+   // private AprilTagDetectionPipeline aprilTagPipeline;
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
@@ -101,7 +102,7 @@ public class BlueCloseStack extends LinearOpMode {
         int width = 160;
 
         detector = new DetectColor(width, telemetry, new Scalar(140, 255, 255), new Scalar(75, 100, 100));
-        //  aprilTagPipeline = new AprilTagDetectionPipeline();
+      //  aprilTagPipeline = new AprilTagDetectionPipeline();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
@@ -286,7 +287,7 @@ public class BlueCloseStack extends LinearOpMode {
 
 
         if (e == DetectColor.ColorLocation.RIGHT || e == DetectColor.ColorLocation.UNDETECTED) {
-            // aprilTagPipeline.setTargetTag(3);
+           // aprilTagPipeline.setTargetTag(3);
             tagUse=3;
 
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
@@ -360,7 +361,7 @@ public class BlueCloseStack extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y-5, Math.toRadians(centerLineToLinear1Heading)))
 
                     .UNSTABLE_addTemporalMarkerOffset(0.15, () -> {
-                        // t.set(true);
+                       // t.set(true);
                     })
 
                     .waitSeconds(4)
@@ -609,7 +610,7 @@ public class BlueCloseStack extends LinearOpMode {
             telemetry.update();
 
         }
+        }
+
+
     }
-
-
-}
