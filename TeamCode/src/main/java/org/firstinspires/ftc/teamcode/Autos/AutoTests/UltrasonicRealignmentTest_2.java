@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
 @Disabled
-public class DistSensorTest_pt2  extends LinearOpMode {
+public class UltrasonicRealignmentTest_2 extends LinearOpMode {
     DistanceSensor dist;
     public double oldDistance;
     int count = 0;

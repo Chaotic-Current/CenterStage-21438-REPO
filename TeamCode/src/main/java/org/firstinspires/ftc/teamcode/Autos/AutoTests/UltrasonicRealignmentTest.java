@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous
 @Disabled
-public class DistSensorTest extends LinearOpMode{
+public class UltrasonicRealignmentTest extends LinearOpMode{
     DistanceSensor dist;
     public double distance;
     public double distanceLeft =0;
