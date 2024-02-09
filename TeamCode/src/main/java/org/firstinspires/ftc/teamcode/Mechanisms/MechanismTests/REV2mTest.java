@@ -21,8 +21,7 @@ public class REV2mTest  extends OpMode {
     public void init() {
         left = hardwareMap.get(Rev2mDistanceSensor.class, "left");
         right = hardwareMap.get(Rev2mDistanceSensor.class, "right");
-
-        lowPass = new LowPass(0,0.975); // TODO: tune values
+        lowPass = new LowPass(0,0.5);
     }
 
     @Override
@@ -34,12 +33,12 @@ public class REV2mTest  extends OpMode {
         rightFiltered = lowPass.execute(rightDist);
 
         telemetry.addData("filtered left dist:", leftFiltered);
-        telemetry.addData("raw left dist:", leftDist);
+        telemetry.addData("raw left dist:", (leftDist-0.4));
 
         telemetry.addData("filtered right dist:", rightFiltered);
         telemetry.addData("raw right dist:", rightDist);
 
-        telemetry.addData("filtered angle:", Math.atan(Math.abs(leftFiltered-rightFiltered) / DIST_BTWN_SENS));
+        telemetry.addData("filtered angle:", Math.toDegrees(Math.atan(Math.abs(leftFiltered-rightFiltered) / DIST_BTWN_SENS)));
 
         telemetry.update();
     }
