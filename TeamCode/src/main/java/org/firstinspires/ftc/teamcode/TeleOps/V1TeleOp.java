@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ArmMecNew;
 import org.firstinspires.ftc.teamcode.Mechanisms.IntakeMech;
 import org.firstinspires.ftc.teamcode.Mechanisms.SignalEdgeDetector;
 import org.firstinspires.ftc.teamcode.Mechanisms.SlideMech;
-import org.firstinspires.ftc.teamcode.Mechanisms.MechanismTests.ClawRealign;
+import org.firstinspires.ftc.teamcode.Mechanisms.ClawRealign;
 
 @TeleOp (name = "CS_TeleOpRobotBased")
 @Config
