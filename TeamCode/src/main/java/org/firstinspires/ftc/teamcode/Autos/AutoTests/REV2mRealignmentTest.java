@@ -7,20 +7,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Mechanisms.MechanismTests.REV2mArrayMech;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous
 public class REV2mRealignmentTest extends LinearOpMode {
     Rev2mDistanceSensor left, right;
-    REV2mArrayMech mech;
-    private volatile double angle;
+    private  double angle;
     private IMU imu;
-
-    public enum State{
-        on, off
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -51,7 +45,7 @@ public class REV2mRealignmentTest extends LinearOpMode {
         TrajectorySequence move = bot.trajectorySequenceBuilder(new Pose2d())
                 .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(-20)))
                 .waitSeconds(1.5)
-                .turn(angle) // we'll fix later
+                .turn(angle) // Laura has a solution to  fix on Monday
                 .waitSeconds(1.5)
                 //.lineToLinearHeading(new Pose2d(15, -10, Math.toRadians(0)))
                 .build();
@@ -60,7 +54,6 @@ public class REV2mRealignmentTest extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
             bot.update();
-
         }
     }
 

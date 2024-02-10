@@ -88,10 +88,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     REV2mArrayMech sensors;
 
-    public enum State{
-        on, off
-    }
-    State currentState = State.off;
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
@@ -318,19 +314,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        /*
-        double var  = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        switch(currentState){
-            case on:
-                var-= sensors.execute();
-                currentState = State.off;
-                break;
-            case off:
-                break;
-        }
-        //imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)
-
-         */
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
     }
 
