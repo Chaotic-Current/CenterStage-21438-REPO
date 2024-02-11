@@ -42,7 +42,7 @@ public class REV2mRealignmentTest extends LinearOpMode {
 
         SampleMecanumDrive bot = new SampleMecanumDrive(hardwareMap);
 
-        TrajectorySequence move = bot.trajectorySequenceBuilder(new Pose2d())
+            TrajectorySequence move = bot.trajectorySequenceBuilder(new Pose2d())
                 .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(-20)))
                 .waitSeconds(1.5)
                 .turn(angle) // Laura has a solution to  fix on Monday
