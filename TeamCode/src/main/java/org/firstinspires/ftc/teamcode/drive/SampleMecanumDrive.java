@@ -102,7 +102,6 @@ public class SampleMecanumDrive extends MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-       // sensors = new REV2mArrayMech(hardwareMap);
 
         // TODO: adjust the names of the following hardware devices to match your configuration
         imu = hardwareMap.get(IMU.class, "imu");
@@ -115,10 +114,6 @@ public class SampleMecanumDrive extends MecanumDrive {
         BL = hardwareMap.get(DcMotorEx.class, "BL");
         BR = hardwareMap.get(DcMotorEx.class, "BR");
         FR = hardwareMap.get(DcMotorEx.class, "FR");
-
-        left = hardwareMap.get(Rev2mDistanceSensor.class, "left"); // apparently i2c bus 0 is alr in use by imu so don't plug anything in there
-        right = hardwareMap.get(Rev2mDistanceSensor.class, "right");
-
 
         motors = Arrays.asList(FL, BL, BR, FR);
         FL.setDirection(DcMotorEx.Direction.REVERSE);

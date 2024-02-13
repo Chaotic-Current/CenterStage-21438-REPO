@@ -1,22 +1,26 @@
 package org.firstinspires.ftc.teamcode.Autos.AutoTests;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous
+@Config
 public class RuckusProgrammingTest extends LinearOpMode {
    Rev2mDistanceSensor left, right;
    private  double angle;
    private IMU imu;
-
+   private ElapsedTime timer = new ElapsedTime();
+   public static double offset = 3.8;
 
    @Override
    public void runOpMode() {
@@ -40,12 +44,7 @@ public class RuckusProgrammingTest extends LinearOpMode {
       }
 
       TrajectorySequence traj1 = bot.trajectorySequenceBuilder(new Pose2d())
-              .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(-20))) // -20 used in setPoseEstimate
-              .waitSeconds(1.5)
-              .build();
-
-      TrajectorySequence traj2 = bot.trajectorySequenceBuilder(new Pose2d())
-              .lineToLinearHeading(new Pose2d(-20, 10, Math.toRadians(-40)))
+              .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(-20)))
               .waitSeconds(1.5)
               .build();
 
@@ -55,34 +54,36 @@ public class RuckusProgrammingTest extends LinearOpMode {
          bot.update();
       }
 
-      angle = Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2);
-      bot.setPoseEstimate(new Pose2d(0,0, -20 + angle)); // probably not a +, idk
-      bot.update();
+      /* (ignore)
+      timer.reset();
+      while(timer.seconds() < 10){
+         if(!bot.isBusy()){
+            angle = Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2);
+            TrajectorySequence traj2 = bot.trajectorySequenceBuilder(new Pose2d())
+                    .turn(angle)
+                    .build();
+            bot.followTrajectorySequenceAsync(traj2);
+         }
+         bot.update();
+      } */
 
-      bot.followTrajectorySequenceAsync(traj2);
+      angle = Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2)+Math.toRadians(offset);
+      imu.resetYaw();
+      TrajectorySequence traj2 = bot.trajectorySequenceBuilder(new Pose2d())
+              //.lineToLinearHeading(new Pose2d(15, 20, bot.getPoseEstimate().getHeading() - angle))
+              .turn(angle)
+              .waitSeconds(1.0)
+              .lineToLinearHeading(new Pose2d(-5, 15, Math.toRadians(90)))
+              .build();
+
+       bot.followTrajectorySequenceAsync(traj2);
 
       while(bot.isBusy() && opModeIsActive()) { // !slides.atTarget && for feedforward, // slides.update(); in loop
          bot.update();
+         telemetry.addLine("angle (degrees): " + Math.toDegrees(angle));
+         telemetry.update();
       }
 
    }
 
 }
-
-
-/*
-public void deliverYellow() {
-        Vector2d destination; //need to fix (offset)
-        sleep(1000);
-        fluffy.drive.pose = fluffy.getPoseFromAprilTag();
-        if (PATH.equals("Left")) {
-            destination = fluffy.tagPositions[0].plus(fluffy.DELIVERY_OFFSET_RED);
-        } else if (PATH.equals("Center")) {
-            destination = fluffy.tagPositions[1].plus(fluffy.DELIVERY_OFFSET_RED);
-        } else {
-            destination = fluffy.tagPositions[2].plus(fluffy.DELIVERY_OFFSET_RED);
-        }
-        if ((int) initMenu.get(1) == 1) { // allows our driver to select right or left delivery position
-            destination = destination.plus(new Vector2d(0, 3.5));
-        }
- */
