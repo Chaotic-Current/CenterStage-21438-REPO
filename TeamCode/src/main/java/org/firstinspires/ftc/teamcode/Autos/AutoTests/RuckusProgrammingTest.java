@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 public class RuckusProgrammingTest extends LinearOpMode {
    Rev2mDistanceSensor left, right;
    private  double angle;
+   private  double correction;
    private IMU imu;
-   private ElapsedTime timer = new ElapsedTime();
    public static double offset = 3.8;
 
    @Override
@@ -44,36 +44,27 @@ public class RuckusProgrammingTest extends LinearOpMode {
       }
 
       TrajectorySequence traj1 = bot.trajectorySequenceBuilder(new Pose2d())
-              .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(-20)))
-              .waitSeconds(1.5)
+              .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(20)))
+              .waitSeconds(0.5)
               .build();
 
       bot.followTrajectorySequenceAsync(traj1);
-
       while(bot.isBusy() && opModeIsActive() && !isStopRequested()) { // !slides.atTarget && for feedforward, // slides.update(); in loop
          bot.update();
       }
 
-      /* (ignore)
-      timer.reset();
-      while(timer.seconds() < 10){
-         if(!bot.isBusy()){
-            angle = Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2);
-            TrajectorySequence traj2 = bot.trajectorySequenceBuilder(new Pose2d())
-                    .turn(angle)
-                    .build();
-            bot.followTrajectorySequenceAsync(traj2);
-         }
-         bot.update();
-      } */
+      angle = Math.toDegrees(Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2)+Math.toRadians(offset));
+      correction = Math.toDegrees(bot.getPoseEstimate().getHeading()+Math.toRadians(angle));
 
-      angle = Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2)+Math.toRadians(offset);
-      imu.resetYaw();
-      TrajectorySequence traj2 = bot.trajectorySequenceBuilder(new Pose2d())
-              //.lineToLinearHeading(new Pose2d(15, 20, bot.getPoseEstimate().getHeading() - angle))
-              .turn(angle)
+
+
+
+
+      TrajectorySequence traj2 = bot.trajectorySequenceBuilder(traj1.end())
+              //.turn(angle) bot.getPoseEstimate().getHeading() - angle
+              .lineToLinearHeading(new Pose2d(15, 0, Math.toRadians(correction)))
               .waitSeconds(1.0)
-              .lineToLinearHeading(new Pose2d(-5, 15, Math.toRadians(90)))
+              //.lineToLinearHeading(new Pose2d(0, 0, Math.toRadians(correction)))
               .build();
 
        bot.followTrajectorySequenceAsync(traj2);
@@ -81,6 +72,7 @@ public class RuckusProgrammingTest extends LinearOpMode {
       while(bot.isBusy() && opModeIsActive()) { // !slides.atTarget && for feedforward, // slides.update(); in loop
          bot.update();
          telemetry.addLine("angle (degrees): " + Math.toDegrees(angle));
+         telemetry.addLine(" correction: " + correction);
          telemetry.update();
       }
 
