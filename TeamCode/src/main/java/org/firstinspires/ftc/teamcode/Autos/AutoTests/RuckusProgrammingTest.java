@@ -44,7 +44,7 @@ public class RuckusProgrammingTest extends LinearOpMode {
       }
 
       TrajectorySequence traj1 = bot.trajectorySequenceBuilder(new Pose2d())
-              .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(20)))
+              .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(0)))
               .waitSeconds(0.5)
               .build();
 
@@ -55,14 +55,14 @@ public class RuckusProgrammingTest extends LinearOpMode {
 
       angle = Math.toDegrees(Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2)+Math.toRadians(offset));
       correction = Math.toDegrees(bot.getPoseEstimate().getHeading()+Math.toRadians(angle));
-
+      bot.setPoseEstimate(new Pose2d(10, 0, bot.getPoseEstimate().getHeading()-Math.toRadians(angle)));
 
 
 
 
       TrajectorySequence traj2 = bot.trajectorySequenceBuilder(traj1.end())
               //.turn(angle) bot.getPoseEstimate().getHeading() - angle
-              .lineToLinearHeading(new Pose2d(15, 0, Math.toRadians(correction)))
+              .lineToLinearHeading(new Pose2d(15, 5, 0))
               .waitSeconds(1.0)
               //.lineToLinearHeading(new Pose2d(0, 0, Math.toRadians(correction)))
               .build();
