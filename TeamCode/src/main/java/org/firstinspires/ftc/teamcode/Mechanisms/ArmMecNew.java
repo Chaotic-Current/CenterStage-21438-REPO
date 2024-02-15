@@ -30,7 +30,6 @@ public class ArmMecNew {
         } else {
             setExtake();
         }
-
         //isIntake = !isIntake;
     }
 

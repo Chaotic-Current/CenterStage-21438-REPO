@@ -32,7 +32,6 @@ public class V1TeleOp extends OpMode {
     ClawRealign cr;
     private IMU imu;
     private double botHeading;
-
     private boolean canRealign = false;
 
     //private Servo planeLaucher;
@@ -49,12 +48,10 @@ public class V1TeleOp extends OpMode {
     SignalEdgeDetector gamePad_1_DpadDown = new SignalEdgeDetector(() -> gamepad1.dpad_down);
     SignalEdgeDetector gamePad_1_DpadLeft = new SignalEdgeDetector(() -> gamepad1.dpad_left);
     SignalEdgeDetector GamePad_2_DpadLeft = new SignalEdgeDetector(() -> gamepad2.dpad_left);
-
     SignalEdgeDetector GamePad_2_DpadUp = new SignalEdgeDetector(() -> gamepad2.dpad_up);
     public static double wristPos = 0.5;
     private final double PRECISIONREDUCTION = 0.39;
     private final double TURN_PRECESION = 0.65;
-
     private ElapsedTime timer = new ElapsedTime();
     private ElapsedTime timer2;
     private boolean slidesUp = false;
@@ -80,7 +77,6 @@ public class V1TeleOp extends OpMode {
         }
         return max;
     }
-
 
     @Override
     public void init(){
@@ -261,6 +257,19 @@ public class V1TeleOp extends OpMode {
 
 
         //wrist.setPosition(wristPos);
+/*
+        switch (slide){
+            case gamepad2.right_trigger > 0.1:
+                slides.setManualSlideUp(); //165 old val
+                break;
+            case gamepad2.left_trigger > 0.1:
+                slides.setManualSlideDown();
+                break;
+            default:
+                slides.setCurrentPosition(SlideMech.CurrentPosition.LEVEl1);
+                break;
+        }
+        */
 
         if (gamepad2.right_trigger > 0.1){
             slides.setManualSlideUp(); //165 old val

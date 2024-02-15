@@ -19,19 +19,14 @@ public class ClawMech {
     public static double halfOpenPos = 0.45;
     public static double timeOffset = 750;
     public ElapsedTime timer;
-
     public boolean delayOver;
-
     public boolean readyForSlides;
-
     public enum ClawState {
         OPEN, HALF_OPEN, CLOSED, DELAY_CLOSE
     }
-
     private boolean bothOpenRan;
 
     private ClawState state;
-
 
     public ClawMech(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
         this.gamepad = gamepad;

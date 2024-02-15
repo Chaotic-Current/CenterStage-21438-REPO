@@ -49,11 +49,8 @@ public class IntakeMech {
     public static double AutoPower = 0.85;
     public static double AutoExtakePower = 0.6;
     public static double ejectPower = -1.0;
-
     public static double leftMin = 0.85;
-
     public static double rightmax = 0.15;
-
     public static double threshHoldPower = 30;
 
     private double lastRecordedTime;
@@ -67,15 +64,9 @@ public class IntakeMech {
     private State state;
 
     private boolean isIntaking = false;
-
     ElapsedTime timer = new ElapsedTime();
 
     boolean isReduced = false;
-
-    boolean hasRanOnce = false;
-
-    double lastRecordedTwo;
-
     public boolean isLowering = false;
 
 
@@ -133,15 +124,11 @@ public class IntakeMech {
         right = hardwareMap.get(Servo.class, "ARM_R");
 
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
        // left.setPosition(leftFinalPos);
       //  right.setPosition(rightFinalPos);
-
-
     }
 
     public State getState() {
