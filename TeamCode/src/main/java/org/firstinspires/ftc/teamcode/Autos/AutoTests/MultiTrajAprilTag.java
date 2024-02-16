@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode.Autos.AutoTests;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -19,7 +15,6 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.opencv.core.Mat;
 
 import java.util.List;
 
@@ -28,6 +23,7 @@ import java.util.List;
 public class MultiTrajAprilTag extends LinearOpMode {
     public static double offset = 3.8;
     private double x,y;
+    private Pose2d pastVelocity = new Pose2d();
     Rev2mDistanceSensor left, right;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
@@ -51,7 +47,7 @@ public class MultiTrajAprilTag extends LinearOpMode {
 
     }   // end method initAprilTag()
 
-    private void telemetryAprilTag() {
+    private void aprilTagUpdate() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
@@ -95,38 +91,47 @@ public class MultiTrajAprilTag extends LinearOpMode {
             telemetry.addLine("Initial left distance (inches): " + left.getDistance(DistanceUnit.INCH));
             telemetry.addLine("Initial right distance (inches): " + right.getDistance(DistanceUnit.INCH));
             telemetry.addLine("Initial angle (degrees): " + Math.toDegrees(angle));
+            aprilTagUpdate();
             telemetry.update();
         }
 
         TrajectorySequence traj1 = bot.trajectorySequenceBuilder(new Pose2d(0,0,0))
                // .lineToLinearHeading(new Pose2d(25, 0, Math.toRadians(-90)))
-                .forward(6)
-                .waitSeconds(4)
+               // .splineToConstantHeading(new Vector2d(24,-24))
+               // .splineToConstantHeading(new Vector2d(24,-24),Math.toRadians(0))
+                //.forward(6)
+                //.waitSeconds(2)
+                .forward(16)
                 .build();
 
         bot.followTrajectorySequenceAsync(traj1);
         while (bot.isBusy() && opModeIsActive() && !isStopRequested()) { // !slides.atTarget && for feedforward, // slides.update(); in loop
             bot.update();
-            telemetryAprilTag();
+            aprilTagUpdate();
             telemetry.update();
         }
 
         angle = Math.toDegrees(Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2) + Math.toRadians(offset));
         correction = Math.toDegrees(bot.getPoseEstimate().getHeading() + Math.toRadians(angle));
 
-        Pose2d traj2StartPosewOffset = new Pose2d(traj1.end().getX()+x,traj1.end().getY(),traj1.end().getHeading());
+        /* cd C:\Users\Indra\AppData\Local\Android\Sdk
+cd platform-tools
+adb connect 192.168.43.1:5555
+*/
+        Pose2d traj2StartPosewOffset = new Pose2d(traj1.end().getX()+depthCalculation(bot.getPoseEstimate().getX(),60,y),traj1.end().getY()-x,traj1.end().getHeading());
         bot.setPoseEstimate(traj2StartPosewOffset);
         TrajectorySequence traj2 = bot.trajectorySequenceBuilder(traj2StartPosewOffset)
                 //.turn(angle) bot.getPoseEstimate().getHeading() - angle
-                .setConstraints(SampleMecanumDrive.getVelocityConstraint(15, 10, 11.5) , SampleMecanumDrive.getAccelerationConstraint(7))
-                .lineToLinearHeading(new Pose2d(6))
-                .resetConstraints()
-                .lineTo(new Vector2d(25,0))
+               // .setConstraints(SampleMecanumDrive.getVelocityConstraint(15, 10, 11.5) , SampleMecanumDrive.getAccelerationConstraint(7))
+                //.lineTo(new Vector2d(40,-24))
+                .lineToSplineHeading(new Pose2d(60,0,Math.toRadians(0)))
+                //.resetConstraints()
                 .waitSeconds(1.0)
                 //.lineToLinearHeading(new Pose2d(0, 0, Math.toRadians(correction)))
                 .build();
 
        bot.followTrajectorySequenceAsync(traj2);
+       bot.update();
 
         while (bot.isBusy() && opModeIsActive()) { // !slides.atTarget && for feedforward, // slides.update(); in loop
             bot.update();
@@ -136,5 +141,10 @@ public class MultiTrajAprilTag extends LinearOpMode {
         }
 
     }
+
+    public static double depthCalculation(double currentPose, double boardPosition, double camDepth){
+        return (boardPosition-currentPose)-(camDepth);
+    }
+
 
 }

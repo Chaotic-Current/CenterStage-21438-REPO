@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autos.AutoTests;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -44,13 +45,15 @@ public class RuckusProgrammingTest extends LinearOpMode {
       }
 
       TrajectorySequence traj1 = bot.trajectorySequenceBuilder(new Pose2d())
-              .lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(0)))
-              .waitSeconds(0.5)
+              //.lineToLinearHeading(new Pose2d(10, 0, Math.toRadians(0)))
+              .splineToConstantHeading(new Vector2d(24,-24),Math.toRadians(0))
+             // .waitSeconds(0.5)
               .build();
 
       bot.followTrajectorySequenceAsync(traj1);
       while(bot.isBusy() && opModeIsActive() && !isStopRequested()) { // !slides.atTarget && for feedforward, // slides.update(); in loop
          bot.update();
+
       }
 
       angle = Math.toDegrees(Math.atan((right.getDistance(DistanceUnit.INCH) - left.getDistance(DistanceUnit.INCH)) / 11.2)+Math.toRadians(offset));
