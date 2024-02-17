@@ -66,6 +66,7 @@ public class CamKalman extends KalmanF{
                 {(1/dt)*(currentVelocity.getX()-pastVelocity.getX())},
                 {(1/dt)*(currentVelocity.getY()-pastVelocity.getY())}
         });
+        pastVelocity = new Pose2d(currentVelocity.getX(),currentVelocity.getY(),currentVelocity.getHeading());
         update(measurements,input);
     }
 
