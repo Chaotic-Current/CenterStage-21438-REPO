@@ -8,8 +8,13 @@ import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.ejml.simple.SimpleMatrix;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Mechanisms.KalmanF;
+import org.firstinspires.ftc.teamcode.Mechanisms.MechanismTests.AprilTagCam;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,6 +68,22 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
     private SampleMecanumDrive drive;
 
+    private KalmanF multiSensorFuser;
+
+    private SimpleMatrix measurements;
+
+    private AprilTagCam frontTagCam;
+
+    private enum CamStates{
+        FRONTON,
+        OFF,
+        BACKON
+    }
+
+    private CamStates currentCamState = CamStates.FRONTON;
+    private ArrayList<Double> frontBoardInfo;
+
+
     public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, SampleMecanumDrive drive) {
         super(Arrays.asList(
                 new Pose2d(PARALLEL_X, PARALLEL_Y, 0),
@@ -70,6 +91,10 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         ));
 
         this.drive = drive;
+        /*
+        multiSensorFuser = new KalmanF(new Pose2d(0,0,0));
+        frontTagCam = new AprilTagCam(hardwareMap,"WebcamFront",2); */
+        //HAVE TO INTIALIZE telemetry -> bot.getEncoder.setCamTelemetry(telemetry);
 
         parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "PO"));
         perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "IN"));
@@ -106,11 +131,54 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
+        //Saving current positions of encoders
+        /*
+        double pependicularPos = encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * X_MULTIPLIER;
+        double parallelPos = encoderTicksToInches(parallelEncoder.getCurrentPosition()) * Y_MULTIPLIER;
+        //updating apriltag data
+        frontTagCam.aprilTagUpdate();
+        //applying apriltag to kalman filter through measurements state vector
+        switch(currentCamState){
+            case OFF:
+                measurements = new SimpleMatrix(new double[][]{
+                        {0},
+                        {0},
+                        {0},
+                        {0}
+                });
+                break;
+            case FRONTON:
+                measurements = new SimpleMatrix(new double[][]{
+                        {pependicularPos-frontTagCam.getHorizDisplacement()},
+                        {0}, // parallelPos+frontTagCam.getDepthDisplacement(frontBoardInfo) boardInfo can be altered using setBoardInfo()
+                        {getWheelVelocities().get(1)},
+                        {getWheelVelocities().get(0)}
+                });
+                break;
+            case BACKON:
+                measurements = new SimpleMatrix(new double[][]{
+                        {0},
+                        {1}, //boardInfo can be altered using setBoardInfo()->preferebly only altered once in init
+                        {0},
+                        {0}
+                });
+                break;
+
+        }
+        //Kalman Filter Input update method
+        Pose2d inputs = new Pose2d(getWheelVelocities().get(1),getWheelVelocities().get(0),0);
+        multiSensorFuser.inputUpdate(inputs, measurements);
 
         return Arrays.asList(
                 (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + errorY,
-                encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * Y_MULTIPLIER - errorX
+               multiSensorFuser.getX_k().get(0,0)
         );
+        */
+        return Arrays.asList(
+                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + errorY,
+                (encoderTicksToInches(perpendicularEncoder.getCurrentPosition())) * Y_MULTIPLIER
+        );
+
     }
 
     public double getParallelEncoderPos(){
@@ -127,7 +195,6 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         // TODO: If your encoder velocity can exceed 32767 counts / second (such as the REV Through Bore and other
         //  competing magnetic encoders), change Encoder.getRawVelocity() to Encoder.getCorrectedVelocity() to enable a
         //  compensation method
-
 
         return Arrays.asList(
                 encoderTicksToInches(parallelEncoder.getCorrectedVelocity()) * X_MULTIPLIER,
@@ -151,5 +218,27 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
     public double getErrorY() {
         return errorY;
+    }
+
+    public void setCamTelemetry(Telemetry tele){
+        frontTagCam.setTelemetry(tele);
+    }
+
+    public void setFrontBoardInfo(ArrayList<Double> list){
+        // This is basically (boardPosition(1)-currentPose(0))-(camDepth(2));
+        //TeleOp init: bot.getEncoder.setFrontBoardInfo(new ArrayList<>(Arrays.asList(currentPos,boardPos,camDepth)));
+        frontBoardInfo = new ArrayList<Double>(Arrays.asList(
+                list.get(0),
+                list.get(1),
+                list.get(2)
+        ));
+    }
+    public KalmanF getMultiSensorFuser(){
+        return multiSensorFuser;
+    }
+
+    public void activateFrontCam(){
+        currentCamState = CamStates.FRONTON;
+
     }
 }
