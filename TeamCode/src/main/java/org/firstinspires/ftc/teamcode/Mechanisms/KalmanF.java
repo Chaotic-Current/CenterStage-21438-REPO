@@ -17,13 +17,13 @@ public class KalmanF {
     double dt = 0.025;//0.035
 
 
-    private Pose2d pastVelocity = new Pose2d(0,0,0);
     private Pose2d pastPosition = new Pose2d(0,0,0);
+
     public static double depthVar = 0.001; // 0.005
     private double horzVar = 0.001; //0.005
 
     //velocity from odo
-    public static double velocityVar = 0.001;
+    public static double velocityVar = 0.0;
 
 
 
@@ -75,7 +75,7 @@ public class KalmanF {
                 {0,0,dt,0},
                 {0,0,0,dt}
         });
-        pastVelocity = new Pose2d(currentVel.getX(),currentVel.getY(), currentVel.getHeading());
+        pastPosition = new Pose2d(currentVel.getX(),currentVel.getY(), currentVel.getHeading());
     }
 
     public KalmanF(SimpleMatrix f, SimpleMatrix g, SimpleMatrix r, SimpleMatrix q, SimpleMatrix h) {
@@ -131,13 +131,20 @@ public class KalmanF {
 
         return x_k;
     }
-    public void inputUpdate( Pose2d currentVelocity, SimpleMatrix measurements){
+    public void inputUpdate( Pose2d currentPosition, SimpleMatrix measurements){
         /*
         SimpleMatrix input  = new SimpleMatrix(new double[][]{
-                {(1/dt)*(currentVelocity.getX()-pastVelocity.getX())},
-                {(1/dt)*(currentVelocity.getY()-pastVelocity.getY())},
-                {(1/dt)*(currentVelocity.getX()-pastVelocity.getX())},
-                {(1/dt)*(currentVelocity.getY()-pastVelocity.getY())}
+                {(1/dt)*(currentPosition.getX()-pastVelocity.getX())},
+                {(1/dt)*(currentPosition.getY()-pastVelocity.getY())},
+                {(1/dt)*(currentPosition.getX()-pastVelocity.getX())},
+                {(1/dt)*(currentPosition.getY()-pastVelocity.getY())}
+        }); */
+         /*
+        SimpleMatrix input  = new SimpleMatrix(new double[][]{
+                {currentPosition.getX()-pastPosition.getX())},
+                {currentPosition.getY()-pastPosition.getY()},
+                {0},
+                {0}
         }); */
         SimpleMatrix input  = new SimpleMatrix(new double[][]{
                 {0},
@@ -146,7 +153,7 @@ public class KalmanF {
                 {0}
         });
 
-        pastVelocity = new Pose2d(currentVelocity.getX(),currentVelocity.getY(),currentVelocity.getHeading());
+        pastPosition = new Pose2d(currentPosition.getX(),currentPosition.getY(),currentPosition.getHeading());
         update(measurements,input);
     }
 
