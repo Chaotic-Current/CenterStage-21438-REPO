@@ -22,30 +22,25 @@ public class ClawRealign {
         servo.setPosition(servoPosition);
 
         // Retrieve the IMU from the hardware map
-        // Adjust the orientation parameters to match your robot
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP));
 
-        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
-        imu.initialize(parameters);
         this.telemetry = telemetry;
     }
 
-    public void swivelToPostion(SlideMech.CurrentPosition e, Servo servo, double botHeading, boolean canRealign, Telemetry telemetry)
+    public void swivelToPostion( Servo servo, double botHeading, boolean canRealign, Telemetry telemetry)
     {
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
             // The equivalent button is start on Xbox-style controllers.
 
-        if(!canRealign) {
+         if(!canRealign) {
             telemetry.addLine("Not changing heading");
             servo.setPosition(0.5);
-            return;
+
         }
         else{
             telemetry.addData("Bot Heading: ", botHeading);
             servo.setPosition(0.5 - (botHeading/180));
         }
+
     }
 }
