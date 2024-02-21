@@ -36,7 +36,7 @@ public class DriveTrain {
         FIELD_CENTRIC,
     }
 
-    Mode currentMode = Mode.FIELD_CENTRIC;
+    Mode currentMode = Mode.ROBOT_CENTRIC;
     public DriveTrain(HardwareMap hM, Telemetry telemetry, Gamepad gamepad) {
 
         this.hardwareMap = hM;
