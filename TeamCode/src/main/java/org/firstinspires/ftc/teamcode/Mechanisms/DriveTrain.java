@@ -183,12 +183,13 @@ public class DriveTrain {
                 motorFrontRight.setPower(frontRightPower*.4);
                 motorBackRight.setPower(backRightPower*.4);
             }
-            else if(intakeStates==Intake.IntakeStates.INTAKE){
+            /*
+            else if(intakeStates==Intake.IntakeStates.INTAKE){//intakeStates==Intake.IntakeStates.INTAKE
                 motorFrontLeft.setPower(frontLeftPower*.3);
                 motorBackLeft.setPower(backLeftPower*.3);
                 motorFrontRight.setPower(frontRightPower*.3);
                 motorBackRight.setPower(backRightPower*.3);
-            }
+            } */
             else{
                 motorFrontLeft.setPower(frontLeftPower);
                 motorBackLeft.setPower(backLeftPower);

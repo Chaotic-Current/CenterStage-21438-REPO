@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -12,6 +13,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 
+
+@Config
 public class Intake {
     private HardwareMap hardwareMap;
 
@@ -19,9 +22,7 @@ public class Intake {
 
     private Gamepad gamepad1;
 
-    private Servo intakeServoL;
-
-    private Servo intakeServoR;
+    private Servo intakeArmR, intakeArmL;
 
     private DcMotorEx rollerMotor;
 
@@ -29,7 +30,10 @@ public class Intake {
 
 
 
-    private double motorPow = 0.85;
+    public static double motorPow = 0.85;
+
+    public static double intakeRestPosition = 0.35;
+
 
     private double armPos = 0.0;
 
@@ -37,7 +41,7 @@ public class Intake {
     private double bottomPos = 0.302;
 
     private int posIndex = 0;
-    private double threshold;
+    public static double threshold = Integer.MAX_VALUE;
     public enum IntakeStates{
         INTAKE,
         EXTAKE,
@@ -64,10 +68,16 @@ public class Intake {
         rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("intake");
         rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
+        intakeArmR = hardwareMap.servo.get("inServoR");
+        intakeArmL = hardwareMap.servo.get("inServoL");
+        intakeArmR.setDirection(Servo.Direction.REVERSE);
+
     }
 
     public void execute(){
 
+        intakeArmL.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition);
+        intakeArmR.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition+0.06);
 
         switch (currentState) {
             //When the roller is in the ground state, there is no movement of intake
@@ -76,6 +86,7 @@ public class Intake {
                 //When x is pressed and the outake is at rest, the state is switched to Moving
                 if (gamepad1.x) {
                     currentState = IntakeStates.INTAKE;
+                    outake.openClawB();
                         /*
                     outake.openClawB();
                     outake.openClawU(); */
@@ -86,20 +97,12 @@ public class Intake {
                     outake.openClawB();
                     outake.openClawU(); */
                 }
-                else if(gamepad1.y){
-                    timer.reset();
-                    currentState = IntakeStates.TOGGLE;
-                        /*
-                    outake.openClawB();
-                    outake.openClawU();*/
-
-                }
 
                 break;
 
             case INTAKE:
 
-                if(!canIntake())
+                if(true) //
                     rollerMotor.setPower(motorPow);
                 else
                     rollerMotor.setPower(-motorPow);
@@ -124,21 +127,6 @@ public class Intake {
                 }
 
                 break;
-            case TOGGLE:
-                if(timer.seconds()<0.3){
-                    rollerMotor.setPower(-0.7);
-                }
-                else{
-                    rollerMotor.setPower(motorPow);
-                }
-                if(timer.seconds()>=1){
-                    currentState = IntakeStates.GROUND;
-                   // outake.closeClawB();
-                   // outake.closeClawU();
-                }
-
-
-
             }
 
 

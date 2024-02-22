@@ -24,10 +24,10 @@ public class SlideMech {
     private final double MAX = 2500;
     public final static double Minimum = 0;
 
-    public static double slideKp = 0.006; //0.00326; //0.0039;
-    public static double slideKpDown = 0.006;
+    public static double slideKp = 0.0037; //0.0037;
+    public static double slideKpDown = 0.002;//0.002
     public static double slideKpManualDown = 0.00; // 0.007 old val
-    public static double slideKi = 0.00375; //0.00000325;
+    public static double slideKi = 0.000000375; //0.00000325;
     public static double slideKd = 0.000000; //0.000001;
     public static double slideKf = 0.00000; //0.000069;
     public static double slideKpClimb = 0.003;
@@ -37,7 +37,7 @@ public class SlideMech {
 
     private final double[] PIDF_COFFECIENTS = {slideKp, slideKi, slideKd, slideKf};
 
-    private int targetPos;
+    public static int targetPos;
     double correctionLeft;
     double correctionRight;
 
@@ -60,7 +60,7 @@ public class SlideMech {
         slideLeft.setRunMode(Motor.RunMode.VelocityControl);
         slideRight.setRunMode(Motor.RunMode.VelocityControl);
 
-        slideLeft.setInverted(true);
+        slideRight.setInverted(true);
 
         slidePIDF = new PIDFController(PIDF_COFFECIENTS[0], PIDF_COFFECIENTS[1], PIDF_COFFECIENTS[2], PIDF_COFFECIENTS[3]);
 
@@ -106,12 +106,12 @@ public class SlideMech {
             correctionLeft = slidePIDF.calculate(slideLeft.getCurrentPosition(), targetPos);
             correctionRight = slidePIDF.calculate(slideRight.getCurrentPosition(), targetPos);
 
-     /* telemetry.addData("targetPosition: ", targetPos);
+      telemetry.addData("targetPosition: ", targetPos);
         telemetry.addData("Right motor position: ", slideRight.getCurrentPosition());
         telemetry.addData("Left motor position: ", slideLeft.getCurrentPosition());
         telemetry.addData("Left correction: ", correctionLeft);
         telemetry.addData("Right correction: ", correctionRight);
-        telemetry.update();*/
+        telemetry.update();
 
 
             // sets the output power of the motor
