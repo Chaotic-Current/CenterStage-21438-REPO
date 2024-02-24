@@ -12,6 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 @Autonomous(name="HuskyLensTest")
 @Disabled
+@SuppressWarnings("All")
 public class HuskyLensTest extends LinearOpMode {
 
     OpenCvCamera camera;

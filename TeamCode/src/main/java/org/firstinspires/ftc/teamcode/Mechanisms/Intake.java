@@ -30,12 +30,20 @@ public class Intake {
 
 
 
-    public static double motorPow = 0.85;
+    public static double motorPow = 0.63;//0.85
 
-    public static double intakeRestPosition = 0.35;
+    public static double intakeRestPosition = 0.7;
+    public static double intakeTargetPos = 0.0;
+
+    public static double armPos2 = 0.27;
 
 
-    private double armPos = 0.0;
+
+    public static double armPos = 0.13;
+
+
+
+
 
 
     private double bottomPos = 0.302;
@@ -55,6 +63,19 @@ public class Intake {
     private AnalogSensor IntakeCurrent;
     private Outake outake;
 
+    public Intake(HardwareMap hw, Telemetry tele, Outake out){
+        this.hardwareMap = hw;
+        this.telemetry = tele;
+        this.outake = out;
+
+        rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("IN");
+        rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
+
+       // intakeArmR = hardwareMap.servo.get("inServoR");
+        intakeArmL = hardwareMap.servo.get("ARM_L");
+       // intakeArmR.setDirection(Servo.Direction.REVERSE);
+    }
+
     public Intake(HardwareMap hw, Telemetry tele, Gamepad g1 , Outake outake ){
         this.hardwareMap = hw;
         this.telemetry = tele;
@@ -64,35 +85,40 @@ public class Intake {
         ;
         //Reversing direction of right servo
 
-        //Motor Init
-        rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("intake");
-        rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
-        intakeArmR = hardwareMap.servo.get("inServoR");
-        intakeArmL = hardwareMap.servo.get("inServoL");
-        intakeArmR.setDirection(Servo.Direction.REVERSE);
+        //Motor Init
+        rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("IN");
+        rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        intakeArmL = hardwareMap.get(Servo.class, "ARM_L");
+       // intakeArmR = hardwareMap.servo.get("inServoR");
+       // intakeArmL = hardwareMap.servo.get("inServoL");
+       // intakeArmR.setDirection(Servo.Direction.REVERSE);
 
     }
 
-    public void execute(){
+    public void executeTeleOp(){
 
-        intakeArmL.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition);
-        intakeArmR.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition+0.06);
+        intakeArmL.setPosition((1-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition);
+        telemetry.addData("servo pos", intakeArmL.getPosition() );
+       // intakeArmR.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition+0.06);
 
         switch (currentState) {
             //When the roller is in the ground state, there is no movement of intake
             case GROUND:
+                
                 rollerMotor.setPower(0.0);
                 //When x is pressed and the outake is at rest, the state is switched to Moving
                 if (gamepad1.x) {
                     currentState = IntakeStates.INTAKE;
-                    outake.openClawB();
+                    //outake.claw.setPosition(0.52);
                         /*
                     outake.openClawB();
                     outake.openClawU(); */
+                    outake.openClaw();
                 }
                 else if (gamepad1.b) {
                     currentState = IntakeStates.EXTAKE;
+                    outake.openClaw();
                         /*
                     outake.openClawB();
                     outake.openClawU(); */
@@ -102,6 +128,8 @@ public class Intake {
 
             case INTAKE:
 
+
+                outake.openClaw();
                 if(true) //
                     rollerMotor.setPower(motorPow);
                 else
@@ -112,6 +140,8 @@ public class Intake {
                         /*
                     outake.closeClawB();
                 outake.closeClawU(); */
+                    //outake.setArmPosition(armPos2);
+                    outake.closeClaw();
                     currentState = IntakeStates.GROUND;
                 }
                 break;
@@ -131,6 +161,48 @@ public class Intake {
 
 
     }
+    public void executeAuto(){
+        switch (currentState) {
+            case GROUND:
+
+                rollerMotor.setPower(0.0);
+                intakeArmL.setPosition(intakeRestPosition);
+              //  intakeArmR.setPosition(intakeRestPosition+0.06);
+
+                break;
+
+            case INTAKE:
+
+                if(true) //
+                    rollerMotor.setPower(motorPow);
+                else
+                    rollerMotor.setPower(-motorPow);
+
+                intakeArmL.setPosition(intakeTargetPos);
+               // intakeArmR.setPosition(intakeTargetPos+0.06);
+                break;
+
+            case EXTAKE:
+                rollerMotor.setPower(-motorPow);
+                break;
+            case TOGGLE:
+                rollerMotor.setPower(motorPow);
+                intakeArmL.setPosition(intakeRestPosition);
+                outake.openClaw();
+                if(timer.seconds()>0.5){
+                    outake.closeClaw();
+                    if(timer.seconds()>1){
+                        timer.reset();
+                    }
+                }
+                break;
+        }
+
+
+    }
+
+
+
 
     public IntakeStates getCurrentState(){
         return currentState;
@@ -142,6 +214,32 @@ public class Intake {
 
     public boolean canIntake(){
         return rollerMotor.getCurrent(CurrentUnit.AMPS) > threshold; // tune threshold
+    }
+
+    public void setToGround(){
+       // outake.closeClawB();
+       // outake.closeClaw();
+        currentState = IntakeStates.GROUND;
+
+    }
+    public void setToIntake(double pos){
+        //outake.openClawB();
+        //0.8 for first pixel off stack// 0.42
+        //0.79 for second pixel off stack/4
+        //0.77
+        //0.745
+        //outake.openClaw();
+        intakeTargetPos = pos;
+        currentState = IntakeStates.INTAKE;
+    }
+    public void twerk(){
+        //outake.openClawB();
+        //0.8 for first pixel off stack// 0.42
+        //0.79 for second pixel off stack/4
+        //0.77
+        //0.745
+      //  outake.openClaw();
+        currentState = IntakeStates.TOGGLE;
     }
 
 

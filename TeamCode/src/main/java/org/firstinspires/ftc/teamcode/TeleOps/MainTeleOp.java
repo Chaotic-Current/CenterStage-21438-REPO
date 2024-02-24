@@ -19,7 +19,7 @@ public class MainTeleOp extends LinearOpMode {
     private void initialize() {
 
         driveTrain = new DriveTrain(hardwareMap,telemetry,gamepad1);
-      //  outake = new Outake(hardwareMap,telemetry,gamepad2,driveTrain);
+        outake = new Outake(hardwareMap,telemetry,gamepad2,driveTrain);
         intake  = new Intake(hardwareMap,telemetry,gamepad1,outake);
 
 
@@ -34,13 +34,15 @@ public class MainTeleOp extends LinearOpMode {
         while (opModeInInit()) {
             driveTrain.IMUSetup();
         }
+        //intake.setToIntake(1); do this when doing auto
         while (opModeIsActive()) {
 
-            intake.execute();
+            intake.executeTeleOp();
             outake.setIntake(intake.getCurrentState());
             outake.executeTeleOp();
             driveTrain.setIntake(intake.getCurrentState());
             driveTrain.drive();
+            telemetry.update();
 
         }
 

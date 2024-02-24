@@ -14,9 +14,9 @@ public class ClawMech {
     private Telemetry telemetry;
     public static double openPos = 0.3;
     public Gamepad gamepad;
-    public static double close = 0.6;
+    public static double close = 0.2;
     private SignalEdgeDetector rightBumper, rightDPadRight;
-    public static double halfOpenPos = 0.45;
+    public static double halfOpenPos = 0.25;
     public static double timeOffset = 750;
     public ElapsedTime timer;
     public boolean delayOver;

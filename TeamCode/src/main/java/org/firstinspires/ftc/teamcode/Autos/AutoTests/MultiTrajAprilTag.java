@@ -54,7 +54,7 @@ public class MultiTrajAprilTag extends LinearOpMode {
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.id == 2) {
+            if (detection.id == 5) {
                 x = -detection.ftcPose.x;
                 y = detection.ftcPose.y - 10;
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));

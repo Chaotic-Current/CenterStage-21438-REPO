@@ -1,19 +1,15 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 @SuppressWarnings("all")
@@ -41,7 +37,7 @@ public class Outake {
     //public ArmMecNew arms;
     private Servo armR, armL;
 
-    public static double depositPos = 0.94, intakePos = 0.12;
+    public static double depositPos = 0.94, intakePos = 0.3, restPos = 0.27;
 
     //public Servo wristRotation;
 
@@ -51,8 +47,10 @@ public class Outake {
     public DcMotorEx slideR;
 
     private SlideMech slideMech;
+    private ArmMecNew armMec;
 
-    public static double openPosU,openPosB = 0.6,closePosB = 0.7,closePosU;
+    public static double openPosU=0.7,openPosB = 0.825, bottom = 0.22, upper =0.25, inte = 0.3;
+    public static double close = 0.2, halfOpen = 0.25, open = 0.3;
 
 
 
@@ -105,9 +103,10 @@ public class Outake {
     private Intake.IntakeStates currentIntakeState = Intake.IntakeStates.GROUND;
     private DriveTrain driveTrain;
     //Constructor for Auto
-    public Outake(HardwareMap hw, Telemetry tele, IMU imu){
+    public Outake(HardwareMap hw, Telemetry tele){
         this.hardwareMap = hw;
         this.telemetry = tele;
+
         //Servo Init
         /*
         wristRotation = (ServoImplEx)hardwareMap.servo.get("wristR");
@@ -118,32 +117,30 @@ public class Outake {
         range = new PwmControl.PwmRange(500,2500);
 
 
+      /*  armR = hardwareMap.servo.get("armR");
+        armL = hardwareMap.servo.get("armL");
+        armL.setDirection(Servo.Direction.REVERSE); */
+       // armR.setPwmRange(range);
+       // armL.setPwmRange(range);
 
-        claw = hardwareMap.servo.get("claw");
+        //clawU = hardwareMap.servo.get("clawU");
+        //clawB = hardwareMap.servo.get("clawB");
 
+        wrist = hardwareMap.servo.get("WRIST");
+        //wristRelignment = new ClawRealign(hardwareMap,telemetry,wrist, driveTrain.getImu());
 
-       // wristRelignment = new ClawRealign(hardwareMap,telemetry,wrist,imu);
+        // wristRotation = hardwareMap.servo.get("wristR");
+        // launcher = hardwareMap.servo.get("launcher");
+        // launcher.setPosition(0.5);
 
-        wrist = hardwareMap.servo.get("wrist");
-        launcher = hardwareMap.servo.get("launcher");
-        launcher.setPosition(0.5);
+        claw = hardwareMap.servo.get("CLAW");
 
-
+        //change directions
+        // clawB.setDirection(Servo.Direction.REVERSE);
 
         //Motor Init
-        slideL = (DcMotorEx) hardwareMap.dcMotor.get("slideL");
-        slideR = (DcMotorEx) hardwareMap.dcMotor.get("slideR");
-
-        slideR.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        slideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //disregard this if we want accurate pid ig
-        slideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        slideL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        slideR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slideMech = new SlideMech(hardwareMap);
+        armMec = new ArmMecNew(hardwareMap);
     }
 
     //Constructor for TeleOp
@@ -158,27 +155,29 @@ public class Outake {
 
         //arms = new ArmMecNew(hardwareMap);
 
-        armR = hardwareMap.servo.get("armR");
-        armL = hardwareMap.servo.get("armL");
-        armL.setDirection(Servo.Direction.REVERSE);
+
+       // armR.setPwmRange(range);
+       // armL.setPwmRange(range);
+
 
         //clawU = hardwareMap.servo.get("clawU");
         //clawB = hardwareMap.servo.get("clawB");
 
-        wrist = hardwareMap.servo.get("wrist");
+        wrist = hardwareMap.servo.get("WRIST");
         //wristRelignment = new ClawRealign(hardwareMap,telemetry,wrist, driveTrain.getImu());
 
        // wristRotation = hardwareMap.servo.get("wristR");
        // launcher = hardwareMap.servo.get("launcher");
        // launcher.setPosition(0.5);
 
-        claw = hardwareMap.servo.get("claw");
+        claw = hardwareMap.servo.get("CLAW");
 
         //change directions
        // clawB.setDirection(Servo.Direction.REVERSE);
 
         //Motor Init
         slideMech = new SlideMech(hardwareMap);
+        armMec = new ArmMecNew(hardwareMap);
 
         /*
         slideL = (DcMotorEx) hardwareMap.dcMotor.get("slideL");
@@ -215,12 +214,10 @@ public class Outake {
                 slideMech.update();
                 wrist.setPosition(0.5);
                 //arms.setIntake();
-                setArmIntake();
+                //setArmIntake();
 
-                //when a is pressed, outake begins extension sequence
-                if (gamepad2.a){
-                    closeClawB();
-                    //closeClawU();
+                if(isChanging){
+                    isChanging = false;
                     currentOutakeState = OutakeStates.EXTENSION;
                 }
 
@@ -231,8 +228,7 @@ public class Outake {
                 //when dpad down is pressed again in extension state, outake state is changed to reset state
                 if (gamepad2.dpad_down){
                     currentOutakeState = OutakeStates.RESET;
-                    closeClawB();
-                   // closeClawU();
+                    closeClaw();
                     slideTimer.reset();
                 }
                 else if(gamepad2.options && gamepad2.share) currentOutakeState = OutakeStates.RIGGING;
@@ -241,15 +237,19 @@ public class Outake {
                     wrist.setPosition(0.5);
                     //when Y is pressed, clawU opens
                     if(gamepad2.y){
-                        //openClawU();
+                       // openClawU();
+                        openClaw();
                     }
                     //when X is pressed, clawB opens
                     if(gamepad2.x){
-                        openClawB();
+                        //openClawB();
+                        halfOpenClaw();
                     }
-                    if(slideMech.getCurrentTickPosition()>400){
+                    if(slideMech.getCurrentTickPosition()>1200){
                         //arms.setExtake();
-                        setArmDeposit();
+                        //setArmDeposit();
+                        armMec.setExtake();
+
                     }
                     //slides extend based off PID
                     slideMech.update();
@@ -266,8 +266,7 @@ public class Outake {
             case MANUAL:
                 if (gamepad2.dpad_down){
                     currentOutakeState = OutakeStates.RESET;
-                    closeClawB();
-                    //closeClawU();
+                    closeClaw();
                     slideTimer.reset();
                 }
                 else if(gamepad2.options && gamepad2.share) currentOutakeState = OutakeStates.RIGGING;
@@ -277,12 +276,12 @@ public class Outake {
                     manual();
 
                     if(gamepad2.x)
-                        openClawB();
+                        halfOpenClaw();
                     if(gamepad2.y)
-                        //openClawU();
-                    if(slideMech.getCurrentTickPosition()>400)
-                        setArmDeposit();
-                        //arms.setExtake();
+                        openClaw();
+                    if(slideMech.getCurrentTickPosition()>1200)
+                       // setArmDeposit();
+                        armMec.setExtake();
 
                 //if the target position of the slides were changed during manual, the state is changed back to Extension so PID
                 //starts again
@@ -311,14 +310,15 @@ public class Outake {
 
 
             case RESET:
-                //arms.setExtake();
-                setArmIntake();
-                closeClawB();
+                armMec.setIntake();
+                //setArmIntake();
+                closeClaw();
+                //claw.setPosition(0.6);
                 wrist.setPosition(0.5);
                 //While the slides are not at ground, the PID is being calculated
                 //after the slides finally get to close to our target position, the current state changes to rest
 
-                if (slideMech.getCurrentTickPosition() > 40) {
+                if (slideMech.getCurrentTickPosition() > 50) {
                     //Only starts decreasing the slide height after the arm gets most of the way down
                    if(slideTimer.seconds()>=0.8){
                        //runSlidesPID();
@@ -326,16 +326,8 @@ public class Outake {
                    }
                 }
                 else {
+                   // claw.setPosition(0.4);
                     currentOutakeState = OutakeStates.REST;
-                }
-                //If the bumpers interrupt the PID, the state switches to manual.
-                if(gamepad2.right_bumper || gamepad2.left_bumper){
-                    currentOutakeState = OutakeStates.MANUAL;
-                }
-                //If there is a change in target position(d-pad pressed), then state switches to extension
-                if(isChanging){
-                    isChanging = false;
-                    currentOutakeState = OutakeStates.EXTENSION;
                 }
                 break;
 
@@ -349,49 +341,41 @@ public class Outake {
         wrist.setPosition(0.5);
         switch(currentOutakeState){
             case EXTENSION:
-                wristRelignment.swivelToPostion(wrist, driveTrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES),(slideTimer.seconds()>1),telemetry);
+                //wristRelignment.swivelToPostion(wrist, driveTrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES),(slideTimer.seconds()>1),telemetry);
                 slideMech.update();
-                if(slideL.getCurrentPosition()>100){
-                    //arms.setExtake();
-                    setArmDeposit();
+                if(slideMech.getCurrentTickPosition()>1200){
+                    armMec.setExtake();
+                   // setArmDeposit();
                 }
-                break;
-
-            case STACK:
-
-                if(slideTimer.seconds() > 1) {
-                    // arms.setExtake();
-                    setArmDeposit();
-                }
-                if(slideTimer.seconds() >= 1.5)
-                    slideMech.update();
                 break;
 
             case RESET:
-                //arms.setExtake();
-                setArmIntake();
+                armMec.setIntake();
+                //setArmIntake();
+                //closeClawB();
+                //claw.setPosition(0.6);
+                closeClaw();
                 wrist.setPosition(0.5);
-                closeClawB();
-                closeClawU();
-
-                //While the slides are not at our target, the PID is being calculated
+                //While the slides are not at ground, the PID is being calculated
                 //after the slides finally get to close to our target position, the current state changes to rest
 
-                if (slideMech.getCurrentTickPosition() > 10) {
+                if (slideMech.getCurrentTickPosition() > 50) {
                     //Only starts decreasing the slide height after the arm gets most of the way down
-                    if(slideTimer.seconds()>=1.5){
+                    if(slideTimer.seconds()>=0.8){
                         //runSlidesPID();
                         slideMech.update();
                     }
                 }
                 else {
+                    // claw.setPosition(0.4);
                     currentOutakeState = OutakeStates.REST;
                 }
                 break;
 
             case REST:
-                closeClawB();
-                closeClawU();
+                slideMech.update();
+                wrist.setPosition(0.5);
+                //setArmIntake();
                 break;
         }
     }
@@ -412,9 +396,6 @@ public class Outake {
         if(gamepad2.dpad_right) {
             slideMech.setMidJunction();
 
-        }
-        if(gamepad2.dpad_up){
-            slideMech.setHighJunction();
         }
         if(gamepad2.dpad_down){
             slideMech.setIntakeOrGround();
@@ -449,15 +430,20 @@ public class Outake {
     //AUTO METHODS
 
     //claw controls
-    public void closeClawB(){ claw.setPosition(closePosB); }
-    public void closeClawU(){ claw.setPosition(closePosU); }
-    public void openClawB(){
-        claw.setPosition(openPosB);
-    }
-    public void openClawU(){
-        claw.setPosition(openPosU);
+
+
+
+    public void closeClaw(){
+        claw.setPosition(close);
     }
 
+    public void halfOpenClaw(){
+        claw.setPosition(halfOpen);
+    }
+
+    public void openClaw(){
+        claw.setPosition(open);
+    }
 
     public void setTargetPosition(int targetPosition){
         this.pastTargetPosition = targetPosition;
@@ -465,12 +451,14 @@ public class Outake {
     //FSM MODIFIERS
     public void resetOutake(){
         currentOutakeState = OutakeStates.RESET;
-        pastTargetPosition = 10;
+        //pastTargetPosition = 10;
+        slideMech.setIntakeOrGround();
         slideTimer.reset();
     }
     public void extendOutake(int target){
         currentOutakeState = OutakeStates.EXTENSION;
-        pastTargetPosition = target;
+        //pastTargetPosition = target;
+        slideMech.setTargetPos(target);
         slideTimer.reset();
     }
 
@@ -501,6 +489,12 @@ public class Outake {
     public void setArmDeposit(){
         armR.setPosition(depositPos);
         armL.setPosition(depositPos);
+        telemetry.addLine("Is working");
+    }
+
+    public void setArmPosition(double pos){
+        armR.setPosition(pos);
+        armL.setPosition(pos);
     }
 
 

@@ -20,12 +20,15 @@ public class SlideMech {
 
     public static int MID_JUNCTION = 2100; //<-- 12.90V, 1550;// old 890 as of 11/8/2023
     public static int LOW_JUNCTION = 1490;  //<-- 12.90V, 1860;
-    public static int ZERO_POSITION = -40;//5V;// old val -105
+    public static int ZERO_POSITION = 0;//5V;// old val -40
     private final double MAX = 2500;
     public final static double Minimum = 0;
 
     public static double slideKp = 0.0037; //0.0037;
-    public static double slideKpDown = 0.002;//0.002
+    public static double slideKpDown = 0.005;//0.002
+
+    public static double slideKiDown = 0.00003;
+
     public static double slideKpManualDown = 0.00; // 0.007 old val
     public static double slideKi = 0.000000375; //0.00000325;
     public static double slideKd = 0.000000; //0.000001;
@@ -76,7 +79,7 @@ public class SlideMech {
 
         if (!isClimbing) {
             if (avg > targetPos) {
-                slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
+                slidePIDF.setPIDF(slideKpDown, slideKiDown, slideKd, slideKf);
             } else {
                 slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
             }
@@ -98,7 +101,7 @@ public class SlideMech {
 
             if (!isClimbing) {
                 if (avg > targetPos) {
-                    slidePIDF.setPIDF(slideKpDown, slideKi, slideKd, slideKf);
+                    slidePIDF.setPIDF(slideKpDown, slideKiDown, slideKd, slideKf);
                 } else {
                     slidePIDF.setPIDF(slideKp, slideKi, slideKd, slideKf);
                 }
@@ -111,7 +114,6 @@ public class SlideMech {
         telemetry.addData("Left motor position: ", slideLeft.getCurrentPosition());
         telemetry.addData("Left correction: ", correctionLeft);
         telemetry.addData("Right correction: ", correctionRight);
-        telemetry.update();
 
 
             // sets the output power of the motor
@@ -137,6 +139,10 @@ public class SlideMech {
     public void setMidJunction() {
         targetPos = MID_JUNCTION;
         currentPosition = CurrentPosition.LEVEL2;
+    }
+
+    public void setTargetPos(int num){
+        targetPos = num;
     }
 
     public void climbUp() {

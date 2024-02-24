@@ -12,7 +12,9 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Mechanisms.ArmMecNew;
 import org.firstinspires.ftc.teamcode.Mechanisms.ClawMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.IntakeMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.Outake;
 import org.firstinspires.ftc.teamcode.Mechanisms.SlideMech;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -35,7 +37,11 @@ public class BlueFarStack extends LinearOpMode {
     private SampleMecanumDrive drive;
     private ElapsedTime timer = new ElapsedTime();
     private OpenCvWebcam frontCam, backCam;
-    private IntakeMech intake;
+   // private IntakeMech intake;
+
+    private Intake intake;
+
+    private Outake outake;
     private ArmMecNew arm;
     private SlideMech slide;
     private ClawMech clawMech;
@@ -62,30 +68,30 @@ public class BlueFarStack extends LinearOpMode {
     public static double frwDistance3 = 12;
     public static double wait01 = 1;
     public static double wait02 = 1;
-    public static double centerLineToLinear1X = 25.5, centerLineToLinear1Y = -19.3, centerLineToLinear1Heading = 92, wait1Center = 3;
+    public static double centerLineToLinear1X = 25.5, centerLineToLinear1Y = -20.15, centerLineToLinear1Heading = 92, wait1Center = 3;
 
     public static double centerSplineToLinearHeading1X = 1.5, centerSplineToLinearHeading1Y = 6, centerSplineToLinearHeading1EndTangent = 75, centerSplineToLinearHeading1Heading = 90;
 
-    public static double centerLineTo1X = 1.5, centerLineTo1Y = 55;
+    public static double centerLineTo1X = 1.9, centerLineTo1Y = 53;
 
     public static double centerSplineToLinearHeading2X = 27.5, centerSplineToLinearHeading2Y = 71, centerSplineToLinearHeading2EndTangent = 75, centerSplineToLinearHeading2Heading = 90;
 
     public static double leftSplineToLinearHeading2X = 22.5, leftSplineToLinearHeading2Y = 71, leftSplineToLinearHeading2EndTangent = 75, leftSplineToLinearHeading2Heading = 90;
 
-    public static double rightSplineToLinearHeading2X = 31.5, rightSplineToLinearHeading2Y = 72.25, rightSplineToLinearHeading2EndTangent = 75, rightSplineToLinearHeading2Heading = 90;
+    public static double rightSplineToLinearHeading2X = 31, rightSplineToLinearHeading2Y = 72.25, rightSplineToLinearHeading2EndTangent = 75, rightSplineToLinearHeading2Heading = 90;
 
     public static double centerLineToLinear2Y = 41;
 
     // LEFT
     public static double leftLineToLinear2X = 20, leftLineToLinear2Y = 33.5, leftLineToLinear2Heading = 90, wait1Left = 3, wait2Left = 1;
     public static double leftLinetoLinear3Y = 40.5;
-    public static double leftLinetoLinear1X = 31.5, leftLinetoLinear1Y = -4, leftLineToLinear1Heading = 45;
+    public static double leftLinetoLinear1X = 32.5, leftLinetoLinear1Y = -4, leftLineToLinear1Heading = 45;
     public static double leftBackDist = 10;
 
     // RIGHT
     public static double rightSpline1deg = -75;
     public static double rightLineToLinear2deg = 90;
-    public static double rightSplineTo1X = 27, rightSplineTo1Y = 2.5, splineToLinear1Heading = 45;
+    public static double rightSplineTo1X = 27, rightSplineTo1Y = 1.5, splineToLinear1Heading = 45;
     public static double rightLineToLinear2X = 32.75, rightLineToLinear2Y = 37.5, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
     public static double rightLineToLinear3Y = 40.25;
 
@@ -253,12 +259,12 @@ public class BlueFarStack extends LinearOpMode {
     public void initialize() {
         //intake = new IntakeMech(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
+       // intake = new IntakeMech(hardwareMap, telemetry);
+      //  outake = new Outake(hardwareMap, telemetry);
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
-        intake = new IntakeMech(hardwareMap, telemetry);
-        wrist = hardwareMap.get(Servo.class, "WRIST");
-        wrist.setPosition(0.5);
+        intake = new Intake(hardwareMap,telemetry,outake);
         cameraInit();
     }
 
@@ -287,18 +293,20 @@ public class BlueFarStack extends LinearOpMode {
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
                         clawMech.open();
-                        intake.setServosUp();
+                       // intake.setServosUp();
                     })
                     .lineToLinearHeading(new Pose2d(rightSplineTo1X, rightSplineTo1Y, Math.toRadians(rightSpline1deg)))
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .waitSeconds(2)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        intake.reverse();
+                    .UNSTABLE_addTemporalMarkerOffset(-2.5, () -> {
+                      //  intake.
+                        intake.setToIntake(0.8);
                     })
                     .UNSTABLE_addDisplacementMarkerOffset(2.5, () -> {
-                        intake.stop();
+                        intake.setToGround();
+                       // intake.stop();
                         clawMech.close();
-                        intake.AutoIntakeServoPositionStage1();
+                       // intake.AutoIntakeServoPositionStage1();
                     })
                     // .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X, centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
@@ -309,9 +317,9 @@ public class BlueFarStack extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(1.25, () -> {
                         arm.setExtake();
                     })
-                    .splineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X+1, rightSplineToLinearHeading2Y, Math.toRadians(rightSplineToLinearHeading2Heading)), Math.toRadians(rightSplineToLinearHeading2EndTangent))
+                    .splineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X, rightSplineToLinearHeading2Y, Math.toRadians(rightSplineToLinearHeading2Heading)), Math.toRadians(rightSplineToLinearHeading2EndTangent))
                     .waitSeconds(1.5)
-                    .lineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X +1, toStackLinetoLinear2Y, Math.toRadians(rightSplineToLinearHeading2Heading)))
+                    .lineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X, toStackLinetoLinear2Y, Math.toRadians(rightSplineToLinearHeading2Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         clawMech.halfOpen();
                     })
@@ -345,18 +353,20 @@ public class BlueFarStack extends LinearOpMode {
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                         clawMech.open();
-                        intake.setServosUp();
+                       // intake.setServosUp();
                     })
                     .lineToLinearHeading(new Pose2d(25, 6, Math.toRadians(45)))
                     .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
                     .waitSeconds(2)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        intake.reverse();
+                    .UNSTABLE_addTemporalMarkerOffset(-2.5, () -> {
+                        //intake.reverse();
+                        //intake.setToIntake(0.8);
                     })
                     .UNSTABLE_addDisplacementMarkerOffset(2.5, () -> {
-                        intake.stop();
+                        //intake.stop();
+                        //intake.setToGround();
                         clawMech.close();
-                        intake.AutoIntakeServoPositionStage1();
+                        //intake.AutoIntakeServoPositionStage1();
                     })
                     .splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X, centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
                     .lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
@@ -366,13 +376,13 @@ public class BlueFarStack extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(1.25, () -> {
                         arm.setExtake();
                     })
-                    .splineToLinearHeading(new Pose2d(leftSplineToLinearHeading2X - 2, leftSplineToLinearHeading2Y, Math.toRadians(leftSplineToLinearHeading2Heading)), Math.toRadians(leftSplineToLinearHeading2EndTangent))
+                    .splineToLinearHeading(new Pose2d(leftSplineToLinearHeading2X - 1, leftSplineToLinearHeading2Y-0.5, Math.toRadians(leftSplineToLinearHeading2Heading)), Math.toRadians(leftSplineToLinearHeading2EndTangent))
                     .waitSeconds(1)
                     .lineToLinearHeading(new Pose2d(leftSplineToLinearHeading2X - 2, toStackLinetoLinear2Y, Math.toRadians(rightSplineToLinearHeading2Heading)))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         clawMech.halfOpen();
                     })
-                    .waitSeconds(0.5)
+                    .waitSeconds(1.25)
                     .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
                         slide.setCustom(1470);
                     })
@@ -401,7 +411,7 @@ public class BlueFarStack extends LinearOpMode {
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
                         clawMech.open();
-                        intake.setServosUp();
+                        //intake.setServosUp();
                     })
                     .lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
 
@@ -409,12 +419,14 @@ public class BlueFarStack extends LinearOpMode {
                     .waitSeconds(2)
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        intake.reverse();
+                        //intake.reverse();
+                        intake.setToIntake(0.8);
                     })
                     .UNSTABLE_addDisplacementMarkerOffset(2.5, () -> {
-                        intake.stop();
+                        //intake.stop();
+                        intake.setToGround();
                         clawMech.close();
-                        intake.AutoIntakeServoPositionStage1();
+                        //intake.AutoIntakeServoPositionStage1();
                     })
                     .splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X, centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
                     .lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
@@ -482,10 +494,11 @@ public class BlueFarStack extends LinearOpMode {
             telemetryAprilTag();
             telemetry.addLine("" + drive.getPoseEstimate());
             telemetry.addLine(drive.getEncoder().getErrorX() + "-x, " + drive.getEncoder().getErrorY() + "-y");
-            telemetry.addLine(intake.getServosPos());
+            telemetry.addLine(""+intake.intakeTargetPos);
             drive.update();
+          //  intake.executeAuto();
             slide.update();
-            intake.update(drive);
+            //intake.update(drive);
             telemetry.update();
         }
     }

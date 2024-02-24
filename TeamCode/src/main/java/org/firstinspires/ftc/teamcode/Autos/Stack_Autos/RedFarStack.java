@@ -12,7 +12,9 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Mechanisms.ArmMecNew;
 import org.firstinspires.ftc.teamcode.Mechanisms.ClawMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.IntakeMech;
+import org.firstinspires.ftc.teamcode.Mechanisms.Outake;
 import org.firstinspires.ftc.teamcode.Mechanisms.SlideMech;
 //import org.firstinspires.ftc.teamcode.Pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
@@ -36,7 +38,10 @@ public class RedFarStack extends LinearOpMode {
 	private SampleMecanumDrive drive;
 	private ElapsedTime timer = new ElapsedTime();
 	private OpenCvWebcam frontCam, backCam;
-	private IntakeMech intake;
+	//private IntakeMech intake;
+	private Intake intake;
+
+	private Outake outake;
 	private ArmMecNew arm;
 	private SlideMech slide;
 	private ClawMech clawMech;
@@ -269,7 +274,7 @@ public class RedFarStack extends LinearOpMode {
 		arm = new ArmMecNew(hardwareMap);
 		slide = new SlideMech(hardwareMap);
 		clawMech = new ClawMech(hardwareMap, telemetry);
-		intake = new IntakeMech(hardwareMap, telemetry);
+		intake = new Intake(hardwareMap, telemetry, outake);
 		wrist = hardwareMap.get(Servo.class, "WRIST");
 		wrist.setPosition(0.5);
 		clawMech.open();
@@ -306,18 +311,20 @@ public class RedFarStack extends LinearOpMode {
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
 						clawMech.open();
-						intake.setServosUp();
+						//intake.setServosUp();
 					})
 					.lineToLinearHeading(new Pose2d(25, -14, Math.toRadians(-45)))
 					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 					.waitSeconds(waitAtStack)
-					.UNSTABLE_addTemporalMarkerOffset(0,()->{
-						intake.reverse();
+					.UNSTABLE_addTemporalMarkerOffset(-2.5,()->{
+						//intake.reverse();
+						intake.setToIntake(0.8);
 					})
 					.UNSTABLE_addDisplacementMarkerOffset(2.5,()->{
-						intake.stop();
+						//intake.stop();
+						intake.setToGround();
 						clawMech.close();
-						intake.AutoIntakeServoPositionStage1();
+						//intake.AutoIntakeServoPositionStage1();
 					})
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
@@ -363,18 +370,20 @@ public class RedFarStack extends LinearOpMode {
 			autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
 						clawMech.open();
-						intake.setServosUp();
+						//intake.setServosUp();
 					})
 					.lineToLinearHeading(new Pose2d(31.5, -6, Math.toRadians(-45)))
 					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 					.waitSeconds(waitAtStack)
-					.UNSTABLE_addTemporalMarkerOffset(0,()->{
-						intake.reverse();
+					.UNSTABLE_addTemporalMarkerOffset(-2.5,()->{
+						//intake.reverse();
+						intake.setToIntake(0.8);
 					})
 					.UNSTABLE_addDisplacementMarkerOffset(2.5,()->{
-						intake.stop();
+						//intake.stop();
+						intake.setToGround();
 						clawMech.close();
-						intake.AutoIntakeServoPositionStage1();
+						//intake.AutoIntakeServoPositionStage1();
 					})
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
@@ -422,18 +431,19 @@ public class RedFarStack extends LinearOpMode {
 					//.lineToLinearHeading(new Pose2d(leftLinetoLinear1X, leftLinetoLinear1Y, Math.toRadians(leftLineToLinear1Heading)))
 					.UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
 						clawMech.open();
-						intake.setServosUp();
+						//intake.setServosUp();
 					})
 					.lineToLinearHeading(new Pose2d(27, -2.5, Math.toRadians(45)))
 					.lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y, Math.toRadians(centerLineToLinear1Heading)))
 					.waitSeconds(waitAtStack)
-					.UNSTABLE_addTemporalMarkerOffset(0,()->{
-						intake.reverse();
+					.UNSTABLE_addTemporalMarkerOffset(-2.5,()->{
+						intake.setToIntake(0.8);
 					})
 					.UNSTABLE_addDisplacementMarkerOffset(2.5,()->{
-						intake.stop();
+						//intake.stop();
+						intake.setToGround();
 						clawMech.close();
-						intake.AutoIntakeServoPositionStage1();
+						//intake.AutoIntakeServoPositionStage1();
 					})
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading1X,centerSplineToLinearHeading1Y, Math.toRadians(centerSplineToLinearHeading1Heading)), Math.toRadians(centerSplineToLinearHeading1EndTangent))
 					.lineTo(new Vector2d(centerLineTo1X, centerLineTo1Y))
@@ -503,10 +513,10 @@ public class RedFarStack extends LinearOpMode {
 			telemetryAprilTag();
 			telemetry.addLine(""+drive.getPoseEstimate());
 			telemetry.addLine(drive.getEncoder().getErrorX() + "-x, " + drive.getEncoder().getErrorY() + "-y");
-			telemetry.addLine(intake.getServosPos());
+			telemetry.addLine(""+intake.intakeTargetPos);
 			drive.update();
 			slide.update();
-			intake.update(drive);
+			intake.executeAuto();
 			telemetry.update();
 		}
 	}
