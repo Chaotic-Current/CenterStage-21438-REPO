@@ -50,7 +50,7 @@ public class Outake {
     private ArmMecNew armMec;
 
     public static double openPosU=0.7,openPosB = 0.825, bottom = 0.22, upper =0.25, inte = 0.3;
-    public static double close = 0.2, halfOpen = 0.25, open = 0.3;
+    public static double close = 0.2, halfOpen = 0.25, open = 0.5;
 
 
 
@@ -167,8 +167,8 @@ public class Outake {
         //wristRelignment = new ClawRealign(hardwareMap,telemetry,wrist, driveTrain.getImu());
 
        // wristRotation = hardwareMap.servo.get("wristR");
-       // launcher = hardwareMap.servo.get("launcher");
-       // launcher.setPosition(0.5);
+        launcher = hardwareMap.servo.get("plane");
+        launcher.setPosition(0.81);
 
         claw = hardwareMap.servo.get("CLAW");
 
@@ -205,7 +205,7 @@ public class Outake {
         changeTargetPos();
 
         if(gamepad2.share){
-           // launcher.setPosition(0.25);
+            launcher.setPosition(0.5);
         }
 
         switch (currentOutakeState) {
@@ -215,6 +215,12 @@ public class Outake {
                 wrist.setPosition(0.5);
                 //arms.setIntake();
                 //setArmIntake();
+                if(gamepad2.a){
+                    closeClaw();
+                }
+                if(gamepad2.b){
+                    openClaw();
+                }
 
                 if(isChanging){
                     isChanging = false;
@@ -231,7 +237,9 @@ public class Outake {
                     closeClaw();
                     slideTimer.reset();
                 }
-                else if(gamepad2.options && gamepad2.share) currentOutakeState = OutakeStates.RIGGING;
+                else if(gamepad2.options && gamepad2.share){ currentOutakeState = OutakeStates.RIGGING;
+                    slideMech.climbUp();
+                }
                 else {
                     //wristRelignment.swivelToPostion(wrist, driveTrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES),(slideTimer.seconds()>1),telemetry);
                     wrist.setPosition(0.5);
@@ -269,7 +277,9 @@ public class Outake {
                     closeClaw();
                     slideTimer.reset();
                 }
-                else if(gamepad2.options && gamepad2.share) currentOutakeState = OutakeStates.RIGGING;
+                else if(gamepad2.options && gamepad2.share){ currentOutakeState = OutakeStates.RIGGING;
+                    slideMech.climbUp();
+                }
                 else{
                     //wristRelignment.swivelToPostion(wrist, driveTrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES),(slideTimer.seconds()>1),telemetry);
                     wrist.setPosition(0.5);
@@ -297,12 +307,11 @@ public class Outake {
                     currentOutakeState = OutakeStates.MANUAL;
                 }
                 else{
+
                     if(gamepad2.left_bumper){
-                        slideMech.setPower(-0.5);
+                        slideMech.setIntakeOrGround();
                     }
-                    else{
-                        slideMech.setPower(-0.4);
-                    }
+                    slideMech.update();
 
                 }
 
@@ -409,14 +418,14 @@ public class Outake {
     }
     private void manual(){
         //slide control
-        if(gamepad2.right_bumper && slideMech.getCurrentTickPosition()<3000){
+        if((gamepad2.right_bumper)){
             slideMech.setManualSlideUp();
         }
-        else if(gamepad2.left_bumper && slideMech.getCurrentTickPosition()>0){
+        else if((gamepad2.left_bumper)){
             slideMech.setManualSlideDown();
         }
         else{
-            slideMech.setPower(Kf);
+            slideMech.setPower(0.01);
         }
 
     }

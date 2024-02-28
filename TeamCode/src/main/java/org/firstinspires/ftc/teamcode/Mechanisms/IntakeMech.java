@@ -28,24 +28,24 @@ public class IntakeMech {
     private Gamepad gamepad;
 
     // LEFT
-    public static double leftFinalPos = 0.74; //also the down position in teleOPp
+    public static double leftFinalPos = 0.7; //also the down position in teleOPp
     public static double leftFinalUp = 1;
-    public static double leftTeleOpUp = 0.8;
+    public static double leftTeleOpUp = 0.7;
     public static double leftAutoApproachPosition = .8;
     public static double leftAutoIntakePositionStage1 = .789;
     public static double leftAutoIntakePositionStage2 = .475;
 
     // RIGHT
     public static double rightFinalUp = 0;
-    public static double rightTeleOp = 0.2;
+    public static double rightTeleOp = 0.3;
     public static double rightAutoApproachPosition = .2;
     public static double rightAutoIntakePositionStage1 = 0.211;
     public static double rightAutoIntakePositionStage2 = 0.525;
-    public static double rightFinalPos = 0.26; //also the down position in teleOPp
+    public static double rightFinalPos = 0.3; //also the down position in teleOPp
 
     // OTHER
     public static double increment = 0.024;
-    public static double power = 0.7;
+    public static double power = 0.63;
     public static double AutoPower = 0.85;
     public static double AutoExtakePower = 0.6;
     public static double ejectPower = -1.0;
@@ -141,6 +141,7 @@ public class IntakeMech {
         isIntaking = true;
         state = State.RUNNING;
         intake.setPower(AutoPower);
+
     }
 
     public void AutoIntakeServoPositionStage1(){
@@ -178,6 +179,7 @@ public class IntakeMech {
             setIntake();
             state = State.RUNNING;
             intake.setPower(power);
+
 
         } else if (gamepad.dpad_down) {
             state = State.REVERSE;

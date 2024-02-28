@@ -98,7 +98,8 @@ public class Intake {
 
     public void executeTeleOp(){
 
-        intakeArmL.setPosition((1-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition);
+        //intakeArmL.setPosition((1-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition);
+        intakeArmL.setPosition(intakeRestPosition);
         telemetry.addData("servo pos", intakeArmL.getPosition() );
        // intakeArmR.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition+0.06);
 
@@ -108,7 +109,7 @@ public class Intake {
                 
                 rollerMotor.setPower(0.0);
                 //When x is pressed and the outake is at rest, the state is switched to Moving
-                if (gamepad1.x) {
+                if (gamepad1.left_trigger>0.1) { //gamepad1.x
                     currentState = IntakeStates.INTAKE;
                     //outake.claw.setPosition(0.52);
                         /*
@@ -116,7 +117,7 @@ public class Intake {
                     outake.openClawU(); */
                     outake.openClaw();
                 }
-                else if (gamepad1.b) {
+                else if (gamepad1.dpad_down) {
                     currentState = IntakeStates.EXTAKE;
                     outake.openClaw();
                         /*
@@ -136,7 +137,7 @@ public class Intake {
                     rollerMotor.setPower(-motorPow);
 
                 //if x is not held, then the state is switched back to ground
-                if (!gamepad1.x) {
+                if (!(gamepad1.left_trigger>0.1)) {
                         /*
                     outake.closeClawB();
                 outake.closeClawU(); */
@@ -149,7 +150,7 @@ public class Intake {
             case EXTAKE:
                 rollerMotor.setPower(-motorPow);
 
-                if (!gamepad1.b) {
+                if (!gamepad1.dpad_down) {
 
                   //  outake.closeClawB();
                   //  outake.closeClawU();

@@ -12,9 +12,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ClawMech {
     private Servo claw; //pin 2
     private Telemetry telemetry;
-    public static double openPos = 0.3;
+    public static double openPos = 1;
     public Gamepad gamepad;
-    public static double close = 0.2;
+    public static double close = 0.19;
     private SignalEdgeDetector rightBumper, rightDPadRight;
     public static double halfOpenPos = 0.25;
     public static double timeOffset = 750;

@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Mechanisms.ArmMecNew;
+import org.firstinspires.ftc.teamcode.Mechanisms.Camera;
 import org.firstinspires.ftc.teamcode.Mechanisms.ClawMech;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.IntakeMech;
@@ -38,6 +39,8 @@ public class RedFarStack extends LinearOpMode {
 	private SampleMecanumDrive drive;
 	private ElapsedTime timer = new ElapsedTime();
 	private OpenCvWebcam frontCam, backCam;
+
+	private Camera.PropDetection cam;
 	//private IntakeMech intake;
 	private Intake intake;
 
@@ -68,7 +71,7 @@ public class RedFarStack extends LinearOpMode {
 	public static double frwDistance3 = 12;
 	public static double wait01 = 1;
 	public static double wait02 = 1;
-	public static double centerLineToLinear1X = 25.5, centerLineToLinear1Y = 13, centerLineToLinear1Heading = -92, wait1Center = 3;
+	public static double centerLineToLinear1X = 24.5, centerLineToLinear1Y = 13, centerLineToLinear1Heading = -92, wait1Center = 3;
 
 	public static double centerSplineToLinearHeading1X = 1.5, centerSplineToLinearHeading1Y = -6, centerSplineToLinearHeading1EndTangent = -75, centerSplineToLinearHeading1Heading = -90;
 
@@ -278,7 +281,8 @@ public class RedFarStack extends LinearOpMode {
 		wrist = hardwareMap.get(Servo.class, "WRIST");
 		wrist.setPosition(0.5);
 		clawMech.open();
-		cameraInit();
+		cam = new Camera.PropDetection(hardwareMap,telemetry,false);
+		//cameraInit();
 	}
 
 	@Override
@@ -290,17 +294,15 @@ public class RedFarStack extends LinearOpMode {
 
 		drive.setPoseEstimate(new Pose2d(0,-3,0));
 
-		e = detector.getLocate();
-
 		while (!isStarted()) {
 			e = detector.getLocate();
 
 
 			telemetry.update();
 		}
-		frontCam.stopStreaming();
-		frontCam.closeCameraDevice();
-		initAprilTag();
+		//frontCam.stopStreaming();
+		//frontCam.closeCameraDevice();
+		//initAprilTag();
 
 
 
@@ -336,7 +338,7 @@ public class RedFarStack extends LinearOpMode {
 					})
 					.splineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X-4, rightSplineToLinearHeading2Y, Math.toRadians(rightSplineToLinearHeading2Heading)), Math.toRadians(rightSplineToLinearHeading2EndTangent))
 					.waitSeconds(1.5)
-					.lineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X-4,rightSplineToLinearHeading2Y-9.5, Math.toRadians(rightSplineToLinearHeading2Heading)))
+					.lineToLinearHeading(new Pose2d(rightSplineToLinearHeading2X-4,rightSplineToLinearHeading2Y-14.5, Math.toRadians(rightSplineToLinearHeading2Heading)))
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						clawMech.halfOpen();
 					})
@@ -395,7 +397,7 @@ public class RedFarStack extends LinearOpMode {
 					})
 					.splineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X-2, centerSplineToLinearHeading2Y, Math.toRadians(centerSplineToLinearHeading2Heading)), Math.toRadians(centerSplineToLinearHeading2EndTangent))
 					.waitSeconds(1.5)
-					.lineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X-2,centerSplineToLinearHeading2Y-10,Math.toRadians(centerSplineToLinearHeading2Heading)))
+					.lineToLinearHeading(new Pose2d(centerSplineToLinearHeading2X-2,centerSplineToLinearHeading2Y-9,Math.toRadians(centerSplineToLinearHeading2Heading)))
 					.UNSTABLE_addTemporalMarkerOffset(0,()->{
 						clawMech.halfOpen();
 					})
@@ -495,28 +497,10 @@ public class RedFarStack extends LinearOpMode {
 		//hello
 		boolean hasRanOnce = false;
 		while (opModeIsActive() && !isStopRequested()) {
-			telemetry.addLine(e.name());
-			telemetry.addLine(errorX + "-x, " + errorY + "-y");
-			telemetry.addLine("Encoder Pos: " + drive.getEncoder().getWheelPositions());
-			boolean readyToScan = readyToScan();
-			telemetry.addLine("Is ready to scan "+ readyToScan);
 
-			if(readyToScan && drive.getEncoder().getWheelVelocitySum() == 0){
-				telemetry.addLine("Offsets added");
-				//drive.getEncoder().setErrorX(errorX);
-				//drive.getEncoder().setErrorY(errorY);
-				;
-				hasRanOnce = true;
-
-			}
-
-			telemetryAprilTag();
-			telemetry.addLine(""+drive.getPoseEstimate());
-			telemetry.addLine(drive.getEncoder().getErrorX() + "-x, " + drive.getEncoder().getErrorY() + "-y");
-			telemetry.addLine(""+intake.intakeTargetPos);
 			drive.update();
 			slide.update();
-			intake.executeAuto();
+			//intake.executeAuto();
 			telemetry.update();
 		}
 	}

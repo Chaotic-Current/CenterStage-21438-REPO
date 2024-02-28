@@ -60,11 +60,11 @@ public class BlueClose_50 extends LinearOpMode {
     public static double frwDistance3 = 12;
     public static double wait01 = 1;
     public static double wait02 = 1;
-    public static double centerLineToLinear1X = 26, centerLineToLinear1Y = 27, centerLineToLinear1Heading = 90, wait1Center = 3;
+    public static double centerLineToLinear1X = 26, centerLineToLinear1Y = 38.5, centerLineToLinear1Heading = 90, wait1Center = 3;
     public static double centerLineToLinear2Y = 38.5;
 
     // LEFT
-    public static double leftLineToLinear2X = 20, leftLineToLinear2Y = 30, leftLineToLinear2Heading = 90, wait1Left = 3, wait2Left = 1;
+    public static double leftLineToLinear2X = 20, leftLineToLinear2Y = 37.75, leftLineToLinear2Heading = 90, wait1Left = 3, wait2Left = 1;
     public static double leftLinetoLinear3Y = 38.5;
     public static double leftLinetoLinear1X = 26, leftLinetoLinear1Y = 6, leftLineToLinear1Heading = 30;
     public static double leftBackDist = 10;
@@ -72,9 +72,9 @@ public class BlueClose_50 extends LinearOpMode {
     // RIGHT
     public static double rightSpline1deg = -75;
     public static double rightLineToLinear2deg = 90;
-    public static double rightSplineTo1X = 26, rightSplineTo1Y = -3.5, splineToLinear1Heading = -80;
-    public static double rightLineToLinear2X = 32.75, rightLineToLinear2Y = 30, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
-    public static double rightLineToLinear3Y = 38.5;
+    public static double rightSplineTo1X = 28, rightSplineTo1Y = -4.35, splineToLinear1Heading = -80;
+    public static double rightLineToLinear2X = 33.25, rightLineToLinear2Y = 31, splineToLinear2Heading = 90, wait1Right = .3, wait2Right = 1;
+    public static double rightLineToLinear3Y = 39.25;
 
 
     // OTHER
@@ -269,7 +269,7 @@ public class BlueClose_50 extends LinearOpMode {
             autoTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
                     .splineTo(new Vector2d(rightSplineTo1X, rightSplineTo1Y), Math.toRadians(rightSpline1deg))
-                    .waitSeconds(1.5)
+                    .waitSeconds(0.1)
                     .back(5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -286,18 +286,21 @@ public class BlueClose_50 extends LinearOpMode {
                         telemetry.addData("test", 1);
                     })
 
-                    .waitSeconds(0.5)
+                    .waitSeconds(0.1)
 
                     .lineToLinearHeading(new Pose2d(rightLineToLinear2X, rightLineToLinear3Y+0.25, Math.toRadians(rightLineToLinear2deg)))
+                    .waitSeconds(0.15)
+                    //.forward(8)
+
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(930);
+                        slide.setCustom(980);
                     })
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(1)
 
+                    .waitSeconds(0.75)
                     .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
@@ -307,18 +310,18 @@ public class BlueClose_50 extends LinearOpMode {
                         arm.setIntake();
                     })
 
-                    .UNSTABLE_addTemporalMarkerOffset(1.7, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(1, () -> {
                         clawMech.close();
                     })
 
                     .UNSTABLE_addTemporalMarkerOffset(3.5, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(1.5)
+                    .waitSeconds(.25)
 
                     // PARK \\
                     .lineToLinearHeading(new Pose2d(0.5, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
-                    .waitSeconds(.5)
+                    .waitSeconds(.1)
                     .forward(12)
                     .build();
 
@@ -338,24 +341,21 @@ public class BlueClose_50 extends LinearOpMode {
 
                     .back(centerBackwardsDistance1)
 
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y + 2.5, Math.toRadians(centerLineToLinear1Heading)))
+                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear1Y , Math.toRadians(centerLineToLinear1Heading)))
 
-                    .UNSTABLE_addTemporalMarkerOffset(0.15, () -> {
-                        // t.set(true);
-                    })
 
-                    .waitSeconds(1)
+                    .waitSeconds(0.25)
+                    //.forward(8)
 
-                    .lineToLinearHeading(new Pose2d(centerLineToLinear1X, centerLineToLinear2Y+0.25, Math.toRadians(centerLineToLinear1Heading)))
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(930);
+                        slide.setCustom(980);
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(1.5)
 
+                    .waitSeconds(0.75)
                     .back(7)
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         slide.setLowJunction();
@@ -364,19 +364,19 @@ public class BlueClose_50 extends LinearOpMode {
                         arm.setIntake();
                     })
 
-                    .UNSTABLE_addTemporalMarkerOffset(1.7, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(1, () -> {
                         clawMech.close();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
 
                     })
-                    .waitSeconds(2.5)
+                    .waitSeconds(0.2)
 
                     // PARK \\
                     .lineToLinearHeading(new Pose2d(0.5, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
-                    .waitSeconds(.5)
-                    .forward(12) // changed
+                    .waitSeconds(.1)
+                    .forward(8) // changed
                     .build();
 
         } else if (e == DetectColor.ColorLocation.LEFT) {
@@ -395,21 +395,19 @@ public class BlueClose_50 extends LinearOpMode {
                     .waitSeconds(.3)
 
                     .lineToLinearHeading(new Pose2d(leftLineToLinear2X, leftLineToLinear2Y, Math.toRadians(leftLineToLinear2Heading)))
-                    .UNSTABLE_addTemporalMarkerOffset(0.15, () -> {
-                        //t.set(true);
-                    })
-                    .waitSeconds(0.5)
-                    .lineToLinearHeading(new Pose2d(leftLineToLinear2X, leftLinetoLinear3Y+0.25, Math.toRadians(leftLineToLinear2Heading)))
+                    .waitSeconds(0.25)
+                    //.forward(8)
+
+
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                        slide.setCustom(930);
+                        slide.setCustom(980);
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(1.5)
 
-                    .waitSeconds(2)
-                    .back(8)
+                    .waitSeconds(0.75)
+                    .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         slide.setLowJunction();
@@ -418,17 +416,17 @@ public class BlueClose_50 extends LinearOpMode {
                 arm.setIntake();
             })
 
-                    .UNSTABLE_addTemporalMarkerOffset(1.7,()->{
+                    .UNSTABLE_addTemporalMarkerOffset(1,()->{
                         clawMech.close();
                     })
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(2)
+                    .waitSeconds(.25)
 
                     // PARK \\
                     .lineToLinearHeading(new Pose2d(0.5, rightLineToLinear2Y, Math.toRadians(rightLineToLinear2deg)))
-                    .waitSeconds(.5)
+                    .waitSeconds(.1)
                     .forward(13) // changed
                     .build();
 

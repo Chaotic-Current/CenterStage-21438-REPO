@@ -296,7 +296,7 @@ public class V1TeleOp extends OpMode {
         gamePad_1_DpadDown.update();
         gamePad_2_bumperLeft.update();
         GamePad_2_DpadUp.update();
-        cr.swivelToPostion( wrist, botHeading, canRealign, telemetry);
+        //cr.swivelToPostion( wrist, botHeading, canRealign, telemetry);
 
 
 

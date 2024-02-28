@@ -47,9 +47,9 @@ public class RedClose_50 extends LinearOpMode {
 
     public static double linetoLinear1X = 26, linetoLinear1Y = -6, lineToLinear1Heading = -30;
     public static double splineToLinear1X = 26, splineToLinear1Y = 5.25, splineToLinear1Heading = 80;
-    public static double splineToLinear2X = 29, splineToLinear2Y = -39.5, splineToLinear2Heading = -90, wait1 = 3;
-    public static double splineToLinear3X = 26, splineToLinear3Y = -39.5, splineToLinear3Heading = -90, wait2 = 3;
-    public static double splineToLinear4X = 20, splineToLinear4Y = -39.5, splineToLinear4Heading = -90, wait3 = 3;
+    public static double splineToLinear2X = 29, splineToLinear2Y = -41.5, splineToLinear2Heading = -90, wait1 = 3;
+    public static double splineToLinear3X = 26, splineToLinear3Y = -41.5, splineToLinear3Heading = -90, wait2 = 3;
+    public static double splineToLinear4X = 20, splineToLinear4Y = -41.5, splineToLinear4Heading = -90, wait3 = 3;
     public static double frparkX = 4, frparkY=-38, frparkHeading = -90;
 
     public static double parkX = 4, parkY = 37, parkHeading = 90;
@@ -130,7 +130,7 @@ public class RedClose_50 extends LinearOpMode {
 
 
 
-        if (e == DetectColor.ColorLocation.LEFT || e == DetectColor.ColorLocation.UNDETECTED) {
+        if (e == DetectColor.ColorLocation.LEFT ) {
 
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance3)
@@ -170,14 +170,14 @@ public class RedClose_50 extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(3.25)
-                    .strafeRight(28)
+                    .waitSeconds(.1)
+                    .strafeLeft(28)
                     .waitSeconds(.5)
                     .forward(11.5)
                     .build();
 
 
-        } else if (e == DetectColor.ColorLocation.CENTER) {
+        } else if (e == DetectColor.ColorLocation.CENTER || e == DetectColor.ColorLocation.UNDETECTED) {
             firstMove = drive.trajectorySequenceBuilder(new Pose2d())
                     .forward(frwDistance1)
                     .UNSTABLE_addTemporalMarkerOffset(.3, () -> {
@@ -191,19 +191,18 @@ public class RedClose_50 extends LinearOpMode {
 
                     .back(backwardsDistance1)
 
-                    .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y+.2, Math.toRadians(splineToLinear3Heading)))
+                    .lineToLinearHeading(new Pose2d(splineToLinear3X, splineToLinear3Y+1.5, Math.toRadians(splineToLinear3Heading)))
 
                     //.forward(4.5)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(980);
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(1)
 
-                    .waitSeconds(2)
+                    .waitSeconds(.75)
                     .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
@@ -216,8 +215,8 @@ public class RedClose_50 extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
-                    .strafeRight(24)
+                    .waitSeconds(.1)
+                    .strafeLeft(24)
                     .waitSeconds(.5)
                     .forward(11)
                     .build();
@@ -236,18 +235,16 @@ public class RedClose_50 extends LinearOpMode {
                     .waitSeconds(1)
                     .back(backdist2)
                     .waitSeconds(.3)
-                    .lineToLinearHeading(new Pose2d(20, splineToLinear4Y+.5, Math.toRadians(splineToLinear4Heading)))
+                    .lineToLinearHeading(new Pose2d(20, splineToLinear4Y+1, Math.toRadians(splineToLinear4Heading)))
                     //.forward(frw)
 
                     .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                         slide.setCustom(980);
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
                         clawMech.open();
                     })
-                    .waitSeconds(1)
-
-                    .waitSeconds(2)
+                    .waitSeconds(.75)
                     .back(7)
 
                     .UNSTABLE_addTemporalMarkerOffset(.5, () -> {
@@ -260,8 +257,8 @@ public class RedClose_50 extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
                         slide.setIntakeOrGround();
                     })
-                    .waitSeconds(5)
-                    .strafeRight(18)
+                    .waitSeconds(.1)
+                    .strafeLeft(18)
                     .waitSeconds(.5)
                     .forward(11)
                     .build();

@@ -105,54 +105,18 @@ public class DriveTrain {
             double rx = gamepad1.right_stick_x;
             double frontLeftPower = 0, frontRightPower = 0, backLeftPower = 0, backRightPower = 0, denominator = 0 ;
 
-            switch(currentMode){
-                
-                case FIELD_CENTRIC:
-                    if (gamepad1.options) {
-                        imu.resetYaw();
-                    }
 
-                    double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-                    // Rotate the movement direction counter to the bot's rotation
-                    double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-                    double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-                    rotX = rotX * 1.1;  // Counteract imperfect strafing
-
-                    // Denominator is the largest motor power (absolute value) or 1
-                    // This ensures all the powers maintain the same ratio,
-                    // but only if at least one is out of the range [-1, 1]
-                    denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-                    frontLeftPower = (rotY + rotX + rx) / denominator;
-                    backLeftPower = (rotY - rotX + rx) / denominator;
-                    frontRightPower = (rotY - rotX - rx) / denominator;
-                    backRightPower = (rotY + rotX - rx) / denominator;
-                    if(gamepad1.dpad_up){
-                        currentMode = Mode.ROBOT_CENTRIC;
-                    }
-                    break;
-
-
-                case ROBOT_CENTRIC:
-                    denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-                    // Calculate the mecanum motor powers
-                    frontLeftPower = (y + x + 2 * rx) / denominator;
-                    backLeftPower = (y - x + 2 * rx) / denominator;
-                    frontRightPower = (y - x - 2 * rx) / denominator;
-                    backRightPower = (y + x - 2 * rx) / denominator;
-                    // Cube the motor powers
-                    frontLeftPower = Math.pow(frontLeftPower, 3);
-                    frontRightPower = Math.pow(frontRightPower, 3);
-                    backLeftPower = Math.pow(backLeftPower, 3);
-                    backRightPower = Math.pow(backRightPower, 3);
-                    if(gamepad1.dpad_down){
-                        currentMode = Mode.FIELD_CENTRIC;
-                    }
-                    break;
-
-
-            }
+            denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            // Calculate the mecanum motor powers
+            frontLeftPower = (y + x + 2 * rx) / denominator;
+            backLeftPower = (y - x + 2 * rx) / denominator;
+            frontRightPower = (y - x - 2 * rx) / denominator;
+            backRightPower = (y + x - 2 * rx) / denominator;
+            // Cube the motor powers
+            frontLeftPower = Math.pow(frontLeftPower, 3);
+            frontRightPower = Math.pow(frontRightPower, 3);
+            backLeftPower = Math.pow(backLeftPower, 3);
+            backRightPower = Math.pow(backRightPower, 3);
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio, but only when
             // at least one is out of the range [-1, 1]
@@ -177,7 +141,7 @@ public class DriveTrain {
                 backLeftPower /= maxValue;
                 backRightPower /= maxValue;
             }
-            if(gamepad1.left_trigger>0.1){
+            if(gamepad1.right_trigger>0.1){
                 motorFrontLeft.setPower(frontLeftPower*.4);
                 motorBackLeft.setPower(backLeftPower*.4);
                 motorFrontRight.setPower(frontRightPower*.4);

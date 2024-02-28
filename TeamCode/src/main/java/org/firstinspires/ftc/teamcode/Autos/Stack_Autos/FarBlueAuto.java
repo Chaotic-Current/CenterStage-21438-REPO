@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Autos.Stack_Autos;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.Camera;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 
 @Autonomous(name = "FarBlueAuto")
+@Disabled
 public class FarBlueAuto extends LinearOpMode {
 
     enum States {
@@ -29,7 +31,7 @@ public class FarBlueAuto extends LinearOpMode {
 
     public void initialize() {
 
-        PropDetection = new Camera.PropDetection(hardwareMap,telemetry);
+        //PropDetection = new Camera.PropDetection(hardwareMap,telemetry);
         PropDetection.runPipeline();
         outake = new Outake(hardwareMap, telemetry);
         drive = new SampleMecanumDrive(hardwareMap);

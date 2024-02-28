@@ -20,7 +20,7 @@ public class SlideMech {
 
     public static int MID_JUNCTION = 2100; //<-- 12.90V, 1550;// old 890 as of 11/8/2023
     public static int LOW_JUNCTION = 1490;  //<-- 12.90V, 1860;
-    public static int ZERO_POSITION = 0;//5V;// old val -40
+    public static int ZERO_POSITION = -40;//5V;// old val -40
     private final double MAX = 2500;
     public final static double Minimum = 0;
 

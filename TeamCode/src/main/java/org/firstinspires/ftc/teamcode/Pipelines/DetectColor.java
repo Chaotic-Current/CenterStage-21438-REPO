@@ -170,7 +170,7 @@ public class DetectColor extends OpenCvPipeline {
         int maxContourIdx = -1;
         for (int i = 0; i < contours.size(); i++) {
             double area = Imgproc.contourArea(contours.get(i));
-            if (area > maxArea  && area > 40) {
+            if (area > maxArea  && area > 0) {
                 maxArea = area;
                 maxContourIdx = i;
             }

@@ -11,8 +11,8 @@ public class ArmMecNew {
     Servo leftAxon;
     Servo rightAxon;
 
-    public static double intakePosRight = 0.015;
-    public static double intakePosLeft = 0.985;
+    public static double intakePosRight = 0.01;
+    public static double intakePosLeft = 0.99;
     public static double extakePosRight = 0.95;
     public static double extakePosLeft = 0.05;
 
