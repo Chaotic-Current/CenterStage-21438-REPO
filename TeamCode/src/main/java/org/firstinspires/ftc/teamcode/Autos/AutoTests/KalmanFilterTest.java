@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Autos.AutoTests;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
@@ -9,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Mechanisms.LowPass;
@@ -42,8 +45,10 @@ public class KalmanFilterTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
         SampleMecanumDrive bot = new SampleMecanumDrive(hardwareMap);
         bot.getEncoder().setCamTelemetry(telemetry);
+        timer.reset();
         /*
         bot.getEncoder().setFrontBoardInfo(new ArrayList<Double>(Arrays.asList(
 
@@ -62,26 +67,31 @@ public class KalmanFilterTest extends LinearOpMode {
 
         TrajectorySequence traj1 = bot.trajectorySequenceBuilder(new Pose2d(0,0,0))
                // .lineToLinearHeading(new Pose2d(25, 0, Math.toRadians(-90)))
+                .waitSeconds(10)
                // .splineToConstantHeading(new Vector2d(24,-24))
                 //.splineToConstantHeading(new Vector2d(24,-24),Math.toRadians(0))
                 //.forward(6)
                 //.waitSeconds(2)
                // .forward(8)
                 .setConstraints(SampleMecanumDrive.getVelocityConstraint(15, 10, 11.5) , SampleMecanumDrive.getAccelerationConstraint(7))
-                .lineToSplineHeading(new Pose2d(35,-24,Math.toRadians(0)))
+                .lineToSplineHeading(new Pose2d(35,0,Math.toRadians(0)))
                 .resetConstraints()
                 .waitSeconds(28)
                 .build();
 
         waitForStart();
 
+
+
         bot.followTrajectorySequenceAsync(traj1);
         while (opModeIsActive() && !isStopRequested()) { // !slides.atTarget && for feedforward, // slides.update(); in loop
             timer.reset();
             bot.update();
             telemetry.addData("Kalman(perpendicular)",bot.getEncoder().getMultiSensorFuser().getX_k().get(0,0));
+            telemetry.addData("Kalman(perpendicular)",bot.getEncoder().getMultiSensorFuser().getX_k().get(1,0));
             telemetry.addData("perpendicular encoder",bot.getEncoder().getPerpendicularEncoderPos());
-            telemetry.addData("Kalman Gain",bot.getEncoder().getMultiSensorFuser().getK_k().get(0,0));
+            telemetry.addData("parallel encoder",bot.getEncoder().getParallelEncoderPos());
+            telemetry.addData("Kalman Gain",bot.getEncoder().getMultiSensorFuser().getK_k());
             telemetry.addData("loopSpeed",lowP.execute(timer.seconds()));
             telemetry.update();
         }

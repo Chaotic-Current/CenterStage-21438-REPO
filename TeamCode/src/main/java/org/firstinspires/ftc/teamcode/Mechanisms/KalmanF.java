@@ -20,17 +20,18 @@ public class KalmanF {
     private Pose2d pastPosition = new Pose2d(0,0,0);
 
     public static double depthVar = 0.001; // 0.005
-    private double horzVar = 0.001; //0.005
+    public static  double horzVar = 0.001; //0.005
 
     //velocity from odo
-    public static double velocityVar = 0.0;
+    public static double velocityVar = 0.005;
 
 
 
     //I think standard deivation of system
-    private double sigma_a = 0.01;//0.005, 0.01
+    public static double sigma_a = 0.005;//0.005, 0.01
 
     private ArrayList pastVelo;
+    private Pose2d pastVelocity;
 
     public KalmanF(Pose2d currentVel){
         F = new SimpleMatrix(new double[][]{
@@ -75,7 +76,7 @@ public class KalmanF {
                 {0,0,dt,0},
                 {0,0,0,dt}
         });
-        pastPosition = new Pose2d(currentVel.getX(),currentVel.getY(), currentVel.getHeading());
+        pastVelocity = new Pose2d(currentVel.getX(),currentVel.getY(), currentVel.getHeading());
     }
 
     public KalmanF(SimpleMatrix f, SimpleMatrix g, SimpleMatrix r, SimpleMatrix q, SimpleMatrix h) {
@@ -87,10 +88,6 @@ public class KalmanF {
         H = h;
         H_T = H.transpose();
         I = SimpleMatrix.identity(F.numRows());
-        pastVelo = new ArrayList<Double>(Arrays.asList(
-                0.0,
-                0.0
-        ));
     }
 
     public void setInitalPostion(SimpleMatrix x_0, SimpleMatrix P_0, SimpleMatrix b) {
@@ -131,29 +128,23 @@ public class KalmanF {
 
         return x_k;
     }
-    public void inputUpdate( Pose2d currentPosition, SimpleMatrix measurements){
+    public void inputUpdate(Pose2d currentVelocity, SimpleMatrix measurements){
+        SimpleMatrix input  = new SimpleMatrix(new double[][]{
+                {(1/dt)*(currentVelocity.getX()-pastVelocity.getX())},
+                {(1/dt)*(currentVelocity.getY()-pastVelocity.getY())},
+                {(1/dt)*(currentVelocity.getX()-pastVelocity.getX())},
+                {(1/dt)*(currentVelocity.getY()-pastVelocity.getY())}
+        });
         /*
         SimpleMatrix input  = new SimpleMatrix(new double[][]{
-                {(1/dt)*(currentPosition.getX()-pastVelocity.getX())},
-                {(1/dt)*(currentPosition.getY()-pastVelocity.getY())},
-                {(1/dt)*(currentPosition.getX()-pastVelocity.getX())},
-                {(1/dt)*(currentPosition.getY()-pastVelocity.getY())}
-        }); */
-         /*
-        SimpleMatrix input  = new SimpleMatrix(new double[][]{
-                {currentPosition.getX()-pastPosition.getX())},
-                {currentPosition.getY()-pastPosition.getY()},
-                {0},
-                {0}
-        }); */
-        SimpleMatrix input  = new SimpleMatrix(new double[][]{
                 {0},
                 {0},
                 {0},
                 {0}
-        });
+        }); */
 
-        pastPosition = new Pose2d(currentPosition.getX(),currentPosition.getY(),currentPosition.getHeading());
+
+
         update(measurements,input);
     }
 

@@ -91,9 +91,9 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         ));
 
         this.drive = drive;
-        /*
-        multiSensorFuser = new KalmanF(new Pose2d(0,0,0));
-        frontTagCam = new AprilTagCam(hardwareMap,"WebcamFront",2); */
+
+       // multiSensorFuser = new KalmanF(new Pose2d(0,0,0));
+     //   frontTagCam = new AprilTagCam(hardwareMap,"WebcamFront",2);
         //HAVE TO INTIALIZE telemetry -> bot.getEncoder.setCamTelemetry(telemetry);
 
         parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "PO"));
@@ -132,24 +132,25 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public List<Double> getWheelPositions() {
         //Saving current positions of encoders
         /*
-        double pependicularPos = encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * X_MULTIPLIER;
+        double perpendicularPos = encoderTicksToInches(perpendicularEncoder.getCurrentPosition()) * X_MULTIPLIER;
         double parallelPos = encoderTicksToInches(parallelEncoder.getCurrentPosition()) * Y_MULTIPLIER;
+
         //updating apriltag data
         frontTagCam.aprilTagUpdate();
         //applying apriltag to kalman filter through measurements state vector
         switch(currentCamState){
             case OFF:
                 measurements = new SimpleMatrix(new double[][]{
-                        {0},
-                        {0},
-                        {0},
-                        {0}
+                        {perpendicularPos},
+                        {parallelPos}, // parallelPos+frontTagCam.getDepthDisplacement(frontBoardInfo) boardInfo can be altered using setBoardInfo()
+                        {getWheelVelocities().get(1)},
+                        {getWheelVelocities().get(0)}
                 });
                 break;
             case FRONTON:
                 measurements = new SimpleMatrix(new double[][]{
-                        {pependicularPos-frontTagCam.getHorizDisplacement()},
-                        {0}, // parallelPos+frontTagCam.getDepthDisplacement(frontBoardInfo) boardInfo can be altered using setBoardInfo()
+                        {frontTagCam.getHorizDisplacement()},
+                        {parallelPos}, // parallelPos+frontTagCam.getDepthDisplacement(frontBoardInfo) boardInfo can be altered using setBoardInfo()
                         {0},
                         {0}
                 });
@@ -167,12 +168,9 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         //Kalman Filter Input update method
         Pose2d inputs = new Pose2d(getWheelVelocities().get(1),getWheelVelocities().get(0),0);
         multiSensorFuser.inputUpdate(inputs, measurements);
+            */
 
-        return Arrays.asList(
-                (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER + errorY,
-               multiSensorFuser.getX_k().get(0,0)
-        );
-        */
+
         return Arrays.asList(
                 (encoderTicksToInches(parallelEncoder.getCurrentPosition())) * X_MULTIPLIER ,
                 (encoderTicksToInches(perpendicularEncoder.getCurrentPosition())) * Y_MULTIPLIER

@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.Mechanisms.MechanismTests;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Mechanisms.LowPass;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -12,11 +14,17 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
+@Config
+
 public class AprilTagCam {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
+
+    private LowPass lowP;
+
+    public static double alp = 0.5;
 
     private double horizDisplacement = 0;
     private double depthDisplacement = 0;
@@ -34,6 +42,7 @@ public class AprilTagCam {
         builder.addProcessor(aprilTag);
 
         this.targetID = targetID;
+        lowP = new LowPass(0,alp);
 
         visionPortal = builder.build();
     }
@@ -46,7 +55,7 @@ public class AprilTagCam {
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == targetID) {
-                horizDisplacement = -detection.ftcPose.x;
+                horizDisplacement = lowP.execute(detection.ftcPose.x);
                 depthDisplacement = detection.ftcPose.y - 10;
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y-10, detection.ftcPose.z));
