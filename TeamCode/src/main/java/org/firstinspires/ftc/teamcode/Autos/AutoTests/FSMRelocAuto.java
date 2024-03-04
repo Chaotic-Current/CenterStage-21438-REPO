@@ -23,9 +23,9 @@ public class FSMRelocAuto extends LinearOpMode {
     enum States {
         START,
 
-        BACKDROP,
+        GOING_TO_BACKDROP,
 
-        RETURN,
+        GOING_TO_RETURN,
         IDLE
     }
 
@@ -55,21 +55,13 @@ public class FSMRelocAuto extends LinearOpMode {
 
 
     public void initialize() {
-
-       // PropDetection = new Camera.PropDetection(hardwareMap,telemetry);
-        // PropDetection.runPipeline();
-      //  frontTagCam = new AprilTagCam(hardwareMap,"WebcamFront",6);
-       // frontTagCam.setTelemetry(telemetry);
         drive = new SampleMecanumDrive(hardwareMap);
         cameraInit();
-        //outake.closeClawB();
-        //outake.closeClawU();
     }
 
 
     @Override
     public void runOpMode() {
-        int propPos = 2;
         initialize();
         Pose2d blueStart = new Pose2d(14, -60.5, Math.toRadians(90));
 
@@ -87,55 +79,70 @@ public class FSMRelocAuto extends LinearOpMode {
         TrajectorySequence thirdBlueTraj = drive.trajectorySequenceBuilder(secondBlueTraj.end())
                 .lineToLinearHeading(new Pose2d(14,-35,Math.toRadians(0)))
                 .build();
-        //waitForStart();
-        //running pipeline after start button is pressed, its a bet, but have to experiement and see if calling runpipline once
-        // before the command waitForStart(); causes the camera to be running the entire auto, or stops after init
-        //cam.runPipeline();
 
-        //drive.followTrajectorySequenceAsync(camDetection);
         currentState = States.START;
 
         while (opModeInInit()) {
-           // propPos = PropDetection.getPosition();
 
-            //currentDetectionState = cam.getDetectionState();
         }
-       // drive.followTrajectorySequenceAsync(firstBlueTraj);
+
         int currentIteration = 0;
         while (opModeIsActive()) {
             switch (currentState) {
                 case START:
+                    //Starts following the first trajectory and changes to backdrop state
                     if (!drive.isBusy()) {
                         drive.followTrajectorySequenceAsync(firstBlueTraj);
-                        currentState = States.BACKDROP;
+                        currentState = States.GOING_TO_BACKDROP;
                         currentIteration++;
                     }
                     break;
-                case BACKDROP:
+                case GOING_TO_BACKDROP:
+                    /*
+                    From StartState/ReturnState: After following the first trajectory is done->(when at return, we need to go to backdrop),
+                                     (1).Uses April tag data to make a new fixed pose estimate of the robot
+                                     (2).Uses the new fixed Pose in drive.setPoseEstimate and in making a new traj so the bot's currentPosition and start pose for traj is same.
+                                     (3).Starts Following path to backdrop
+                                     (4).Adds to current iteration
+                                     (5).Changes State to Return
+
+
+                    */
+
                     if (!drive.isBusy()) {
-                        //drive.setPoseEstimate();
+                        //calculating the offset( apriltag offset - (our calculated odometry displacement from the tag)) to get how much we are off from our path
                         double offset = calculateOffset(tagLocation,drive.getPoseEstimate().getY(),frontTagCam.getHorizDisplacement());
                         Pose2d fixedPose =  new Pose2d(thirdBlueTraj.end().getX(),thirdBlueTraj.end().getY()+offset,thirdBlueTraj.end().getHeading());
                         drive.setPoseEstimate(fixedPose);
+                        //try to keep sequences relatively short, like 5-6 commands at most, so build time isnt too long
                         secondBlueTraj =  drive.trajectorySequenceBuilder(fixedPose)
                                 .lineToLinearHeading(new Pose2d(55,-35,Math.toRadians(0)))
                                 .build();
                         drive.followTrajectorySequenceAsync(secondBlueTraj);
                         currentIteration++;
-                        currentState = States.RETURN;
+                        currentState = States.GOING_TO_RETURN;
 
                     }
                     break;
-                case RETURN:
+                case GOING_TO_RETURN:
+                     /*
+                    From BackDropState: After following the second Trajectory(towards backdrop) is done->(When At Backdrop, we need to return)
+                                     (1).Follows the premade third trajectory(trajectory that goes back couple of units)
+                                     (2).If the number of iterations(cycles) the bot has done is greater than the num of iterations we specified
+                                         then current state is changed to Idle(stop) state, else current state is changed back to backdrop
+
+
+
+                    */
                     if (!drive.isBusy()) {
-                        thirdBlueTraj = drive.trajectorySequenceBuilder(secondBlueTraj.end())
+                        /*thirdBlueTraj = drive.trajectorySequenceBuilder(secondBlueTraj.end())
                                 .lineToLinearHeading(new Pose2d(14,-35,Math.toRadians(0)))
-                                .build();
+                                .build(); */
                         drive.followTrajectorySequenceAsync(thirdBlueTraj);
                         if(currentIteration>iterations)
                             currentState = States.IDLE;
                         else
-                            currentState = States.BACKDROP;
+                            currentState = States.GOING_TO_BACKDROP;
                     }
                     break;
                 case IDLE:
