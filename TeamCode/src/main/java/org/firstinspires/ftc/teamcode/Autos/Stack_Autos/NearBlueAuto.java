@@ -127,7 +127,7 @@ public class NearBlueAuto extends LinearOpMode {
                 .forward(9)
                 .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
-                    outake.openClaw();
+                   // outake.openClaw();
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
@@ -166,11 +166,11 @@ public class NearBlueAuto extends LinearOpMode {
                 .forward(11.0)
                 .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
-                    outake.halfOpenClaw();
+                  //  outake.halfOpenClaw();
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                     //open claw
-                    outake.openClaw();
+                   // outake.openClaw();
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
@@ -206,7 +206,7 @@ public class NearBlueAuto extends LinearOpMode {
                 .forward(9)
                 .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
-                    outake.openClaw();
+                   // outake.openClaw();
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
@@ -245,11 +245,11 @@ public class NearBlueAuto extends LinearOpMode {
                 .forward(11.0)
                 .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
-                    outake.halfOpenClaw();
+                  //  outake.halfOpenClaw();
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                     //open claw
-                    outake.openClaw();
+                  //  outake.openClaw();
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {

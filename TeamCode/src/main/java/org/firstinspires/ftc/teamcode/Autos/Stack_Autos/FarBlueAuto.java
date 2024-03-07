@@ -35,7 +35,7 @@ public class FarBlueAuto extends LinearOpMode {
         PropDetection.runPipeline();
         outake = new Outake(hardwareMap, telemetry);
         drive = new SampleMecanumDrive(hardwareMap);
-        outake.closeClaw();
+        outake.releaseTop();
     }
 
     @Override

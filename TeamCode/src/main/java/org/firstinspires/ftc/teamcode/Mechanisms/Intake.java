@@ -87,9 +87,9 @@ public class Intake {
 
 
         //Motor Init
-        rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("IN");
+        rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("intake");
         rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        intakeArmL = hardwareMap.get(Servo.class, "ARM_L");
+      //  intakeArmL = hardwareMap.get(Servo.class, "ARM_L");
        // intakeArmR = hardwareMap.servo.get("inServoR");
        // intakeArmL = hardwareMap.servo.get("inServoL");
        // intakeArmR.setDirection(Servo.Direction.REVERSE);
@@ -99,8 +99,8 @@ public class Intake {
     public void executeTeleOp(){
 
         //intakeArmL.setPosition((1-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition);
-        intakeArmL.setPosition(intakeRestPosition);
-        telemetry.addData("servo pos", intakeArmL.getPosition() );
+        //intakeArmL.setPosition(intakeRestPosition);
+       // telemetry.addData("servo pos", intakeArmL.getPosition() );
        // intakeArmR.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition+0.06);
 
         switch (currentState) {
@@ -108,52 +108,46 @@ public class Intake {
             case GROUND:
                 
                 rollerMotor.setPower(0.0);
+                if(timer.seconds()>0.2){
+                    outake.grabTop();
+                    outake.grabBottom();
+                }
                 //When x is pressed and the outake is at rest, the state is switched to Moving
-                if (gamepad1.left_trigger>0.1) { //gamepad1.x
-                    currentState = IntakeStates.INTAKE;
-                    //outake.claw.setPosition(0.52);
+                if(outake.getOutakeState()==Outake.OutakeStates.REST){
+                    if (gamepad1.left_trigger>0.1) { //gamepad1.x
+                        currentState = IntakeStates.INTAKE;
+                        outake.setArmReadyToPick();
+                    }
+                    else if (gamepad1.dpad_down) {
+                        currentState = IntakeStates.EXTAKE;
+                        // outake.openClaw();
                         /*
                     outake.openClawB();
                     outake.openClawU(); */
-                    outake.openClaw();
+                    }
                 }
-                else if (gamepad1.dpad_down) {
-                    currentState = IntakeStates.EXTAKE;
-                    outake.openClaw();
-                        /*
-                    outake.openClawB();
-                    outake.openClawU(); */
-                }
-
                 break;
 
             case INTAKE:
 
 
-                outake.openClaw();
-                if(true) //
-                    rollerMotor.setPower(motorPow);
-                else
-                    rollerMotor.setPower(-motorPow);
-
+              //  outake.openClaw();
+                //rollerMotor.setPower(motorPow);
+                outake.releaseTop();
+                outake.releaseBottom();
                 //if x is not held, then the state is switched back to ground
                 if (!(gamepad1.left_trigger>0.1)) {
-                        /*
-                    outake.closeClawB();
-                outake.closeClawU(); */
-                    //outake.setArmPosition(armPos2);
-                    outake.closeClaw();
+
+                    outake.setArmPick();
                     currentState = IntakeStates.GROUND;
+                    timer.reset();
                 }
                 break;
 
             case EXTAKE:
-                rollerMotor.setPower(-motorPow);
+               // rollerMotor.setPower(-motorPow);
 
                 if (!gamepad1.dpad_down) {
-
-                  //  outake.closeClawB();
-                  //  outake.closeClawU();
                     currentState = IntakeStates.GROUND;
                 }
 
@@ -189,9 +183,9 @@ public class Intake {
             case TOGGLE:
                 rollerMotor.setPower(motorPow);
                 intakeArmL.setPosition(intakeRestPosition);
-                outake.openClaw();
+              //  outake.openClaw();
                 if(timer.seconds()>0.5){
-                    outake.closeClaw();
+                    outake.releaseTop();
                     if(timer.seconds()>1){
                         timer.reset();
                     }

@@ -16,11 +16,11 @@ public class SlideMech {
     private Motor slideLeft, slideRight;
 
     //TODO: change values into actual tested positions instead of placeholders
-    public static int HIGH_JUNCTION = 3100; //<-- 12.90V, 1970;
+    public static int HIGH_JUNCTION = 1500;//3100 //<-- 12.90V, 1970;
 
-    public static int MID_JUNCTION = 2100; //<-- 12.90V, 1550;// old 890 as of 11/8/2023
-    public static int LOW_JUNCTION = 1490;  //<-- 12.90V, 1860;
-    public static int ZERO_POSITION = -40;//5V;// old val -40
+    public static int MID_JUNCTION = 1000;//2100 //<-- 12.90V, 1550;// old 890 as of 11/8/2023
+    public static int LOW_JUNCTION = 500;//1490  //<-- 12.90V, 1860;
+    public static int ZERO_POSITION = 5;//5V;// old val -40
     private final double MAX = 2500;
     public final static double Minimum = 0;
 
