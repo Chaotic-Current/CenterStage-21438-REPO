@@ -125,7 +125,7 @@ public class Outake {
         BOTH
     }
     public OutakeStates currentOutakeState = OutakeStates.REST;
-    private Intake.IntakeStates currentIntakeState = Intake.IntakeStates.GROUND;
+    private Intake.IntakeStates currentIntakeState = Intake.IntakeStates.PICKUP;
     private DriveTrain driveTrain;
     //Constructor for Auto
     public Outake(HardwareMap hw, Telemetry tele){
@@ -167,6 +167,10 @@ public class Outake {
        launcher.setPosition(0.81); */
 
        slideMech = new SlideMech(hardwareMap);
+
+       pastTargetPosition = slideMech.getTargetPos();
+
+       isChanging = false;
     }
     //TeleOp Methods
     public void executeTeleOp(){
@@ -182,12 +186,12 @@ public class Outake {
         switch (currentOutakeState) {
             case REST:
 
-               // slideMech.update();
+                slideMech.update();
                 wrist.setPosition(wristIntake);
                 //setArmReadyToPick();
                 if(isChanging){
                     slideTimer.reset();
-                    setArmReadyToPick();
+                    //setArmReadyToPick();
                     isChanging = false;
                     currentOutakeState = OutakeStates.EXTENSION;
                 }
@@ -216,9 +220,10 @@ public class Outake {
                         setArmDeposit();
                         wrist.setPosition(wristDeposit);
                     }
-                    setArmDeposit();
-                    wrist.setPosition(wristDeposit);
+                    //setArmDeposit();
+                    //wrist.setPosition(wristDeposit);
                     //slides extend based off PID
+
                     slideMech.update();
 
                     //if bumper inputs are given, state switches to manual and pid is interrupted
@@ -291,7 +296,7 @@ public class Outake {
                 //While the slides are not at ground, the PID is being calculated
                 //after the slides finally get to close to our target position, the current state changes to rest
 
-                if (slideMech.getCurrentTickPosition() > 50) {
+                if (slideMech.getCurrentTickPosition() > 100) {
                     //Only starts decreasing the slide height after the arm gets most of the way down
                    if(slideTimer.seconds()>=0.8){
                        //runSlidesPID();
@@ -306,7 +311,8 @@ public class Outake {
 
 
         }
-        telemetry.addData("",slideMech.getCurrentTickPosition());
+        telemetry.addData("slide Positon",slideMech.getCurrentTickPosition());
+        telemetry.addData("CurrentState",currentOutakeState);
     }
     public void executeAuto(){
        // wristRotation.setPosition(wristRPos);
@@ -377,6 +383,9 @@ public class Outake {
         //if the target position changes,
         if(Math.abs(pastTargetPosition - slideMech.getTargetPos())>0){
             isChanging = true;
+        }
+        else{
+            isChanging = false;
         }
         pastTargetPosition = slideMech.getTargetPos();
     }

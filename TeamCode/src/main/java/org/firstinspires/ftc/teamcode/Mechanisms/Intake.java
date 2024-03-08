@@ -22,7 +22,7 @@ public class Intake {
 
     private Gamepad gamepad1;
 
-    private Servo intakeArmR, intakeArmL;
+    private Servo intakeArmR, intakeArmL, gate;
 
     private DcMotorEx rollerMotor;
 
@@ -41,6 +41,8 @@ public class Intake {
 
     public static double armPos = 0.13;
 
+    public static double flickerOpen = 0.0, flickerClose = 0.0;
+
 
 
 
@@ -55,11 +57,11 @@ public class Intake {
         EXTAKE,
 
         TOGGLE,
-        GROUND
+        PICKUP
 
 
     }
-    private IntakeStates currentState = IntakeStates.GROUND;
+    private IntakeStates currentState = IntakeStates.PICKUP;
     private AnalogSensor IntakeCurrent;
     private Outake outake;
 
@@ -89,6 +91,7 @@ public class Intake {
         //Motor Init
         rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("intake");
         rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        //gate = hardwareMap.servo.get("flicker");
       //  intakeArmL = hardwareMap.get(Servo.class, "ARM_L");
        // intakeArmR = hardwareMap.servo.get("inServoR");
        // intakeArmL = hardwareMap.servo.get("inServoL");
@@ -105,8 +108,9 @@ public class Intake {
 
         switch (currentState) {
             //When the roller is in the ground state, there is no movement of intake
-            case GROUND:
-                
+            case PICKUP:
+                //gate.setPosition(flickerClose);
+
                 rollerMotor.setPower(0.0);
                 if(timer.seconds()>0.2){
                     outake.grabTop();
@@ -114,41 +118,38 @@ public class Intake {
                 }
                 //When x is pressed and the outake is at rest, the state is switched to Moving
                 if(outake.getOutakeState()==Outake.OutakeStates.REST){
-                    if (gamepad1.left_trigger>0.1) { //gamepad1.x
+
+                    if(timer.seconds()>1.2){
+                        outake.setArmReadyToPick();
+                    }
+                    if (gamepad1.left_trigger>0.1) {
                         currentState = IntakeStates.INTAKE;
                         outake.setArmReadyToPick();
                     }
                     else if (gamepad1.dpad_down) {
                         currentState = IntakeStates.EXTAKE;
-                        // outake.openClaw();
-                        /*
-                    outake.openClawB();
-                    outake.openClawU(); */
                     }
                 }
                 break;
 
             case INTAKE:
-
-
-              //  outake.openClaw();
-                //rollerMotor.setPower(motorPow);
+                 rollerMotor.setPower(motorPow);
+                //gate.setPosition(flickerOpen);
                 outake.releaseTop();
                 outake.releaseBottom();
                 //if x is not held, then the state is switched back to ground
                 if (!(gamepad1.left_trigger>0.1)) {
-
                     outake.setArmPick();
-                    currentState = IntakeStates.GROUND;
+                    currentState = IntakeStates.PICKUP;
                     timer.reset();
                 }
                 break;
 
             case EXTAKE:
-               // rollerMotor.setPower(-motorPow);
+                rollerMotor.setPower(-motorPow);
 
                 if (!gamepad1.dpad_down) {
-                    currentState = IntakeStates.GROUND;
+                    currentState = IntakeStates.PICKUP;
                 }
 
                 break;
@@ -158,7 +159,7 @@ public class Intake {
     }
     public void executeAuto(){
         switch (currentState) {
-            case GROUND:
+            case PICKUP:
 
                 rollerMotor.setPower(0.0);
                 intakeArmL.setPosition(intakeRestPosition);
@@ -214,7 +215,7 @@ public class Intake {
     public void setToGround(){
        // outake.closeClawB();
        // outake.closeClaw();
-        currentState = IntakeStates.GROUND;
+        currentState = IntakeStates.PICKUP;
 
     }
     public void setToIntake(double pos){
