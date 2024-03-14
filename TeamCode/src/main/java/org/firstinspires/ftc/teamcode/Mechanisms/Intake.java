@@ -27,6 +27,8 @@ public class Intake {
     private DcMotorEx rollerMotor;
 
     private ElapsedTime timer = new ElapsedTime();
+    private ElapsedTime jiggleTimer = new ElapsedTime();
+
 
 
 
@@ -124,11 +126,15 @@ public class Intake {
                 if(outake.getOutakeState()==Outake.OutakeStates.REST){
                     if(timer.seconds()>0.5){
                         outake.setArmPick();
-                    } else if (timer.seconds()>0.5) {
+                    }
+                    else if(timer.seconds()>1){
+                        outake.jiggleOutake(jiggleTimer);
+                    }
+                    else if (timer.seconds()>1.5) {
                         outake.grabTop();
                         outake.grabBottom();
-
-                    } else if(timer.seconds()>2){
+                    }
+                    else if(timer.seconds()>2){
                         outake.setArmReadyToPick();
                     }
                     if (gamepad1.dpad_up) {

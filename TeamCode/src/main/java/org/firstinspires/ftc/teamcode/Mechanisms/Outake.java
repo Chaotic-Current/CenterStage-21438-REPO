@@ -177,8 +177,6 @@ public class Outake {
         //At any moment, you can set the target position(with dpad), and if the current state is either extension or manual, the slides would move
         //to target pos you set
         changeTargetPos();
-        tilt.setPosition(tiltDefault);
-        pivot.setPosition(pivotDefault);
         if(gamepad2.share){
             launcher.setPosition(0.5);
         }
@@ -187,7 +185,7 @@ public class Outake {
             case REST:
 
                 slideMech.update();
-                wrist.setPosition(wristIntake);
+                //wrist.setPosition(wristIntake);
                 //setArmReadyToPick();
                 if(isChanging){
                     slideTimer.reset();
@@ -201,6 +199,8 @@ public class Outake {
 
             case EXTENSION:
                 //when dpad down is pressed again in extension state, outake state is changed to reset state
+                tilt.setPosition(tiltDefault);
+                pivot.setPosition(pivotDefault);
                 if (gamepad2.dpad_down){
                     currentOutakeState = OutakeStates.RESET;
                     releaseTop();
@@ -236,6 +236,8 @@ public class Outake {
                 break;
 
             case MANUAL:
+                tilt.setPosition(tiltDefault);
+                pivot.setPosition(pivotDefault);
                 if (gamepad2.dpad_down){
                     currentOutakeState = OutakeStates.RESET;
                     releaseTop();
@@ -271,6 +273,8 @@ public class Outake {
                 break;
 
             case RIGGING:
+                tilt.setPosition(tiltDefault);
+                pivot.setPosition(pivotDefault);
                 if(gamepad2.right_bumper){
                     currentOutakeState = OutakeStates.MANUAL;
                 }
@@ -287,6 +291,9 @@ public class Outake {
 
 
             case RESET:
+                tilt.setPosition(tiltDefault);
+                pivot.setPosition(pivotDefault);
+
                 armL.setPosition(armReadyToPick);
                 armR.setPosition(armReadyToPick);
                 wrist.setPosition(wristIntake);
@@ -305,6 +312,7 @@ public class Outake {
                 }
                 else {
                    // claw.setPosition(0.4);
+                    wrist.setPosition(wristIntake);
                     currentOutakeState = OutakeStates.REST;
                 }
                 break;
@@ -467,6 +475,13 @@ public class Outake {
         currentIntakeState = i;
     }
 
+    public void setTiltDefault(){
+        tilt.setPosition(tiltDefault);
+    }
+    public void setWristIntake(){
+        wrist.setPosition(wristIntake);
+    }
+
 
     public void setArmPosition(double pos){
         armR.setPosition(pos);
@@ -485,6 +500,19 @@ public class Outake {
     public void setArmDeposit(){
         armR.setPosition(armDeposit);
         armL.setPosition(armDeposit);
+    }
+    public void jiggleOutake(ElapsedTime timer){
+        if(timer.seconds()<0.3){
+            tilt.setPosition(0);
+            wrist.setPosition(0);
+        }
+        else if(timer.seconds()<0.7){
+            tilt.setPosition(0);
+            wrist.setPosition(0);
+        }
+        else{
+            timer.reset();
+        }
     }
 
 
