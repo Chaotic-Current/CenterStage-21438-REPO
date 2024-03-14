@@ -24,10 +24,14 @@ public class AprilTagCam {
 
     private LowPass lowP;
 
-    public static double alp = 0.5;
+    public static double alp = 0.3; //0.5
 
     private double horizDisplacement = 0;
     private double depthDisplacement = 0;
+
+    public static double[] tagValues = {38,33,28};
+
+    public static double tagConstant = 2.5;
 
     private double targetID = 0;
     public AprilTagCam(HardwareMap hw,String name,double targetID){
@@ -48,24 +52,41 @@ public class AprilTagCam {
     }
     public void aprilTagUpdate(){
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        telemetry.addData("# AprilTags Detected", currentDetections.size());
+
         //setting displacement values to 0, so when not picking up anything, the values added to Kalman fitler are 0
 
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
+
+            horizDisplacement = tagValues[detection.id-1]+detection.ftcPose.x-tagConstant;
+
+            telemetry.addData("AprilTag Detected", detection.id);
+            telemetry.addData("Deviation", detection.ftcPose.x);
+
+
+            /*
+
+
             if (detection.id == targetID) {
-                horizDisplacement = lowP.execute(detection.ftcPose.x);
+                //lowP.execute(detection.ftcPose.x)
+                horizDisplacement = -detection.ftcPose.x;
                 depthDisplacement = detection.ftcPose.y - 10;
+                telemetry.addLine(String.format("XYZ %6.1f (inch)", horizDisplacement));
+
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y-10, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
+            */
+
         }   // end for() loop
+        telemetry.addData("Y-Position calculated:", horizDisplacement);
 
         // Add "key" information to telemetry
 
@@ -79,6 +100,7 @@ public class AprilTagCam {
     }
 
     public double getHorizDisplacement(){
+        if (Math.abs(horizDisplacement) > 45) return 0;
         return horizDisplacement;
     }
     public double getDepthDisplacement(ArrayList<Double> boardDisplacmentInfo){

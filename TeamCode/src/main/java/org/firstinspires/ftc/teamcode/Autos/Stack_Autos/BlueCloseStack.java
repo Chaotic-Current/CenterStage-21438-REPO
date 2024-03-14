@@ -44,10 +44,12 @@ public class BlueCloseStack extends LinearOpMode {
     public static double boardX = 44;
     public static double iterations = 2;
 
-    public static double tagID = 6;
+    public static double tagID = 3;
     public static double tagLocation = 30;
 
     public static double camMultiplier = 0.75;
+
+
 
     public void cameraInit() {
         frontTagCam = new AprilTagCam(hardwareMap,"WebcamFront",tagID);
@@ -129,8 +131,9 @@ public class BlueCloseStack extends LinearOpMode {
 
                     if (!drive.isBusy()) {
                         //calculating the offset( apriltag offset - (our calculated odometry displacement from the tag)) to get how much we are off from our path
-                        double offset = calculateOffset(tagLocation,drive.getPoseEstimate().getY(),frontTagCam.getHorizDisplacement());
-                        Pose2d fixedPose =  new Pose2d(toBackdrop.end().getX(), toBackdrop.end().getY()+offset, toBackdrop.end().getHeading());
+                       // double offset = calculateOffset(tagLocation,drive.getPoseEstimate().getY(),frontTagCam.getHorizDisplacement());
+                        double yPos = frontTagCam.getHorizDisplacement() == 0 ? toBackdrop.end().getY() : frontTagCam.getHorizDisplacement();
+                        Pose2d fixedPose =  new Pose2d(toBackdrop.end().getX(), yPos, toBackdrop.end().getHeading());
                         drive.setPoseEstimate(fixedPose);
                         //try to keep sequences relatively short, like 5-6 commands at most, so build time isnt too long
                         toStack =  drive.trajectorySequenceBuilder(fixedPose)
@@ -182,10 +185,6 @@ public class BlueCloseStack extends LinearOpMode {
         }
     }
     public static double calculateOffset(double tagPosition, double currentPosition, double camData){
-        if(camData==0){
-            return 0;
-        }
-        //return camMultiplier*(camData-(currentPosition-tagPosition));
-        return 0;
+        return tagPosition-camData; //camMultiplier*(camData-(currentPosition-tagPosition))
     }
 }
