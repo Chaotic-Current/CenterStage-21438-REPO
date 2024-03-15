@@ -82,7 +82,7 @@ public class NearBlueAuto extends LinearOpMode {
        // frontTagCam.setTelemetry(telemetry);
 
         outake = new Outake(hardwareMap, telemetry);
-        intake = new Intake(hardwareMap,telemetry,outake);
+        intake = new Intake(hardwareMap,telemetry);
         drive = new SampleMecanumDrive(hardwareMap);
         cameraInit();
         //outake.closeClawB();

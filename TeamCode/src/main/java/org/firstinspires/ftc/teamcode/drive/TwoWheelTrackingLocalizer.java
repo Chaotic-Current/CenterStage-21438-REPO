@@ -43,17 +43,17 @@ import java.util.List;
 @Config
 public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     private double errorX, errorY;
-    public static double TICKS_PER_REV = 2000; // 8192
-    public static double WHEEL_RADIUS = .944882; //0.688976378 .944882
+    public static double TICKS_PER_REV = 8192; // 8192 2000
+    public static double WHEEL_RADIUS = 0.688976378; //0.688976378 .944882
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double PARALLEL_X = -2.5; //-1.85 -2.5 X is the up and down direction
-    public static double PARALLEL_Y = -4.85 ; // 4.61 -4.85 Y is the strafe direction
+    public static double PARALLEL_X = -1.85; //-1.85 -2.5 X is the up and down direction
+    public static double PARALLEL_Y = 4.61 ; // 4.61 -4.85 Y is the strafe direction
 
-    public static double PERPENDICULAR_X = 7; //-1.75 7
-    public static double PERPENDICULAR_Y = -3;//-1.4 -3
-    public static double X_MULTIPLIER =  ((50.0/50.3882)+(50.0/50.4448)+(50.0/50.5929))/3.0;// 0.99338783679   ((50.0/50.3882)+(50.0/50.4448)+(50.0/50.5929))/3.0
-    public static double Y_MULTIPLIER = ((50.0/50.0286)+(50.0/50.6799)+(50.0/50.7853))/3.0;//1.0063490194     ((50.0/50.0286)+(50.0/50.6799)+(50.0/50.7853))/3.0
+    public static double PERPENDICULAR_X = -1.75; //-1.75 7
+    public static double PERPENDICULAR_Y = -1.4;//-1.4 -3
+    public static double X_MULTIPLIER =   0.99338783679;// 0.99338783679   ((50.0/50.3882)+(50.0/50.4448)+(50.0/50.5929))/3.0
+    public static double Y_MULTIPLIER = 1.0063490194;//1.0063490194     ((50.0/50.0286)+(50.0/50.6799)+(50.0/50.7853))/3.0
     public static double xOffset = 0;
     public static double yOffset = 0;
     public  static boolean readyToScan = false;
@@ -96,8 +96,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
      //   frontTagCam = new AprilTagCam(hardwareMap,"WebcamFront",2);
         //HAVE TO INTIALIZE telemetry -> bot.getEncoder.setCamTelemetry(telemetry);
 
-        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "BR")); //3
-        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "FR")); //0
+        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "PO")); //PO  BR
+        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "IN")); //IN  FR
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
         errorX = 0;

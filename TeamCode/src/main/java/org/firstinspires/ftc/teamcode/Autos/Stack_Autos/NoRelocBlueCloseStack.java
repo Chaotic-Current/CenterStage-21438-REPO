@@ -16,10 +16,10 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
-@Autonomous(name = "BlueCloseStack")
+@Autonomous(name = "BlueCloseStack(NoReloc)")
 @Config
 
-public class BlueCloseStack extends LinearOpMode {
+public class NoRelocBlueCloseStack extends LinearOpMode {
 
     enum States {
         START,
@@ -59,6 +59,7 @@ public class BlueCloseStack extends LinearOpMode {
 
     public void initialize() {
         drive = new SampleMecanumDrive(hardwareMap);
+        intake = new Intake(hardwareMap,telemetry);
         cameraInit();
     }
 
@@ -79,12 +80,67 @@ public class BlueCloseStack extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(47, 38), Math.toRadians(0))
                 .waitSeconds(1)
 
+                //2+0
+
                 .setReversed(true)
                 .lineToSplineHeading(new Pose2d(40, 25, Math.toRadians(0)))
                 //.splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                .lineToSplineHeading(new Pose2d(20,12,Math.toRadians(0)))
-                .lineToSplineHeading(new Pose2d(-60, 12, Math.toRadians(0)))
+                .lineToSplineHeading(new Pose2d(20,5,Math.toRadians(0)))
+                .lineToSplineHeading(new Pose2d(-54.5, 5, Math.toRadians(0)))
+                .UNSTABLE_addTemporalMarkerOffset(-2, () -> {
+                    //run intake
+                    intake.setToIntake(0.8);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(-0.5,()->{
+                    intake.setToIntake(0.79);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(-0.2,()->{
+                    intake.setToIntake(0.77);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    intake.setToIntake(0.8);
+                })
                 .waitSeconds(1)
+
+                .setReversed(false)
+                .lineToLinearHeading(new Pose2d(23, 5, Math.toRadians(0)))
+                .UNSTABLE_addTemporalMarkerOffset(-0.5,()->{
+                    intake.setToGround();
+                })
+                .lineToLinearHeading(new Pose2d(42,30,Math.toRadians(0)))
+                //.splineToConstantHeading(new Vector2d(42,30), Math.toRadians(45))
+                .waitSeconds(1)
+
+                //2+2
+
+                .setReversed(true)
+                .lineToLinearHeading(new Pose2d(40, 25, Math.toRadians(0)))
+                //.splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
+                .lineToLinearHeading(new Pose2d(20,3,Math.toRadians(0))) //12
+                .lineToSplineHeading(new Pose2d(-55.5, 3, Math.toRadians(0))) //12
+                .UNSTABLE_addTemporalMarkerOffset(-2, () -> {
+                    //run intake
+                    intake.setToIntake(0.8);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(-0.5,()->{
+                    intake.setToIntake(0.76);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    intake.setToIntake(0.9);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0.2,()->{
+                    intake.setToIntake(0.75);
+                })
+                .waitSeconds(1)
+
+                .setReversed(false)
+                .lineToLinearHeading(new Pose2d(23, 5, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(43,30,Math.toRadians(0)))
+                .waitSeconds(1)
+
+                //2+4
+
+
 
                 .build();
 
@@ -109,12 +165,13 @@ public class BlueCloseStack extends LinearOpMode {
 
         int currentIteration = 0;
         while (opModeIsActive()) {
+            intake.executeAuto();
             switch (currentState) {
                 case START:
                     //Starts following the first trajectory and changes to backdrop state
                     if (!drive.isBusy()) {
                         drive.followTrajectorySequenceAsync(firstBlueTraj);
-                        currentState = States.TO_STACK_GOING_TO_BACKDROP;
+                        currentState = States.IDLE;
                         currentIteration++;
                     }
                     break;

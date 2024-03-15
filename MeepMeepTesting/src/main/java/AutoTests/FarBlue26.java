@@ -27,7 +27,7 @@ public class FarBlue26 {
                                 .waitSeconds(1)
                                 .setReversed(false)
                                 .lineToLinearHeading(new Pose2d(23, 12, Math.toRadians(0)))
-                                .splineToConstantHeading(new Vector2d(42,27), Math.toRadians(45))
+                                .splineToConstantHeading(new Vector2d(42,30), Math.toRadians(45))
                                 .waitSeconds(1)
 
                                 .setReversed(true)

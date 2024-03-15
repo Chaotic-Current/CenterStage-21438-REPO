@@ -264,7 +264,7 @@ public class BlueFarStack extends LinearOpMode {
         arm = new ArmMecNew(hardwareMap);
         slide = new SlideMech(hardwareMap);
         clawMech = new ClawMech(hardwareMap, telemetry);
-        intake = new Intake(hardwareMap,telemetry,outake);
+       // intake = new Intake(hardwareMap,telemetry,outake);
         cameraInit();
     }
 

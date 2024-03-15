@@ -34,7 +34,7 @@ public class Intake {
 
     public static double motorPow = 0.59;//0.85
 
-    public static double intakeRestPosition = 0.7;
+    public static double intakeRestPosition = 0.35;
     public static double intakeTargetPos = 0.0;
 
     public static double gateClosePos = 0.57;
@@ -71,10 +71,11 @@ public class Intake {
     private AnalogSensor IntakeCurrent;
     private Outake outake;
 
-    public Intake(HardwareMap hw, Telemetry tele, Outake out){
+
+    public Intake(HardwareMap hw, Telemetry tele){ //Outake out
         this.hardwareMap = hw;
         this.telemetry = tele;
-        this.outake = out;
+       // this.outake = out;
 
         rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("IN");
         rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
@@ -202,7 +203,7 @@ public class Intake {
                 intakeArmL.setPosition(intakeRestPosition);
               //  outake.openClaw();
                 if(timer.seconds()>0.5){
-                    outake.releaseTop();
+                    //outake.releaseTop();
                     if(timer.seconds()>1){
                         timer.reset();
                     }

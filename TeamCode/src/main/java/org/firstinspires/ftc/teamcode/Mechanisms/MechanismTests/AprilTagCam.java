@@ -29,7 +29,7 @@ public class AprilTagCam {
     private double horizDisplacement = 0;
     private double depthDisplacement = 0;
 
-    public static double[] tagValues = {38,33,28};
+    public static double[] tagValues = {38,33,28}; // 38,33,28
 
     public static double tagConstant = 2.5;
 
@@ -59,7 +59,7 @@ public class AprilTagCam {
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
 
-            horizDisplacement = tagValues[detection.id-1]+detection.ftcPose.x-tagConstant;
+            horizDisplacement = tagValues[detection.id-1]+detection.ftcPose.x;
 
             telemetry.addData("AprilTag Detected", detection.id);
             telemetry.addData("Deviation", detection.ftcPose.x);
