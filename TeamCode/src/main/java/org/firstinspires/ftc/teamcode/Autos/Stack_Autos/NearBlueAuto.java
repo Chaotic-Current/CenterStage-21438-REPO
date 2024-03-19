@@ -4,10 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Mechanisms.Camera;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Outake;
@@ -15,16 +13,12 @@ import org.firstinspires.ftc.teamcode.Pipelines.DetectColor;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Mechanisms.MechanismTests.AprilTagCam;
-import org.opencv.core.Scalar;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
 @Autonomous(name = "NearBlueAuto")
 @Config
-@Disabled
+
 public class NearBlueAuto extends LinearOpMode {
 
     enum States {
@@ -35,7 +29,7 @@ public class NearBlueAuto extends LinearOpMode {
     States currentState = States.START;
     SampleMecanumDrive drive;
 
-    Camera.PropDetection PropDetection;
+    Camera.PropDetection propDetection;
 
     private AprilTagCam frontTagCam;
     private OpenCvWebcam cam;
@@ -45,54 +39,26 @@ public class NearBlueAuto extends LinearOpMode {
     Intake intake;
     public static double boardX = 44;
 
-    public void cameraInit() {
-        int width = 160;
-
-        detector = new DetectColor(width, telemetry, new Scalar(140, 255, 255), new Scalar(75, 100, 100), false);
-        //  aprilTagPipeline = new AprilTagDetectionPipeline();
-
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        // backCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamBack"), cameraMonitorViewId);
-        cam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "WebcamFront"), cameraMonitorViewId);
-        // backCam.setPipeline(detector);
-        cam.setPipeline(detector);
-
-        // backCam.setMillisecondsPermissionTimeout(2500);
-        cam.setMillisecondsPermissionTimeout(2500);
-        cam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                telemetry.addLine("started");
-                cam.startStreaming(160, 120, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode) {
-                telemetry.addLine("not open");
-            }
-        });
-    }
 
 
     public void initialize() {
 
-       // PropDetection = new Camera.PropDetection(hardwareMap,telemetry);
-        // PropDetection.runPipeline();
+        propDetection = new Camera.PropDetection(hardwareMap,telemetry,true);
+        propDetection.runPipeline();
       //  frontTagCam = new AprilTagCam(hardwareMap,"WebcamFront",6);
        // frontTagCam.setTelemetry(telemetry);
 
         outake = new Outake(hardwareMap, telemetry);
-        intake = new Intake(hardwareMap,telemetry);
+        intake = new Intake(hardwareMap,telemetry,outake);
         drive = new SampleMecanumDrive(hardwareMap);
-        cameraInit();
-        //outake.closeClawB();
-        //outake.closeClawU();
+     //   cameraInit();
+        outake.closeClaw();
     }
 
 
     @Override
     public void runOpMode() {
-        int propPos = 2;
+        int propPos = 1;
         initialize();
         Pose2d blueStart = new Pose2d(19.6, 60.5, Math.toRadians(270));
         Pose2d blueCam = new Pose2d(20, 61, Math.toRadians(90));
@@ -110,24 +76,24 @@ public class NearBlueAuto extends LinearOpMode {
 
         TrajectorySequence firstBlueTraj = drive.trajectorySequenceBuilder(blueStart)
                 .lineToLinearHeading(new Pose2d(14, 50, Math.toRadians(270)))
-                .splineToSplineHeading(new Pose2d(18, 35, Math.toRadians(315)), Math.toRadians(315))
+                .splineToSplineHeading(new Pose2d(20, 35, Math.toRadians(315)), Math.toRadians(315))
                 .setReversed(true)
-                .back(20) //tune this distance frfr
+                .back(11) //tune this distance frfr
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                   // outake.extendOutake(500);
+                    outake.extendOutake(500);
                     //extend outtake
                 })
-                .lineToSplineHeading(new Pose2d(36, 40, Math.toRadians(0)))
-                .splineToConstantHeading(new Vector2d(boardX, 31), Math.toRadians(0))
+                .lineToSplineHeading(new Pose2d(33, 43, Math.toRadians(0)))
+                .splineToConstantHeading(new Vector2d(40, 40), Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
                     //extend outtake
-                    outake.extendOutake(1400);
+                    outake.extendOutake(1200);
                 })
                 .waitSeconds(0)
-                .forward(9)
+                .forward(17)
                 .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
-                   // outake.openClaw();
+                    outake.openClaw();
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
@@ -140,21 +106,37 @@ public class NearBlueAuto extends LinearOpMode {
 
 
 
-                .lineToLinearHeading(new Pose2d(40, 25, Math.toRadians(0)))
-                .splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(-54.5, 11, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(-2, () -> {
+                .lineToLinearHeading(new Pose2d(40, 15, Math.toRadians(0)))
+                .splineToConstantHeading(new Vector2d(30,10.5), Math.toRadians(180))
+                .lineToLinearHeading(new Pose2d(-55.3, 10.5, Math.toRadians(0)))
+                .UNSTABLE_addTemporalMarkerOffset(-3, () -> {
                     //run intake
-                    intake.setToIntake(0.8);
+                    intake.setToIntake(0.0);
                 })
-                .UNSTABLE_addTemporalMarkerOffset(-0.5,()->{
-                    intake.setToIntake(0.76);
+                .UNSTABLE_addTemporalMarkerOffset(-1.5,()->{
+                    intake.setToIntake(0.06);
                 })
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    intake.setToIntake(0.08);
+                })
+                /*
                 .waitSeconds(1)
                 .setReversed(false)
-                .lineToLinearHeading(new Pose2d(23, 12, Math.toRadians(0)))
+                .forward(5)
+                .back(5)
+                .UNSTABLE_addTemporalMarkerOffset(-1.5,()->{
+                    //intake.setMotorPow(0.63);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(-0.5,()->{
 
-                .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
+                    intake.setToIntake(0.08);
+                })
+
+                 */
+                .waitSeconds(2)
+               // .waitSeconds(0.5)
+                .lineToLinearHeading(new Pose2d(30, 12, Math.toRadians(0)))
+                .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
                     intake.setToGround();
                 })
                 .splineToConstantHeading(new Vector2d(42,32), Math.toRadians(45))
@@ -163,14 +145,14 @@ public class NearBlueAuto extends LinearOpMode {
                     outake.extendOutake(1300);
                 })
                 .waitSeconds(0)
-                .forward(11.0)
+                .forward(16.0)
                 .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
-                  //  outake.halfOpenClaw();
+                    outake.halfOpenClaw();
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                     //open claw
-                   // outake.openClaw();
+                    outake.openClaw();
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
@@ -182,10 +164,6 @@ public class NearBlueAuto extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(47,16,Math.toRadians(0)))
 
 
-
-
-
-
                 .build();
 
 
@@ -194,23 +172,23 @@ public class NearBlueAuto extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(14, 30, Math.toRadians(270)))
                 .setReversed(true)
 
-                .back(20) //tune this distance frfr
+                .back(11) //tune this distance frfr
               //  .waitSeconds(0.25)
                 .lineToSplineHeading(new Pose2d(36, 40, Math.toRadians(0)))
                 .splineToConstantHeading(new Vector2d(boardX, 32), Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
                     //extend outtake
-                    outake.extendOutake(1400);
+                    // outake.extendOutake(1400);
                 })
                 .waitSeconds(0)
                 .forward(9)
                 .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
-                   // outake.openClaw();
+                    // outake.openClaw();
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
-                    outake.resetOutake();
+                    // outake.resetOutake();
                     //retract outtake
                 })
 
@@ -219,71 +197,50 @@ public class NearBlueAuto extends LinearOpMode {
 
 
 
-                .lineToLinearHeading(new Pose2d(40, 25, Math.toRadians(0)))
-                .splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(-54.5, 11, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(40, 15, Math.toRadians(0)))
+                .splineToConstantHeading(new Vector2d(30,12), Math.toRadians(180))
+                .lineToLinearHeading(new Pose2d(-55.5, 12, Math.toRadians(0)))
                 .UNSTABLE_addTemporalMarkerOffset(-2, () -> {
                     //run intake
-                    intake.setToIntake(0.8);
+                    intake.setToIntake(0.0);
                 })
                 .UNSTABLE_addTemporalMarkerOffset(-0.5,()->{
-                    intake.setToIntake(0.76);
+                    intake.setToIntake(0.05);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    intake.setToIntake(0.09);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0.5,()->{
+                    intake.setToIntake(0.02);
                 })
                 .waitSeconds(1)
                 .setReversed(false)
-                .lineToLinearHeading(new Pose2d(23, 12, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(30, 12, Math.toRadians(0)))
 
-                .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
                     intake.setToGround();
                 })
                 .splineToConstantHeading(new Vector2d(42,32), Math.toRadians(45))
                 .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
                     //extend outtake
-                    outake.extendOutake(1300);
+                    // outake.extendOutake(1300);
                 })
                 .waitSeconds(0)
                 .forward(11.0)
                 .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
-                  //  outake.halfOpenClaw();
+                    //  outake.halfOpenClaw();
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                     //open claw
-                  //  outake.openClaw();
+                    // outake.openClaw();
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
-                    outake.resetOutake();
+                    // outake.resetOutake();
                     //retract outtake
                 })
-                //relocalize
-               /* .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    //retract outtake
-                    //Pose2d traj2StartPosewOffset = new Pose2d(drive.getPoseEstimate().getX(),drive.getPoseEstimate().getY()- frontTagCam.getHorizDisplacement(),drive.getPoseEstimate().getHeading());
-                    //drive.setPoseEstimate(traj2StartPosewOffset);
-                })
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //retract outtake
-                })
-                .setReversed(true)
-                .lineToLinearHeading(new Pose2d(35, 20, Math.toRadians(0)))
-                .splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(-60, 12, Math.toRadians(0)))
-                .waitSeconds(2)
-                .setReversed(false)
-                .lineToLinearHeading(new Pose2d(23, 12, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    //extend outtake
-                })
-                .splineToConstantHeading(new Vector2d(42,27), Math.toRadians(45))
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //open claw
-                })
-                .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //retract outtake
 
-                })*/
 
                 .lineToLinearHeading(new Pose2d(47,16,Math.toRadians(0)))
 
@@ -298,68 +255,83 @@ public class NearBlueAuto extends LinearOpMode {
 
         TrajectorySequence thirdBlueTraj = drive.trajectorySequenceBuilder(blueStart)
                 .lineToLinearHeading(new Pose2d(14, 40, Math.toRadians(270)))
-                .splineToSplineHeading(new Pose2d(5, 33, Math.toRadians(210)), Math.toRadians(225))
+                .splineToSplineHeading(new Pose2d(10, 33, Math.toRadians(210)), Math.toRadians(225))
                 .setReversed(true)
-                .back(10) //tune this distance frfr
+                //.back(10) //tune this distance frfr
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     //extend outtake
                 })
-                .splineToConstantHeading(new Vector2d(19, 40), Math.toRadians(0))
-                .lineToSplineHeading(new Pose2d(36, 40, Math.toRadians(0)))
-                .splineToConstantHeading(new Vector2d(boardX, 31), Math.toRadians(0))
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //open claw
-                })
-                .waitSeconds(2)
-                //relocalize
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //retract outtake
-                })
-                .lineToLinearHeading(new Pose2d(40, 25, Math.toRadians(0)))
-                .splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(-60, 12, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //run intake
-                })
-                .waitSeconds(2)
-                .setReversed(false)
-                .lineToLinearHeading(new Pose2d(23, 12, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                //.splineToConstantHeading(new Vector2d(19, 40), Math.toRadians(0))
+                //.lineToSplineHeading(new Pose2d(36, 40, Math.toRadians(0)))
+                //.splineToConstantHeading(new Vector2d(boardX, 31), Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(boardX,30,Math.toRadians(0)))
+                .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
                     //extend outtake
+                    // outake.extendOutake(1400);
                 })
-                .splineToConstantHeading(new Vector2d(42,27), Math.toRadians(45))
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
+                .waitSeconds(0)
+                .forward(9)
+                .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
                     //open claw
+                    // outake.openClaw();
                 })
-                .waitSeconds(2)
-                //relocalize
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
+                .waitSeconds(0.5)
+                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                    // outake.resetOutake();
                     //retract outtake
                 })
-                .setReversed(true)
-                .lineToLinearHeading(new Pose2d(35, 20, Math.toRadians(0)))
-                .splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(-60, 12, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //run intake
-                })
-                .waitSeconds(2)
-                .setReversed(false)
-                .lineToLinearHeading(new Pose2d(23, 12, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    //extend outtake
-                })
-                .splineToConstantHeading(new Vector2d(42,27), Math.toRadians(45))
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //open claw
-                })
-                .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    //retract outtake
-                })
-                .back(7)
 
 
+                //relocalize
+
+
+
+                .lineToLinearHeading(new Pose2d(40, 15, Math.toRadians(0)))
+                .splineToConstantHeading(new Vector2d(30,12), Math.toRadians(180))
+                .lineToLinearHeading(new Pose2d(-55.0, 12, Math.toRadians(0)))
+                .UNSTABLE_addTemporalMarkerOffset(-2, () -> {
+                    //run intake
+                    intake.setToIntake(0.0);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(-0.5,()->{
+                    intake.setToIntake(0.05);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    intake.setToIntake(0.09);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0.5,()->{
+                    intake.setToIntake(0.02);
+                })
+                .waitSeconds(1)
+                .setReversed(false)
+                .lineToLinearHeading(new Pose2d(30, 12, Math.toRadians(0)))
+
+                .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
+                    intake.setToGround();
+                })
+                .splineToConstantHeading(new Vector2d(42,32), Math.toRadians(45))
+                .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
+                    //extend outtake
+                    // outake.extendOutake(1300);
+                })
+                .waitSeconds(0)
+                .forward(11.0)
+                .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
+                    //open claw
+                    //  outake.halfOpenClaw();
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                    //open claw
+                    // outake.openClaw();
+                })
+                .waitSeconds(0.5)
+                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                    // outake.resetOutake();
+                    //retract outtake
+                })
+
+
+                .lineToLinearHeading(new Pose2d(47,16,Math.toRadians(0)))
 
 
 
@@ -374,7 +346,19 @@ public class NearBlueAuto extends LinearOpMode {
         currentState = States.START;
 
         while (opModeInInit()) {
+            switch(propDetection.getPosition()){
+                case BOT_LEFT:
+                    propPos = 1;
+                    break;
+                case BOT_RIGHT:
+                    propPos = 2;
+                    break;
+                case BOT_OTHER:
+                    propPos = 3;
+                    break;
+            }
            // propPos = PropDetection.getPosition();
+            /*
             switch(detector.getLocate()){
                 case LEFT:
                     propPos = 1;
@@ -386,10 +370,16 @@ public class NearBlueAuto extends LinearOpMode {
                     propPos = 3;
                     break;
             }
+            */
+            telemetry.addData("proppos",propPos);
+            telemetry.update();
+
+            propPos = 1;
             //currentDetectionState = cam.getDetectionState();
         }
 
         while (opModeIsActive()) {
+            propPos = 1;
             switch (currentState) {
                 case START:
                     if (!drive.isBusy()) {

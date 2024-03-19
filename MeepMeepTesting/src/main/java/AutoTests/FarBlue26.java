@@ -12,35 +12,45 @@ public class FarBlue26 {
 
         RoadRunnerBotEntity spikeRight = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(55, 55, Math.toRadians(110), Math.toRadians(110), 11.5)
+                .setConstraints(55, 55, Math.toRadians(85), Math.toRadians(50), 11.5)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(14, 61, Math.toRadians(270)))
-                                .lineToLinearHeading(new Pose2d(14, 32, Math.toRadians(270)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-40, 61, Math.toRadians(270)))
+
+
+                                .splineToSplineHeading(new Pose2d(-30, 34, Math.toRadians(315)), Math.toRadians(315))
+                                .back(4)
+                                .lineToSplineHeading(new Pose2d(-54.5, 35, Math.toRadians(0)))
+
+
+
+                                /*
+
+                                .lineToLinearHeading(new Pose2d(-36,32,Math.toRadians(270)))
+                                .back(4)
                                 .setReversed(true)
-                                .splineToConstantHeading(new Vector2d(19, 40), Math.toRadians(0))
-                                .lineToSplineHeading(new Pose2d(36, 40, Math.toRadians(0)))
-                                .splineToConstantHeading(new Vector2d(45.5, 34), Math.toRadians(0))
+                                .lineToSplineHeading(new Pose2d(-54.5,35,Math.toRadians(0)))
+
+                                */
+
+                                /*
+                                .lineToLinearHeading(new Pose2d(-46,33,Math.toRadians(270)))
+                                .back(4)
+                                .lineToSplineHeading(new Pose2d(-54.5,35,Math.toRadians(0)))
                                 .waitSeconds(1)
-                                .lineToLinearHeading(new Pose2d(40, 25, Math.toRadians(0)))
-                                .splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                                .lineToLinearHeading(new Pose2d(-60, 12, Math.toRadians(0)))
-                                .waitSeconds(1)
+
+                                */
+
                                 .setReversed(false)
-                                .lineToLinearHeading(new Pose2d(23, 12, Math.toRadians(0)))
-                                .splineToConstantHeading(new Vector2d(42,30), Math.toRadians(45))
-                                .waitSeconds(1)
+                                .splineToConstantHeading(new Vector2d(-35,58.5),Math.toRadians(0))
+                                .lineToSplineHeading(new Pose2d(25,58.5,Math.toRadians(0)))
+                                .splineToConstantHeading(new Vector2d(45,40),Math.toRadians(0))
 
                                 .setReversed(true)
-                                .lineToLinearHeading(new Pose2d(35, 20, Math.toRadians(0)))
-                                .splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                                .lineToLinearHeading(new Pose2d(-60, 12, Math.toRadians(0)))
-                                .waitSeconds(1)
-                                .setReversed(false)
-                                .lineToLinearHeading(new Pose2d(23, 12, Math.toRadians(0)))
-                                .splineToConstantHeading(new Vector2d(42,27), Math.toRadians(45))
-                                .waitSeconds(1)
-
-
+                                .splineToConstantHeading(new Vector2d(30,58.5),Math.toRadians(180))
+                                .back(2)
+                                .lineToSplineHeading(new Pose2d(-20,58.5,Math.toRadians(0)))
+                                .splineToConstantHeading(new Vector2d(-54,35),Math.toRadians(180))
+                                .lineToSplineHeading(new Pose2d(-56.5,35,Math.toRadians(0)))
 
                                 .build()
                 );

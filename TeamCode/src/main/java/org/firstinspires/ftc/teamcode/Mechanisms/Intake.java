@@ -32,9 +32,9 @@ public class Intake {
 
 
 
-    public static double motorPow = 0.59;//0.85
+    public static double motorPow = 0.8;//0.65
 
-    public static double intakeRestPosition = 0.35;
+    public static double intakeRestPosition = 0.2;
     public static double intakeTargetPos = 0.0;
 
     public static double gateClosePos = 0.57;
@@ -62,20 +62,19 @@ public class Intake {
         INTAKE,
         EXTAKE,
 
-        TOGGLE,
-        PICKUP
+        REST
 
 
     }
-    private IntakeStates currentState = IntakeStates.PICKUP;
+    private IntakeStates currentState = IntakeStates.REST;
     private AnalogSensor IntakeCurrent;
     private Outake outake;
 
 
-    public Intake(HardwareMap hw, Telemetry tele){ //Outake out
+    public Intake(HardwareMap hw, Telemetry tele, Outake outake){ //Outake out
         this.hardwareMap = hw;
         this.telemetry = tele;
-       // this.outake = out;
+        this.outake = outake;
 
         rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("IN");
         rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
@@ -96,9 +95,13 @@ public class Intake {
 
 
         //Motor Init
-        rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("intake");
+
+        rollerMotor = (DcMotorEx) hardwareMap.dcMotor.get("IN");
         rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        gate = hardwareMap.servo.get("flicker");
+
+        // intakeArmR = hardwareMap.servo.get("inServoR");
+        intakeArmL = hardwareMap.servo.get("ARM_L");
+       // gate = hardwareMap.servo.get("flicker");
       //  intakeArmL = hardwareMap.get(Servo.class, "ARM_L");
        // intakeArmR = hardwareMap.servo.get("inServoR");
        // intakeArmL = hardwareMap.servo.get("inServoL");
@@ -112,35 +115,16 @@ public class Intake {
         //intakeArmL.setPosition(intakeRestPosition);
        // telemetry.addData("servo pos", intakeArmL.getPosition() );
        // intakeArmR.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition+0.06);
-
+        intakeArmL.setPosition(intakeRestPosition);
         switch (currentState) {
             //When the roller is in the ground state, there is no movement of intake
-            case PICKUP:
-                if(timer.seconds()<1){
-                    rollerMotor.setPower(motorPow);
-                    gate.setPosition(gateClose);
-                }
-                else{
-                    rollerMotor.setPower(0.0);
-                }
+            case REST:
                 //When x is pressed and the outake is at rest, the state is switched to Moving
-                if(outake.getOutakeState()==Outake.OutakeStates.REST){
-                    if(timer.seconds()>0.5){
-                        outake.setArmPick();
-                    }
-                    else if(timer.seconds()>1){
-                        outake.jiggleOutake(jiggleTimer);
-                    }
-                    else if (timer.seconds()>1.5) {
-                        outake.grabTop();
-                        outake.grabBottom();
-                    }
-                    else if(timer.seconds()>2){
-                        outake.setArmReadyToPick();
-                    }
-                    if (gamepad1.dpad_up) {
+                rollerMotor.setPower(0);
+                if(outake.getOutakeState()== Outake.OutakeStates.REST){
+                    if (gamepad1.left_trigger>0.1) {
                         currentState = IntakeStates.INTAKE;
-                        outake.setArmReadyToPick();
+                        // outake.setArmIntake();
                     }
                     else if (gamepad1.dpad_down) {
                         currentState = IntakeStates.EXTAKE;
@@ -150,33 +134,33 @@ public class Intake {
 
             case INTAKE:
                 rollerMotor.setPower(motorPow);
-                gate.setPosition(gateOpen);
-                outake.releaseTop();
-                outake.releaseBottom();
+                outake.openClaw();
                 //if x is not held, then the state is switched back to ground
-                if (!gamepad1.dpad_up) {
-                   // outake.setArmPick();
-                    currentState = IntakeStates.PICKUP;
-                    timer.reset();
+                if (!(gamepad1.left_trigger>0.1)) {
+                    outake.closeClaw();
+                    currentState = IntakeStates.REST;
                 }
                 break;
 
             case EXTAKE:
-                gate.setPosition(gateOpen);
+                //gate.setPosition(gateOpen);
+                outake.openClaw();
                 rollerMotor.setPower(-motorPow);
 
                 if (!gamepad1.dpad_down) {
-                    currentState = IntakeStates.PICKUP;
+                    outake.closeClaw();
+                    currentState = IntakeStates.REST;
                 }
 
                 break;
             }
-
+        telemetry.addData("left trigger",(gamepad1.left_trigger>0.1));
+        telemetry.addData("left trigger",(gamepad1.dpad_down));
 
     }
     public void executeAuto(){
         switch (currentState) {
-            case PICKUP:
+            case REST:
 
                 rollerMotor.setPower(0.0);
                 intakeArmL.setPosition(intakeRestPosition);
@@ -198,17 +182,7 @@ public class Intake {
             case EXTAKE:
                 rollerMotor.setPower(-motorPow);
                 break;
-            case TOGGLE:
-                rollerMotor.setPower(motorPow);
-                intakeArmL.setPosition(intakeRestPosition);
-              //  outake.openClaw();
-                if(timer.seconds()>0.5){
-                    //outake.releaseTop();
-                    if(timer.seconds()>1){
-                        timer.reset();
-                    }
-                }
-                break;
+
         }
 
 
@@ -230,18 +204,12 @@ public class Intake {
     }
 
     public void setToGround(){
-       // outake.closeClawB();
-       // outake.closeClaw();
-        currentState = IntakeStates.PICKUP;
+        outake.closeClaw();
+        currentState = IntakeStates.REST;
 
     }
     public void setToIntake(double pos){
-        //outake.openClawB();
-        //0.8 for first pixel off stack// 0.42
-        //0.79 for second pixel off stack/4
-        //0.77
-        //0.745
-        //outake.openClaw();
+        outake.openClaw();
         intakeTargetPos = pos;
         currentState = IntakeStates.INTAKE;
     }
@@ -252,7 +220,7 @@ public class Intake {
         //0.77
         //0.745
       //  outake.openClaw();
-        currentState = IntakeStates.TOGGLE;
+       // currentState = IntakeStates.TOGGLE;
     }
 
 

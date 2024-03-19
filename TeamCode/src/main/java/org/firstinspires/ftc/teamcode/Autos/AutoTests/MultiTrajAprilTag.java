@@ -122,7 +122,7 @@ adb connect 192.168.43.1:5555
         bot.setPoseEstimate(traj2StartPosewOffset);
         TrajectorySequence traj2 = bot.trajectorySequenceBuilder(traj2StartPosewOffset)
                 //.turn(angle) bot.getPoseEstimate().getHeading() - angle
-               // .setConstraints(SampleMecanumDrive.getVelocityConstraint(15, 10, 11.5) , SampleMecanumDrive.getAccelerationConstraint(7))
+                .setConstraints(SampleMecanumDrive.getVelocityConstraint(15, 10, 11.5) , SampleMecanumDrive.getAccelerationConstraint(7))
                 //.lineTo(new Vector2d(40,-24))
                 .lineToSplineHeading(new Pose2d(60,0,Math.toRadians(0)))
                 //.resetConstraints()

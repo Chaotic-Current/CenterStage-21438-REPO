@@ -297,7 +297,7 @@ public class RedFarStackNEWCAM extends LinearOpMode {
 
 		while (!isStarted()) {
 			//e = detector.getLocate();
-			propPos =  cam.getPosition();
+			//propPos =  cam.getPosition();
 
 
 			telemetry.update();

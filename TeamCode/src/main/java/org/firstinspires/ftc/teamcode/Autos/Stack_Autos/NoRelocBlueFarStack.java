@@ -16,10 +16,10 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
-@Autonomous(name = "BlueCloseStack(NoReloc)")
+@Autonomous(name = "BlueFarStack(NoReloc)")
 @Config
 
-public class NoRelocBlueCloseStack extends LinearOpMode {
+public class NoRelocBlueFarStack extends LinearOpMode {
 
     enum States {
         START,
@@ -72,29 +72,20 @@ public class NoRelocBlueCloseStack extends LinearOpMode {
         drive.setPoseEstimate(blueStart);
 
         TrajectorySequence firstBlueTraj = drive.trajectorySequenceBuilder(blueStart)
-                //1
-                //.lineToLinearHeading(new Pose2d(14, 45, Math.toRadians(270)))
-                //.lineToLinearHeading(new Pose2d(18, 38, Math.toRadians(315)))
-
-                //2
-                //.lineToLinearHeading(new Pose2d(14, 30, Math.toRadians(270)))
-
-                //3
                 .lineToLinearHeading(new Pose2d(14, 45, Math.toRadians(270)))
-                .lineToLinearHeading(new Pose2d(10, 38, Math.toRadians(225)))
-
+                .splineToSplineHeading(new Pose2d(17, 38, Math.toRadians(315)), Math.toRadians(315))
                 .setReversed(true)
                 .lineToLinearHeading(new Pose2d(14, 45, Math.toRadians(315)))
-                .lineToLinearHeading(new Pose2d(33, 47, Math.toRadians(0)))
-                .lineToConstantHeading(new Vector2d(47, 38))
+                .lineToSplineHeading(new Pose2d(33, 47, Math.toRadians(0)))
+                .splineToConstantHeading(new Vector2d(50, 38), Math.toRadians(0))
                 .waitSeconds(1)
 
                 //2+0
 
                 .setReversed(true)
                 //.splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(30,10,Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-55.5, 10, Math.toRadians(0)))
+                .lineToSplineHeading(new Pose2d(30,11,Math.toRadians(0)))
+                .lineToSplineHeading(new Pose2d(-55.0, 11, Math.toRadians(0)))
                 .UNSTABLE_addTemporalMarkerOffset(-2, () -> {
                     //run intake
                     intake.setToIntake(0.8);
@@ -103,7 +94,7 @@ public class NoRelocBlueCloseStack extends LinearOpMode {
                     intake.setToIntake(0.79);
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    intake.setToIntake(0.76);
+                    intake.setToIntake(0.77);
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0.5,()->{
                     intake.setToIntake(0.8);
@@ -123,8 +114,8 @@ public class NoRelocBlueCloseStack extends LinearOpMode {
 
                 .setReversed(true)
                 //.splineToConstantHeading(new Vector2d(20,12), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(30,11,Math.toRadians(0))) //12
-                .lineToLinearHeading(new Pose2d(-56, 11, Math.toRadians(0))) //12
+                .lineToLinearHeading(new Pose2d(30,13,Math.toRadians(0))) //12
+                .lineToSplineHeading(new Pose2d(-55.5, 13, Math.toRadians(0))) //12
                 .UNSTABLE_addTemporalMarkerOffset(-2, () -> {
                     //run intake
                     intake.setToIntake(0.8);
@@ -133,14 +124,14 @@ public class NoRelocBlueCloseStack extends LinearOpMode {
                     intake.setToIntake(0.76);
                 })
                 .UNSTABLE_addTemporalMarkerOffset(-0.2,()->{
-                    intake.setToIntake(0.73);
+                    intake.setToIntake(0.74);
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     intake.setToIntake(0.8);
                 })
                 .waitSeconds(1)
                 .setReversed(false)
-                .lineToLinearHeading(new Pose2d(30, 11, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(30, 12, Math.toRadians(0)))
                 .UNSTABLE_addTemporalMarkerOffset(-0.5,()->{
                     intake.setToGround();
                 })

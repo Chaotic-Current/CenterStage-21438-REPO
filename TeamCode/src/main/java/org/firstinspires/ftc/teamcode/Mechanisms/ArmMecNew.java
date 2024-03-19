@@ -19,8 +19,8 @@ public class ArmMecNew {
     public boolean isIntake;
 
     public ArmMecNew(HardwareMap hardwareMap){
-        leftAxon = hardwareMap.get(Servo.class, "EXTAKEL");
-        rightAxon = hardwareMap.get(Servo.class, "axon");
+        leftAxon = hardwareMap.get(Servo.class, "armL");
+        rightAxon = hardwareMap.get(Servo.class, "armR");
         isIntake = true;
     }
 

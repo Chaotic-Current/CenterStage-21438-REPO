@@ -41,11 +41,15 @@ public class Outake {
 
 
     */
-    public static double armDeposit = 0.71, armReadyToPick = 0.1 ,  armPick = 0;
-    public static double pivotDefault = 0.5;
+    public static double armDeposit = 0.98, armIntake = 0.02 ,  armPick = 0;
+
+    //0.37 Open
+    //0.6 close
+    //0.46 half Open
+
     public static double wristIntake = 0.09, wristDeposit = 0.64;
     public static double tiltDefault = 0.52;
-    public static double grabPos = 0.45, releasePos = 0.0;
+    public static double clawClose = 0.6, clawOpen = 0.3, clawHalfOpen = 0.46;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -60,7 +64,7 @@ public class Outake {
     public ServoImplEx wristRotation;
 
 
-    public Servo top,bottom;
+    public Servo claw;
 
     public Servo wrist,tilt,pivot;
 
@@ -125,15 +129,20 @@ public class Outake {
         BOTH
     }
     public OutakeStates currentOutakeState = OutakeStates.REST;
-    private Intake.IntakeStates currentIntakeState = Intake.IntakeStates.PICKUP;
+    private Intake.IntakeStates currentIntakeState = Intake.IntakeStates.REST;
     private DriveTrain driveTrain;
     //Constructor for Auto
     public Outake(HardwareMap hw, Telemetry tele){
         this.hardwareMap = hw;
         this.telemetry = tele;
 
+        armR = hardwareMap.servo.get("armR");
+        armL = hardwareMap.servo.get("armL");
+
 
         wrist = hardwareMap.servo.get("WRIST");
+
+        claw = hardwareMap.servo.get("CLAW");
 
 
         //change directions
@@ -154,14 +163,13 @@ public class Outake {
         //Servo Init
        armR = hardwareMap.servo.get("armR");
        armL = hardwareMap.servo.get("armL");
-       armL.setDirection(Servo.Direction.REVERSE);
 
-       pivot = hardwareMap.servo.get("pivot");
-       tilt = hardwareMap.servo.get("tilt");
-       wrist = hardwareMap.servo.get("wrist");
+       wrist = hardwareMap.servo.get("WRIST");
 
-       top = hardwareMap.servo.get("top");
-       bottom = hardwareMap.servo.get("bottom");
+       claw = hardwareMap.servo.get("CLAW");
+
+   //    top = hardwareMap.servo.get("top");
+     //  bottom = hardwareMap.servo.get("bottom");
 
       /* launcher = hardwareMap.servo.get("plane");
        launcher.setPosition(0.81); */
@@ -177,6 +185,7 @@ public class Outake {
         //At any moment, you can set the target position(with dpad), and if the current state is either extension or manual, the slides would move
         //to target pos you set
         changeTargetPos();
+        wrist.setPosition(0.5);
         if(gamepad2.share){
             launcher.setPosition(0.5);
         }
@@ -185,11 +194,10 @@ public class Outake {
             case REST:
 
                 slideMech.update();
-                //wrist.setPosition(wristIntake);
-                //setArmReadyToPick();
+                setArmIntake();
+
                 if(isChanging){
                     slideTimer.reset();
-                    //setArmReadyToPick();
                     isChanging = false;
                     currentOutakeState = OutakeStates.EXTENSION;
                 }
@@ -199,12 +207,9 @@ public class Outake {
 
             case EXTENSION:
                 //when dpad down is pressed again in extension state, outake state is changed to reset state
-                tilt.setPosition(tiltDefault);
-                pivot.setPosition(pivotDefault);
                 if (gamepad2.dpad_down){
                     currentOutakeState = OutakeStates.RESET;
-                    releaseTop();
-                    releaseBottom();
+                    openClaw();
                     slideTimer.reset();
                 }
                 else if(gamepad2.options && gamepad2.share){ currentOutakeState = OutakeStates.RIGGING;
@@ -213,12 +218,13 @@ public class Outake {
                     //wristRelignment.swivelToPostion(wrist, driveTrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES),(slideTimer.seconds()>1),telemetry);
 
                     if(gamepad2.x)
-                        releaseBottom();
+                        halfOpenClaw();
                     if(gamepad2.y)
-                        releaseTop();
-                    if(slideMech.getCurrentTickPosition()>400){
-                        setArmDeposit();
-                        wrist.setPosition(wristDeposit);
+                        openClaw();
+                    if(slideMech.getCurrentTickPosition()>1000){
+                        armL.setPosition(armDeposit);
+                        armR.setPosition(armDeposit);
+
                     }
                     //setArmDeposit();
                     //wrist.setPosition(wristDeposit);
@@ -236,12 +242,9 @@ public class Outake {
                 break;
 
             case MANUAL:
-                tilt.setPosition(tiltDefault);
-                pivot.setPosition(pivotDefault);
                 if (gamepad2.dpad_down){
                     currentOutakeState = OutakeStates.RESET;
-                    releaseTop();
-                    releaseBottom();
+                    openClaw();
                     slideTimer.reset();
                 }
                 else if(gamepad2.options && gamepad2.share){ currentOutakeState = OutakeStates.RIGGING;
@@ -249,16 +252,17 @@ public class Outake {
                 }
                 else{
                     //wristRelignment.swivelToPostion(wrist, driveTrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES),(slideTimer.seconds()>1),telemetry);
-                    wrist.setPosition(0.5);
+                    //wrist.setPosition(0.5);
                     manual();
 
                     if(gamepad2.x)
-                        releaseBottom();
+                       halfOpenClaw();
                     if(gamepad2.y)
-                        releaseTop();
-                    if(slideMech.getCurrentTickPosition()>400){
-                        setArmDeposit();
-                        wrist.setPosition(wristDeposit);
+                       openClaw();
+                    if(slideMech.getCurrentTickPosition()>1000){
+                        armL.setPosition(armDeposit);
+                        armR.setPosition(armDeposit);
+                       // wrist.setPosition(wristDeposit);
                     }
                        // setArmDeposit();
 
@@ -273,8 +277,7 @@ public class Outake {
                 break;
 
             case RIGGING:
-                tilt.setPosition(tiltDefault);
-                pivot.setPosition(pivotDefault);
+
                 if(gamepad2.right_bumper){
                     currentOutakeState = OutakeStates.MANUAL;
                 }
@@ -291,14 +294,12 @@ public class Outake {
 
 
             case RESET:
-                tilt.setPosition(tiltDefault);
-                pivot.setPosition(pivotDefault);
 
-                armL.setPosition(armReadyToPick);
-                armR.setPosition(armReadyToPick);
-                wrist.setPosition(wristIntake);
-                //setArmIntake();
-                releaseTop();
+                closeClaw();
+                armL.setPosition(armIntake);
+                armR.setPosition(armIntake);
+                setArmIntake();
+                //releaseTop();
                 //claw.setPosition(0.6);
                 //While the slides are not at ground, the PID is being calculated
                 //after the slides finally get to close to our target position, the current state changes to rest
@@ -312,7 +313,6 @@ public class Outake {
                 }
                 else {
                    // claw.setPosition(0.4);
-                    wrist.setPosition(wristIntake);
                     currentOutakeState = OutakeStates.REST;
                 }
                 break;
@@ -320,6 +320,7 @@ public class Outake {
 
         }
         telemetry.addData("slide Positon",slideMech.getCurrentTickPosition());
+        telemetry.addData("can I flip arm", (slideMech.getCurrentTickPosition()>1000));
         telemetry.addData("CurrentState",currentOutakeState);
     }
     public void executeAuto(){
@@ -330,19 +331,20 @@ public class Outake {
             case EXTENSION:
                 //wristRelignment.swivelToPostion(wrist, driveTrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES),(slideTimer.seconds()>1),telemetry);
                 slideMech.update();
-                if(slideMech.getCurrentTickPosition()>120){
-                    armMec.setExtake();
-                   // setArmDeposit();
+                if(slideMech.getCurrentTickPosition()>1000){
+                    //armMec.setExtake();
+                    setArmDeposit();
                 }
                 break;
 
             case RESET:
-                armMec.setIntake();
-                //setArmIntake();
+              //  armMec.setIntake();
+                setArmIntake();
+                closeClaw();
                 //closeClawB();
                 //claw.setPosition(0.6);
-                releaseTop();
-                wrist.setPosition(0.5);
+               // releaseTop();
+              //  wrist.setPosition(0.5);
                 //While the slides are not at ground, the PID is being calculated
                 //after the slides finally get to close to our target position, the current state changes to rest
 
@@ -361,7 +363,7 @@ public class Outake {
 
             case REST:
                 slideMech.update();
-                wrist.setPosition(0.5);
+               // wrist.setPosition(0.5);
                 //setArmIntake();
                 break;
         }
@@ -420,23 +422,16 @@ public class Outake {
     //AUTO METHODS
 
     //claw controls
-
-
-
-    public void releaseTop(){
-        top.setPosition(releasePos);
+    public void openClaw(){
+        claw.setPosition(clawOpen);
     }
-    public void releaseBottom(){
-        bottom.setPosition(releasePos);
+    public void halfOpenClaw(){
+        claw.setPosition(clawHalfOpen);
     }
-
-    public void grabTop(){
-        top.setPosition(grabPos);
+    public void closeClaw(){
+        claw.setPosition(clawClose);
     }
 
-    public void grabBottom(){
-        bottom.setPosition(grabPos);
-    }
 
     public void setTargetPosition(int targetPosition){
         this.pastTargetPosition = targetPosition;
@@ -464,13 +459,6 @@ public class Outake {
         Kf = n;
     }
 
-    public void setTopPos(double n){
-        top.setPosition(n);
-    }
-    public void setBottomPos(double n){
-        bottom.setPosition(n);
-    }
-
     public void setIntake(Intake.IntakeStates i){
         currentIntakeState = i;
     }
@@ -488,9 +476,9 @@ public class Outake {
         armL.setPosition(pos);
     }
 
-    public void setArmReadyToPick(){
-        armR.setPosition(armReadyToPick);
-        armL.setPosition(armReadyToPick);
+    public void setArmIntake(){
+        armR.setPosition(armIntake);
+        armL.setPosition(armIntake);
     }
     public void setArmPick(){
         armR.setPosition(armPick);

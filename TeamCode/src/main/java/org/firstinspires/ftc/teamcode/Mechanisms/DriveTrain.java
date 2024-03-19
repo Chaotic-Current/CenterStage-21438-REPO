@@ -17,7 +17,7 @@ public class DriveTrain {
     private final HardwareMap hardwareMap;
     private final Gamepad gamepad1;
 
-    private Intake.IntakeStates intakeStates = Intake.IntakeStates.PICKUP;
+    private Intake.IntakeStates intakeStates = Intake.IntakeStates.REST;
 
    // private static SampleMecanumDrive drive;
 

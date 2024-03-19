@@ -63,11 +63,11 @@ public class PrepTeleOp extends LinearOpMode {
     private Servo armR, armL, top, bottom, gate;
     private PwmControl.PwmRange range;
 
-    public static double intakeServoRPos = 0.5 + 0.06, intakeServoLPos = 0.82; //ignore the 0.06 it's for jank
+    public static double intakeServoRPos = 0.5 + 0.06, intakeServoLPos = 0.5; //ignore the 0.06 it's for jank
 
     public static double intakePos = 0.5;
 
-    public static double armRPos = 0.9, armLPos = 0.9, gatePos = 0.5;
+    public static double armRPos = 0, armLPos = 0, gatePos = 0.5;
 
     public static int targetPos = 1000;
 
@@ -90,14 +90,18 @@ public class PrepTeleOp extends LinearOpMode {
 
 
 
-       /* armL = hardwareMap.get(Servo.class, "armL");
-        armR = hardwareMap.get(Servo.class, "armR");
-        armL.setDirection(Servo.Direction.REVERSE); */
+     
+     
 
-       // outake = new Outake(hardwareMap,telemetry,gamepad2,driveTrain);
-       // intake = new Intake(hardwareMap,telemetry,gamepad1,outake);
-        gate = hardwareMap.servo.get("flicker");
+      //  armL.setDirection(Servo.Direction.REVERSE);
 
+      //  outake = new Outake(hardwareMap,telemetry,gamepad1,driveTrain);
+      //  driveTrain = new DriveTrain(hardwareMap,telemetry,gamepad1);
+      //  intake = new Intake(hardwareMap,telemetry,gamepad1,outake);
+        claw = hardwareMap.servo.get("CLAW");
+       // gate = hardwareMap.servo.get("flicker");
+
+        //outake = new Outake(hardwareMap,telemetry,gamepad2,new DriveTrain(hardwareMap,telemetry,gamepad1));
 
 
     }
@@ -113,7 +117,10 @@ public class PrepTeleOp extends LinearOpMode {
         }
         while (opModeIsActive()) {
             //intakeArmL.setPosition(intakeServoLPos);
-            gate.setPosition(gatePos);
+          // outake.executeTeleOp();
+          // intake.executeTeleOp();
+          // driveTrain.drive();
+         //   claw.setPosition(intakeServoLPos);
             //outake.executeTeleOp();
             //intake.executeTeleOp();
            //.825 half open (openClawB)
@@ -121,7 +128,10 @@ public class PrepTeleOp extends LinearOpMode {
             //0.7 open ClawU5
             //
           // telemetry.addData("pos:",slideMech.getCurrentTickPosition());
-
+            //0.37 Open
+            //0.6 close
+            //0.46 half Open
+             claw.setPosition(clawPosT);
             //claw.setPosition(clawPos);
           // intake.executeTeleOp();
            // intake.execute();

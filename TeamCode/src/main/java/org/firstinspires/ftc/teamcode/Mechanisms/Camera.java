@@ -830,10 +830,10 @@ public class Camera {
         private OpenCvCamera camera;
 
         public enum TSEPosition {
-            LEFT,      //here are the team prop positions, written as an enum
-            MIDDLE,     //NOTE: team prop = team scoring element = TSE  (it all means the same)
+            BOT_LEFT,      //here are the team prop positions, written as an enum
+            BOT_RIGHT,     //NOTE: team prop = team scoring element = TSE  (it all means the same)
 
-            RIGHT
+            BOT_OTHER,
 
         }
 
@@ -851,13 +851,13 @@ public class Camera {
 
         // TOPLEFT anchor point for the bounding box
 
-        private static Point MIDDLE_ANCHOR_POINT = new Point(200, 180); //the top left points
-        private static Point LEFT_ANCHOR_POINT = new Point(500, 180);    //for each vision box
+        private static Point MIDDLE_ANCHOR_POINT = new Point(400, 180); //the top left points
+        private static Point LEFT_ANCHOR_POINT = new Point(100, 180);    //for each vision box
         private static Point RIGHT_ANCHOR_POINT = new Point(260, 180);
         private static int COLOR_DIFF = 10000;
 
         // Width and height for the bounding box
-        public static int REGION_WIDTH = 75;//10          //the size of each vision box (there are going to
+        public static int REGION_WIDTH = 150;//10          //the size of each vision box (there are going to
         public static int REGION_HEIGHT = 100;         //be 3; one for each spike position)
 
         // Color definitions
@@ -889,7 +889,7 @@ public class Camera {
                 RIGHT_ANCHOR_POINT.y + REGION_HEIGHT);
 
         // Running variable storing the parking position
-        private volatile TSEPosition position = TSEPosition.MIDDLE;  //preset the position to middle
+        private volatile TSEPosition position = TSEPosition.BOT_RIGHT;  //preset the position to middle
         private volatile TSEColor color = TSEColor.BLUE;
 
         public PropDetection(HardwareMap hw, Telemetry tele,boolean iB) {
@@ -921,7 +921,7 @@ public class Camera {
         @Override
         public Mat processFrame(Mat input) {  //NOTE: R = red, G = green, and B = blue
 
-            position = TSEPosition.RIGHT;     //automatically assume the TSE is on the right
+            position = TSEPosition.BOT_RIGHT;     //automatically assume the TSE is on the right
             color = TSEColor.BLUE;
 
             leftBlank = false;
@@ -946,7 +946,7 @@ public class Camera {
                     Math.abs(midSumColors.val[0] - midSumColors.val[1]) > COLOR_DIFF &&        //and there is a substantial difference between RED and GREEN/BLUE
                     Math.abs(midSumColors.val[0] - midSumColors.val[2]) > COLOR_DIFF &&
                     !isBlue) {
-                position = TSEPosition.MIDDLE;                                               //TSE is red and on the middle spike
+                position = TSEPosition.BOT_RIGHT;                                               //TSE is red and on the middle spike
                 color = TSEColor.RED;
                 Imgproc.rectangle(
                         input,
@@ -958,7 +958,7 @@ public class Camera {
             } else if (midSumColors.val[2] == maxColor &&                                    //if the color is mostly BLUE out of RED GREEN and BLUE
                     Math.abs(midSumColors.val[2] - midSumColors.val[0]) > COLOR_DIFF &&        //and there is a substantial difference between BLUE and GREEN/BLUE
                     Math.abs(midSumColors.val[2] - midSumColors.val[1]) > COLOR_DIFF && isBlue) {
-                position = TSEPosition.MIDDLE;                                               //TSE is blue and on the middle spike
+                position = TSEPosition.BOT_RIGHT;                                               //TSE is blue and on the middle spike
                 color = TSEColor.BLUE;
                 Imgproc.rectangle(
                         input,
@@ -998,7 +998,7 @@ public class Camera {
 
             // Change the bounding box color based on the sleeve color
             if (leftSumColors.val[0] == maxColor && Math.abs(leftSumColors.val[0] - leftSumColors.val[1]) > COLOR_DIFF && Math.abs(leftSumColors.val[0] - leftSumColors.val[2]) > COLOR_DIFF && !isBlue) {
-                position = TSEPosition.RIGHT;
+                position = TSEPosition.BOT_LEFT;
                 color = TSEColor.RED;
                 Imgproc.rectangle(
                         input,
@@ -1008,7 +1008,7 @@ public class Camera {
                         2
                 );
             } else if (leftSumColors.val[2] == maxColor && Math.abs(leftSumColors.val[2] - leftSumColors.val[0]) > COLOR_DIFF && Math.abs(leftSumColors.val[2] - leftSumColors.val[1]) > COLOR_DIFF && isBlue) {
-                position = TSEPosition.RIGHT;
+                position = TSEPosition.BOT_LEFT;
                 color = TSEColor.BLUE;
                 Imgproc.rectangle(
                         input,
@@ -1029,7 +1029,8 @@ public class Camera {
             }
 
             if (leftBlank && midBlank)
-                position = TSEPosition.LEFT;
+                position = TSEPosition.BOT_OTHER;
+
 
 
             //if it didn't find the TSE on the middle or left spikes, it has to be on the right spike.
@@ -1115,7 +1116,9 @@ public class Camera {
         }
 
         //returns where the TSE is, so that the bot can use it to determine where it will place the pixel.
-        public int getPosition() {
+        public TSEPosition getPosition() {
+            return position;
+            /*
             switch (position) {
                 case MIDDLE:
                     return 2;
@@ -1125,6 +1128,8 @@ public class Camera {
                     return 3;
             }
             return 0;
+
+             */
         }
 
     }

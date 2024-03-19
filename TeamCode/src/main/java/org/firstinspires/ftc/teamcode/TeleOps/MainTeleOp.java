@@ -19,7 +19,7 @@ public class MainTeleOp extends LinearOpMode {
     private void initialize() {
 
         driveTrain = new DriveTrain(hardwareMap,telemetry,gamepad1);
-        outake = new Outake(hardwareMap,telemetry,gamepad2,driveTrain);
+        outake = new Outake(hardwareMap,telemetry,gamepad1,driveTrain);
         intake  = new Intake(hardwareMap,telemetry,gamepad1,outake);
 
 
