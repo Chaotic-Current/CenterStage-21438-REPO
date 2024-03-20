@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -22,7 +23,8 @@ public class Intake {
 
     private Gamepad gamepad1;
 
-    private Servo intakeArmR, intakeArmL, gate;
+    private ServoImplEx intakeArmR, intakeArmL, gate;
+
 
     private DcMotorEx rollerMotor;
 
@@ -62,6 +64,8 @@ public class Intake {
         INTAKE,
         EXTAKE,
 
+        TOGGLE,
+
         REST
 
 
@@ -80,7 +84,7 @@ public class Intake {
         rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
        // intakeArmR = hardwareMap.servo.get("inServoR");
-        intakeArmL = hardwareMap.servo.get("ARM_L");
+        intakeArmL = (ServoImplEx) hardwareMap.servo.get("ARM_L");
        // intakeArmR.setDirection(Servo.Direction.REVERSE);
     }
 
@@ -100,7 +104,8 @@ public class Intake {
         rollerMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
         // intakeArmR = hardwareMap.servo.get("inServoR");
-        intakeArmL = hardwareMap.servo.get("ARM_L");
+        intakeArmL = (ServoImplEx) hardwareMap.servo.get("ARM_L");
+
        // gate = hardwareMap.servo.get("flicker");
       //  intakeArmL = hardwareMap.get(Servo.class, "ARM_L");
        // intakeArmR = hardwareMap.servo.get("inServoR");
@@ -115,11 +120,12 @@ public class Intake {
         //intakeArmL.setPosition(intakeRestPosition);
        // telemetry.addData("servo pos", intakeArmL.getPosition() );
        // intakeArmR.setPosition((0.5-intakeRestPosition)*gamepad1.right_trigger+intakeRestPosition+0.06);
-        intakeArmL.setPosition(intakeRestPosition);
         switch (currentState) {
             //When the roller is in the ground state, there is no movement of intake
             case REST:
                 //When x is pressed and the outake is at rest, the state is switched to Moving
+                intakeArmL.setPwmEnable();
+                intakeArmL.setPosition(intakeRestPosition);
                 rollerMotor.setPower(0);
                 if(outake.getOutakeState()== Outake.OutakeStates.REST){
                     if (gamepad1.left_trigger>0.1) {
@@ -133,6 +139,7 @@ public class Intake {
                 break;
 
             case INTAKE:
+                intakeArmL.setPwmDisable();
                 rollerMotor.setPower(motorPow);
                 outake.openClaw();
                 //if x is not held, then the state is switched back to ground
@@ -143,6 +150,7 @@ public class Intake {
                 break;
 
             case EXTAKE:
+                intakeArmL.setPwmDisable();
                 //gate.setPosition(gateOpen);
                 outake.openClaw();
                 rollerMotor.setPower(-motorPow);
@@ -182,6 +190,16 @@ public class Intake {
             case EXTAKE:
                 rollerMotor.setPower(-motorPow);
                 break;
+            case TOGGLE:
+                rollerMotor.setPower(motorPow);
+                intakeArmL.setPosition(intakeRestPosition);
+                outake.openClaw();
+                if(timer.seconds()>0.5){
+                    outake.closeClaw();
+                    if(timer.seconds()>1){
+                        timer.reset();
+                    }
+                }
 
         }
 
@@ -220,7 +238,7 @@ public class Intake {
         //0.77
         //0.745
       //  outake.openClaw();
-       // currentState = IntakeStates.TOGGLE;
+        currentState = IntakeStates.TOGGLE;
     }
 
 

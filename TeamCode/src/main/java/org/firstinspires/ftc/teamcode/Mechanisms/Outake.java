@@ -49,7 +49,7 @@ public class Outake {
 
     public static double wristIntake = 0.09, wristDeposit = 0.64;
     public static double tiltDefault = 0.52;
-    public static double clawClose = 0.6, clawOpen = 0.3, clawHalfOpen = 0.46;
+    public static double clawClose = 0.6, clawOpen = 0.25, clawHalfOpen = 0.46;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
